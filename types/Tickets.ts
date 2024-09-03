@@ -1,0 +1,6 @@
+export enum TicketType {
+    ORDER_NOT_RECEIVED = "ORDER_NOT_RECEIVED",
+    SENT_TO_AMAZON = "SENT_TO_AMAZON",
+    RETURNED = "RETURNED",
+    CANCELED = "CANCELED",
+}

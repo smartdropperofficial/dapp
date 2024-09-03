@@ -1,0 +1,7 @@
+### Request to create an order on Web3 with Authorization Token
+POST http://localhost:3000/api/createOrderOnWeb3 HTTP/1.1
+Content-Type: application/json
+
+{
+    "encryptedCode": " U2FsdGVkX19OZ8TNoIIJuHdh1WY3AzlTE%2BST3cgM%2FAZbQRWS8U27Y3gm5EVTRvdqypMpAN96cp41js8vzDk6v%2FYRk68rDreO8rsHBSGM95ueHbcixxhcemol01LstPkTH8LgU3htjwlQ%2BDLOoAQ9OTUZsTAYPpjHi9iMcj4VB%2FZRTa9nWbGTtMM3fW%2FdYTkEHq5Ci9CUlXrRXh7Ie%2FOC%2BQr9PX2XjkjPe7GnaouIjXY%3D"
+}

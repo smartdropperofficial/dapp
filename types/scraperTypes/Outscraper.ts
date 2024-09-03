@@ -1,0 +1,60 @@
+export interface OutscraperResponse {
+    short_url: string;
+    asin: string;
+    name: string;
+    rating: null;
+    reviews: null;
+    answered_questions: null;
+    fast_track_message: null;
+    about: string;
+    description: string;
+    categories: string[];
+    store_title: string;
+    store_url: string;
+    price: string;
+    availability: string;
+    strike_price: null;
+    price_saving: null;
+    shipping: string;
+    merchant_info: string;
+    bage: string;
+    currency: null;
+    image_1: string;
+    image_2: string;
+    image_3: string;
+    image_4: string;
+    image_5: string;
+    overview: null;
+    details: Details;
+}
+
+export interface Details {
+    brand_seller_or_collection_name: string;
+    model_number: string;
+    part_number: string;
+    item_shape: string;
+    dial_window_material_type: string;
+    display_type: string;
+    clasp: string;
+    case_material: string;
+    case_diameter: string;
+    case_thickness: string;
+    band_material: string;
+    band_size: string;
+    band_width: string;
+    band_color: string;
+    dial_color: string;
+    bezel_material: string;
+    bezel_function: string;
+    calendar: string;
+    movement: string;
+    water_resistant_depth: string;
+    warranty: string;
+    package_dimensions: string;
+    item_model_number: string;
+    department: string;
+    date_first_available: string;
+    manufacturer: string;
+    asin: string;
+    country_of_origin: string;
+}

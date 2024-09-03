@@ -1,0 +1,40 @@
+{
+    "build": {
+      "image": "fleek/node:lts",
+      "command": "yarn && yarn build && yarn export",
+      "publicDir": "out",
+      "baseDir": ".",
+      "environment": {
+      "AMAZON_ZONE_RAINFOREST": "amazon.com",
+        "AZURE_API_KEY": "44yKIb3lO-oGpUs2BDYZzT8Q8VYnfNpNd2SsCmeYbzvSAzFuSrRLTQ==",
+        "AZURE_API_URL": "https://amazonservices.azurewebsites.net",
+        "MAILER_TOKEN": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE3MTAwMzEzMTcsImV4cCI6MTg5OTMzMzcxNywiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoianJvY2tldEBleGFtcGxlLmNvbSJ9.VtF1QTztrMIG_r1-YqtTFZYAj9N2rCeMa0xGlBX6L30",
+        "MAILER_WEBHOOK": "https://api-sspmailer.vercel.app",
+        "NEXTAUTH_SECRET": "qChSss5GZJ5Rytsd7HqUecfjr99RfJwF",
+        "NEXTAUTH_URL": "https://localhost:3000",
+        "NEXT_PUBLIC_ALCHEMY_API_KEY": "vdrgrvsKWWT8xzPIQZRME4nI85KCnDOw",
+        "NEXT_PUBLIC_ALCHEMY_API_KEY_TESTNET": "pVfxh6iyiWTwg_oy5fpMfg0jJUHITI4x",
+        "NEXT_PUBLIC_API_ENCRYPTER": "qChSss5GZJ5Rytsd7HqUecfjr99RfJwF",
+        "NEXT_PUBLIC_IRON_PASSWORD": "XpbLR3GSUApLXdPLs6pNVdS8faMaJeFd",
+        "NEXT_PUBLIC_ORDER_CREATOR_ADDRESS": "0xCbcb40d8bf70fAA33C975E70611FbCABaA175682",
+        "NEXT_PUBLIC_ORDER_ID_KEY": "S5p96i91uDOq0WxGRTOPIIDYbMjSyhPM",
+        "NEXT_PUBLIC_SMART_CONTRACT_COIN": "0xc2132d05d31c914a87c6611c10748aeb04b58e8f",
+        "NEXT_PUBLIC_SUBSCRIPTION_MODEL_MANAGER_ADDRESS": "0x322813Fd9A801c5507c9de605d63CEA4f2CE6c44",
+        "NEXT_PUBLIC_PROMOTER_MANAGER_ADDRESS": "0xa85233C63b9Ee964Add6F2cffe00Fd84eb32338f",
+        "NEXT_PUBLIC_SUBSCRIPTION_MANAGER_ADDRESS": "0x04393091ecD61f7Ba1f6Af4619d879D5051175d0",
+        "NEXT_PUBLIC_ORDER_MANAGER_ADDRESS": "0xBf952E4A43233149518382D124aE67442A9267Ee",
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhpa3hoeHdpcWZpaWFpa3Vsa3h6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY3NzQxOTY0NywiZXhwIjoxOTkyOTk1NjQ3fQ.E2HU9f8vW_bJO46EW6I35Mos9_LtN31TQR61-YHKZs4",
+        "NEXT_PUBLIC_SUPABASE_URL": "https://xikxhxwiqfiiaikulkxz.supabase.co",
+        "NEXT_PUBLIC_ZINC_API_KEY": "7716AD0A1B33C6BCA398630B",
+        "ORDER_API_URL": "https://api.zinc.io/v1",
+        "OXYLABS_PASS": "Password.123",
+        "OXYLABS_USER": "brunoferreira",
+        "RAINFOREST_API_KEY": "E97D5B357B0245378FDC1931C50AB843",
+        "SCRAPER": "LIBRARY",
+        "WEB3_WEBHOOK": "https://ssp-api-web3.vercel.app",
+        "FLEEK_API_KEY": "fleek-api-key"  
+
+
+      }
+    }
+   }
