@@ -34,6 +34,7 @@ const nextConfig = {
 
 const prod = process.env.NODE_ENV === 'production';
 const withPWA = require('next-pwa')({
+    maximumFileSizeToCacheInBytes: 6000000,  // 6MB, increase as needed
     dest: 'public', // Destination directory for the PWA files
     disable: !prod, // Disable PWA in development mode
     register: true, // Register the PWA service worker

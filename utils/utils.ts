@@ -160,26 +160,39 @@ export const formatSPDate = (dateString: string): string => {
     return formattedDate;
 };
 
-export const fetchAbiFromDatabase = async (contractName: string) => {
-    const { data, error } = await supabase
-        .from('abi_contracts')
-        .select(contractName)
-        .single();
+export const fetchAbiFromDatabase = async (contractName: string): Promise<any | null> => {
+    try {
+        // Define the data type as an object with string keys
+        const { data, error } = await supabase
+            .from('abi_contracts')
+            .select(contractName)
+            .single();
 
-    if (error) {
-        console.error('Errore durante il recupero dell\'ABI:', error);
-        return null;
-    } else if (data && data[contractName]) {
-        try {
-            const abi = JSON.parse(data[contractName]);
-            console.log('ABI recuperato con successo:', abi);
-            return abi;
-        } catch (parseError) {
-            console.error('Errore durante il parsing dell\'ABI:', parseError);
+        // Handle errors returned by Supabase
+        if (error) {
+            console.error(`Errore durante il recupero dell'ABI per il contratto ${contractName}:`, error);
             return null;
         }
-    } else {
-        console.error(`Nessun ABI trovato per la colonna: ${contractName}`);
+
+        // Type assertion or generic typing to ensure `data` has string keys
+        if (data && typeof data === 'object' && contractName in data) {
+            try {
+                // Attempt to parse the ABI
+                const abi = JSON.parse(data[contractName as keyof typeof data]);
+                console.log('ABI recuperato con successo:', abi);
+                return abi;
+            } catch (parseError) {
+                console.error('Errore durante il parsing dell\'ABI:', parseError);
+                return null;
+            }
+        } else {
+            // No ABI data found for the given contractName
+            console.error(`Nessun ABI trovato per la colonna: ${contractName}`);
+            return null;
+        }
+    } catch (exception) {
+        // Catch unexpected errors outside of Supabase or JSON parsing
+        console.error('Errore inatteso durante il recupero dell\'ABI:', exception);
         return null;
     }
 };

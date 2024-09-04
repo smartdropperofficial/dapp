@@ -12,7 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 const orderStatusResponse = await supabase
                     .from('orders')
                     .select(
-                        'order_id, created_at, 'wallet_address', status, shipping_info, creation_tx, payment_tx, products, request_id, tax_request_id, tax_amount, subtotal_amount, total_amount'
+                        'order_id, created_at, wallet_address, status, shipping_info, creation_tx, payment_tx, products, request_id, tax_request_id, tax_amount, subtotal_amount, total_amount'
                     )
                     .eq('order_id', orderId)
                     .single();

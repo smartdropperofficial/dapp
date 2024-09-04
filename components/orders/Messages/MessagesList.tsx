@@ -1,9 +1,10 @@
 import React from 'react';
 import MessageBubble from './MessageBubble'; // Importa il componente MessageBubble
 import { Spinner } from 'react-bootstrap';
+import { MessageSB } from '@/types/OrderSB';
 
 interface MessagesListProps {
-    messages: Message[];
+    messages: MessageSB[];
     loggedInAddress: string | undefined;
     isLoadingMessages: boolean;
 }
@@ -19,7 +20,7 @@ const MessagesList: React.FC<MessagesListProps> = ({ messages, loggedInAddress, 
 
     return (
         <div className='d-flex overflow-y-auto'>
-            {messages.map((mgs: Message) => (
+            {messages.map((mgs: MessageSB) => (
                 <MessageBubble
                     key={mgs.id}
                     senderAddress={mgs.sender_wallet_address}
