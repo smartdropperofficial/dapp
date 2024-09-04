@@ -34,6 +34,7 @@
         "amazon-buddy": "^2.2.45",
         "axios": "^1.5.1",
         "bootstrap": "^5.2.3",
+        "build": "^0.1.4",
         "crypto-js": "^4.2.0",
         "date-fns": "^3.6.0",
         "eslint": "8.36.0",

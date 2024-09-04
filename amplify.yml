@@ -1,21 +1,18 @@
 version: 1
 frontend:
-    phases:
-        preBuild:
-            commands:
-                - 'yarn install'  # Usa yarn install per installare le dipendenze
-        build:
-            commands:
-                - 'npm i build'  # Usa npm i build per costruire il progetto
-    artifacts:
-        baseDirectory: .next  # Directory che contiene i file di build
-        files:
-            - '**/*'  # Includi tutti i file generati
-    cache:
-        paths:
-            - '.next/cache/**/*'  # Cache della build Next.js
-            - '.npm/**/*'  # Cache dei pacchetti npm
-
-    start:
-        commands:
-            - 'npm run start'  # Comando per avviare il server
+  phases:
+    preBuild:
+      commands:
+        - yarn install
+    build:
+      commands:
+        - npm i build --force  # Usa l'opzione --force per forzare la risoluzione
+  artifacts:
+    baseDirectory: .next
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - .next/cache/**/*  
+      - .npm/**/*
+app
