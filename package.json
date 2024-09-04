@@ -11,6 +11,7 @@
         "lint": "next lint"
     },
     "dependencies": {
+        "@aws-amplify/cli": "^12.12.6",
         "@depay/coinbase-wallet-sdk": "^3.7.2",
         "@depay/js-verify-signature": "^3.1.8",
         "@depay/web3-wallets": "^15.2.4",
