@@ -64,6 +64,7 @@ export default async function auth(req: any, res: any) {
             async session({ session, token }: { session: any; token: any }) {
                 if (token) {
                     const userRole = await getUserRole(token.sub);
+                    console.log("🚀 ~ session ~ userRole:", userRole)
                     if (userRole) {
                         token.email = userRole?.email;
                         token.verified = userRole?.is_verified;

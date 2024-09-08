@@ -11,8 +11,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (address) {
         // Chiamata a RPC per ottenere i dati
         const { data, error } = await supabase
-          .rpc('get_orders_with_tickets', { wallet_address: address }) // Passaggio dei parametri RPC
+             .from('orders')
+          // .rpc('get_orders_with_tickets', { wallet_address: address }) // Passaggio dei parametri RPC
           .select('*')  // Seleziona tutti i campi
+          .eq('wallet_address', address)
           .order('created_at', { ascending: false }); // Ordina per data
 
         console.log("🚀 ~ handler ~ error:", error);

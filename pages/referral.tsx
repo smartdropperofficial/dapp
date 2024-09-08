@@ -367,7 +367,7 @@ const Referral = () => {
                                     <table className="table table-striped table-bordered w-100" style={{ maxWidth: '100%' }}>
                                         <thead>
                                             <tr>
-                                                <th scope="col">#</th>
+                                                {/* <th scope="col">#</th> */}
                                                 <th scope="col">Type</th>
                                                 <th scope="col">Period</th>
                                                 <th scope="col">Price</th>
@@ -392,7 +392,7 @@ const Referral = () => {
                                                     )
                                                     ?.map((sub: SubscriptionManagementModel, index) => (
                                                         <tr key={index}>
-                                                            <th scope="row">{index + 1}</th>
+                                                            {/* <th scope="row">{index + 1}</th> */}
                                                             <td>{getSubscriptionType(sub?.subscriptionModel?.subscriptionType)}</td>
                                                             <td>{getSubscriptionPeriod(sub?.subscriptionModel?.subscriptionPeriod)}</td>
                                                             <td>${sub?.subscriptionModel?.promoPrice}</td>

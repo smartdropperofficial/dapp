@@ -14,44 +14,42 @@ const useSubscriptionPlan = () => {
     const { address: account } = useAccount();
     const [contract, setContract] = useState<ethers.Contract | null>(null);
     useEffect(() => {
-
-        if (signer && config) {
-            console.log('config?.subscription_contract:', config?.subscription_contract);
-            try {
-                // const subscriptionContract = new ethers.Contract(config?.subscription_contract as `0x${string}`, subscriptionModelABI, signer);
-                // setContract(subscriptionContract);
-            } catch (error) {
-                console.error('Errore nella creazione del contratto:', error);
-            }
-
+        if (!signer || !config?.subscription_contract) return;
+        try {
+            const subscriptionContract = new ethers.Contract(
+                config?.subscription_contract as `0x${string}`,
+                subscriptionModelABI,
+                signer
+            );
+            setContract(subscriptionContract);
+        } catch (error) {
+            console.error('Error creating contract:', error);
         }
     }, [signer, config]);
 
 
     useEffect(() => {
         const loadContract = async () => {
-            if (signer && config?.subscription_contract) {
-                try {
-                    const abi = await fetchAbiFromDatabase('subscription_plan');
-                    console.log("🚀 ~ loadContract ~ abi:", abi)
-                    if (abi) {
-                        const subscriptionContract = new ethers.Contract(
-                            config.subscription_contract as `0x${string}`,
-                            abi,
-                            signer
-                        );
-                        setContract(subscriptionContract);
-                        console.log('Subscription Plan Contract set successfully:', subscriptionContract);
-                    }
-                } catch (error) {
-                    console.error('Errore nel caricamento dell\'ABI o nella creazione del contratto:', error);
+            if (!signer || !config?.subscription_contract) return;
+            try {
+                const abi: ethers.ContractInterface = await fetchAbiFromDatabase('subscription_plan');
+                if (abi) { 
+                    console.log("Contract Address:", config.subscription_contract);
+                    console.log("Contract ABI:", abi);
+                    const subscriptionContract = new ethers.Contract(
+                        config.subscription_contract as `0x${string}`,
+                        abi,
+                        signer
+                    );
+                    setContract(subscriptionContract);
                 }
+            } catch (error) {
+                console.error('Error loading contract:', error);
             }
         };
 
         loadContract();
     }, [signer, config]);
-
 
     const getSubscriptionByPeriod = useCallback(
         async (subscriptionPeriod: number): Promise<SubscriptionManagementModel[]> => {

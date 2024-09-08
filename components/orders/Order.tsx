@@ -201,12 +201,12 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
                case OrderStatus.PAYMENT_RECEIVED:
                     return (
                          <button onClick={() => showInfoSwal("We are placing your order on Amazon, please come back later")} className="btn btn-secondary col-lg-6 col-md-8 col-sm-12 col-xs-12">
-                              Awaiting order creation
+                              Awaiting order creation on Retailer Store
                          </button>
                     );
                case OrderStatus.SENT_TO_AMAZON:
                     return (
-                         <button className="btn btn-secondary  col-10 col-xl-8" onClick={() => setShowModal({ show: true, type: "View Status", asin: asin })}>
+                         <button className="btn btn-primary  col-10 col-xl-8" onClick={() => setShowModal({ show: true, type: "View Status", asin: asin })}>
                               View Status
                          </button>
                     );
@@ -301,7 +301,9 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
                     {orderItems?.map((product, i) => {
                          return (
                               <div key={`${order.order_id}-${i}-order`} className="mt-4 mb-5">
-                                   <OrderProduct product={product} order={order} />
+                                   <OrderProduct product={product} order={order} /> 
+                                   <div className="order-buttons mt-3 text-end d-flex justify-content-center">{order.status && renderSwitch(order.status, product.asin, true)}</div>
+
                               </div>
                          );
                     })}

@@ -1,26 +1,25 @@
-// import React, { useEffect, useState } from 'react';
-// import { FiSave, FiCheck } from 'react-icons/fi';
-// import Card from '../components/UI/Card';
-// import { supabase } from '../utils/supabaseClient';
-// import { useSession } from 'next-auth/react';
-// import { SessionExt } from '../types/SessionExt';
-// import { Alert, AlertTitle } from '@mui/material';
 
+
+import { SessionExt } from "@/types/SessionExt";
+import { supabase } from "@/utils/supabaseClient";
+import { useSession } from "next-auth/react";
 import router from "next/router";
-import { useEffect } from "react";
-import { useAccount } from "wagmi";
+import { useEffect, useState } from "react";
+import { Button, Card } from "react-bootstrap";
+import Swal from "sweetalert2";
+import { useAccount } from "wagmi"; 
+import MailManagement from "@/components/UI/MailManagement";
 
-const Settings = () => {  
+const Settings = () => {     
     const { address } = useAccount();
 
+    const { data: session }: { data: SessionExt | null } = useSession() as { data: SessionExt | null };
     useEffect(() => {
         if (!address) {
             router.push('/login');
-        }  else {
-            router.push('/verify-email');  
         }
     }, [address]);
-   
+    return <MailManagement/>;
 };
 
 export default Settings;
