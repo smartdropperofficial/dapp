@@ -67,6 +67,7 @@
         "swr": "^2.2.5",
         "typescript": " 5.4.5",
         "uuidv4": "^6.2.13",
+        "viem": "^2.21.6",
         "wagmi": "^0.12.1"
     },
     "devDependencies": {

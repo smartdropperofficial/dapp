@@ -12,7 +12,7 @@ import { formatUnits } from 'ethers/lib/utils.js';
 import { updateDataOnSB } from '@/hooks/Database/services/update';
 
 const useSubscriptionManagement = () => {
-    const { config } = useContext(ConfigContext);
+    const { config,setAbiConfigHandler } = useContext(ConfigContext);
 
 
     // const contractAddress = config?.subscription_management_contract as `0x${string}`;
@@ -27,7 +27,8 @@ const useSubscriptionManagement = () => {
     useEffect(() => {
         const loadContract = async () => {
             if (signer && config?.subscription_management_contract) {
-                try {
+                try { 
+
                     const abi = await fetchAbiFromDatabase('subscription_management');
                     if (abi) {
                         const contract = new ethers.Contract(
@@ -35,7 +36,9 @@ const useSubscriptionManagement = () => {
                             abi,
                             signer
                         );
-                        setContract(contract);
+                        setContract(contract); 
+                       setAbiConfigHandler({ subscriptionManagementAbi: abi });
+
                     }
                 } catch (error) {
                 }

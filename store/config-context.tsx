@@ -17,14 +17,24 @@ type ConfigType = {
     promoter_contract: string;
     subscription_contract: string;
     subscription_management_contract: string;
-    amazon_api: string;
-};
+    amazon_api: string; 
+    orderAbi:string, 
+    promoterAbi:string,
+    subscriptionPlanAbi:string,
+    subscriptionManagementAbi:string
+}; 
+type AbiConfig = {
+    orderAbi:string, 
+    promoterAbi:string,
+    subscriptionPlanAbi:string,
+    subscriptionManagementAbi:string
+}
 
 export const ConfigContext = createContext({
-    config: null as ConfigType | null,
-    // isLoading: false,
+    config: null as ConfigType | null, 
+    abiConfig : null as  AbiConfig | null,
     setConfigHandler: (config: ConfigType | null) => { },
-    // setIsLoadingHandler: (value: boolean) => {},
+    setAbiConfigHandler: (abiConfig: Partial<AbiConfig> | null) => {},
 });
 
 const ConfigContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -44,19 +54,38 @@ const ConfigContextProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         promoter_contract: '',
         subscription_contract: '',
         subscription_management_contract: '',
-        amazon_api: '',
+        amazon_api: '', 
+        orderAbi:'', 
+        promoterAbi:'',
+        subscriptionPlanAbi:'',
+        subscriptionManagementAbi:''
+    }); 
+
+    const [configAbi, setConfigAbi] = useState<Partial<AbiConfig> | null>({
+         
+        orderAbi:'', 
+        promoterAbi:'',
+        subscriptionPlanAbi:'',
+        subscriptionManagementAbi:''
     });
-    // const setIsLoadingHandler = (value: boolean) => {
-    //     setIsLoading(value);
-    // };
+
+    const setAbiConfigHandler = (partialAbiConfig: Partial<AbiConfig> | null) => {
+        setConfigAbi((prevAbiConfig) => ({
+            ...prevAbiConfig,
+            ...partialAbiConfig,  // Sovrascrive solo i campi specificati
+        }));
+    };
+
     const setConfigHandler = (config: ConfigType | null) => {
         setConfig(config);
     };
+
     const store = {
         config: config,
         isLoading: isLoading,
-        setConfigHandler,
-        // setIsLoadingHandler: setIsLoadingHandler,
+        abiConfig: configAbi,
+        setConfigHandler, 
+        setAbiConfigHandler
     };
 
     useEffect(() => {
@@ -85,6 +114,10 @@ const ConfigContextProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             fetchConfig();
         }
     }, [session, session?.config_db]);
+
+
+
+
 
     useEffect(() => {
         if (config) {

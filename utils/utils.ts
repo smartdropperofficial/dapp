@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { formatUnits } from 'ethers/lib/utils.js';
 import { parse, isValid, format } from 'date-fns';
 import { SubscriptionManagementModel } from '@/hooks/Contracts/Subscription/types';
+import { Abi, AbiFunction, AbiEvent } from 'viem';
 
 export const encryptData = (data: string) => {
     const ciphertext = AES.encrypt(data, process.env.NEXT_PUBLIC_API_ENCRYPTER!);
@@ -183,11 +184,23 @@ export const fetchAbiFromDatabase = async (contractName: string): Promise<any | 
                 return null;
             }
         } else {
-            // No ABI data found for the given contractName
+            // No ABI data found for the given contractNa   me
             return null;
         }
     } catch (exception) {
         // Catch unexpected errors outside of Supabase or JSON parsing
         return null;
     }
-};
+}; 
+export const filterAbi = (abi: Abi): (AbiFunction | AbiEvent)[] => {
+    return abi.filter(
+        (item): item is AbiFunction | AbiEvent =>
+            item.type === 'function' || item.type === 'event'
+    );
+}; 
+export const FormatedAbi = (abi: any) => { 
+   return  abi.abiConfig?.orderAbi ? (typeof abi.abiConfig.orderAbi === 'string'
+    ? filterAbi(JSON.parse(abi.abiConfig.orderAbi) as Abi)
+    : filterAbi(abi.abiConfig.orderAbi as Abi)) // Se è già un oggetto
+: undefined;
+}

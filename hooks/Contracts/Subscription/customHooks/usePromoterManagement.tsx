@@ -10,7 +10,7 @@ import { ConfigContext } from '@/store/config-context';
 import { formatUnits } from 'ethers/lib/utils.js';
 
 const usePromoterManagement = () => {
-    const { config } = useContext(ConfigContext);
+    const { config,setAbiConfigHandler } = useContext(ConfigContext);
 
     // const contractAddress = process.env.NEXT_PUBLIC_PROMOTER_MANAGER_ADDRESS as `0x${string}`;
     const contractAddress = config?.promoter_contract as `0x${string}`;
@@ -32,6 +32,7 @@ const usePromoterManagement = () => {
                             signer
                         );
                         setContract(contract);
+                       setAbiConfigHandler({ promoterAbi: abi });
                     }
                 } catch (error) {
                 }

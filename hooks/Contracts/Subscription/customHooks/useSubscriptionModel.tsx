@@ -9,7 +9,7 @@ import { ConfigContext } from '@/store/config-context';
 import { formatUnits } from 'ethers/lib/utils.js';
 
 const useSubscriptionPlan = () => {
-    const { config } = useContext(ConfigContext);
+    const { config,setAbiConfigHandler } = useContext(ConfigContext);
     const { data: signer } = useSigner();
     const { address: account } = useAccount();
     const [contract, setContract] = useState<ethers.Contract | null>(null);
@@ -31,15 +31,16 @@ const useSubscriptionPlan = () => {
     useEffect(() => {
         const loadContract = async () => {
             if (!signer || !config?.subscription_contract) return;
-            try {
-                const abi: ethers.ContractInterface = await fetchAbiFromDatabase('subscription_plan');
-                if (abi) { 
+            try { 
+                const abiJson = await fetchAbiFromDatabase('subscription_plan');
+                if (abiJson) { 
                     const subscriptionContract = new ethers.Contract(
                         config.subscription_contract as `0x${string}`,
-                        abi,
+                        abiJson,
                         signer
                     );
-                    setContract(subscriptionContract);
+                    setContract(subscriptionContract); 
+                    setAbiConfigHandler({ orderAbi: abiJson });
                 }
             } catch (error) {
                 console.error('Error loading contract:', error);

@@ -8,7 +8,7 @@ import { ConfigContext } from '@/store/config-context';
 import { convertToDecimal, fetchAbiFromDatabase } from '@/utils/utils';
 
 const useOrderManagement = () => {
-    const { config } = useContext(ConfigContext);
+    const { config,setAbiConfigHandler } = useContext(ConfigContext);
 
     const contractAddress = config?.order_contract as `0x${string}`;
     const { data: signer } = useSigner();
@@ -30,7 +30,9 @@ const useOrderManagement = () => {
                             abi,
                             signer
                         );
-                        setContract(contract);
+                        setContract(contract); 
+                       setAbiConfigHandler({ orderAbi: abi });
+
                     }
                 } catch (error) {
                     console.error('Errore nel caricamento dell\'ABI o nella creazione del contratto:', error);

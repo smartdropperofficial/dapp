@@ -3,7 +3,7 @@ import { useContext, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useAccount, useContractReads, useWaitForTransaction } from 'wagmi';
 import SmartShopperABI from '../../../utils/abi/SmartShopperABI.json';
-import { decryptData, encryptData } from '../../../utils/utils';
+import { decryptData, encryptData, FormatedAbi } from '../../../utils/utils';
 import { OrderSteps } from '../../../types/OrderSteps';
 import { OrderSB } from '../../../types/OrderSB';
 import { OrderStatus } from '../../../types/Order';
@@ -32,7 +32,7 @@ import LoadPackagesCheckout from '@/components/subscriptions/subscriptionModels/
 import { ConfigContext } from '@/store/config-context';
 import { OrderContext } from '@/store/order-context';
 import CoinbaseButton from '@/components/UI/CoinbaseButton';
-
+import Skeleton from 'react-loading-skeleton';
 const Checkout = () => {
     const { getExchangeTax } = useOrderManagement();
     const subsContext = useContext(SubscriptionContext);
@@ -59,7 +59,7 @@ const Checkout = () => {
     const [exchangeFees, setExchangeFees] = useState<number>();
     const [slippage, setSlippage] = useState<number>(0.8);
     const [loadingReferral, setLoadingReferral] = useState(false);
-
+    const [loadingPrices,setLoadingPrices] = useState(true) ; 
     const [isBestChoice, setIsBestChoice] = useState<boolean>(false);
     const showCheckout = useRef<{ isSameWallet: boolean; hasFetchedSC: boolean }>({
         isSameWallet: false,
@@ -243,13 +243,13 @@ const Checkout = () => {
             isCreatingOrder.current = true;
             processOrder();
         },
-    });
-
-    useContractReads({
+    }); 
+  
+    useContractReads({ 
         contracts: [
             {
-                address: process.env.NEXT_PUBLIC_ORDER_MANAGER_ADDRESS as `0x${string}`,
-                abi: SmartShopperABI,
+                address: configContext.config?.order_contract  as `0x${string}`,
+                abi:FormatedAbi(configContext.abiConfig?.orderAbi!),
                 functionName: 'getOrder',
                 args: [orderId],
             },
@@ -374,9 +374,6 @@ const Checkout = () => {
             // });
         }
     };
-
-
-
     const processOrder = async () => {
         const updateDb: OrderSB = {
             status: OrderStatus.PAYMENT_RECEIVED,
@@ -405,7 +402,8 @@ const Checkout = () => {
             });
         }
     };
-
+    
+    
     useEffect(() => {
         if (loadingPaymentTx) {
             setOrderStep(OrderSteps.WAITING_CONFIRMATION);
@@ -420,8 +418,9 @@ const Checkout = () => {
                 exchangeFees: exchangeFees,
                 fees: fees,
                 tax: Number(amountToPay.tax)
-            });
-        }
+            }); 
+            setLoadingPrices(false)
+        } 
     }, [fees, amountToPay, exchangeFees, zincFee, shippingFees]);
     // useEffect(() => {
     //     configCtx.setIsLoadingHandler(false);
@@ -430,7 +429,12 @@ const Checkout = () => {
     //         configCtx.setIsLoadingHandler(true);
     //     };
     // }, [configCtx]);
+    const RenderPricesSkeleton = () => {
+         return (
+            <Skeleton height={20} count={6} />
 
+         ); 
+    }
     return (
         <div>
             {waitForSub ? (
@@ -624,7 +628,7 @@ const Checkout = () => {
                         )}
                         <section id="payment-details" className="col-12 col-xl-4 h-100  py-xl-3 my-3 mx-xl-1 sticky -lg-top">
                             <Card>
-                                {amountToPay && (
+                                {amountToPay && !loadingPrices ?  (
                                     <>
                                         <div className="subtotal d-flex justify-content-between mt-3">
                                             <strong>
@@ -739,11 +743,12 @@ const Checkout = () => {
                                                                             <h1
                                                                                 style={{
                                                                                     backgroundColor: '#fff',
-                                                                                    color: '#ff9900',
+                                                                                    color: '#494949',
                                                                                     width: '100%',
-                                                                                }}
+                                                                                }} 
+                                                                                className='fw-bolder'
                                                                             >
-                                                                                <b>${subsContext.selectedPackage?.promoPrice.toFixed(2)}</b>
+                                                                                ${subsContext.selectedPackage?.promoPrice.toFixed(2)}
                                                                             </h1>
                                                                             instead of
                                                                             <h4>
@@ -942,7 +947,7 @@ const Checkout = () => {
                                             </div>
                                         </div>
                                     </>
-                                )}
+                                ) :RenderPricesSkeleton() }
                             </Card>
                         </section>
                     </section>
