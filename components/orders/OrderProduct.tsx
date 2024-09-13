@@ -80,7 +80,7 @@ const OrderProduct: React.FC<IMyOrderProductProps> = ({ product, order }) => {
                      </Tooltip> */}
 
                      <OverlayTrigger
-                        trigger="hover"
+                       trigger={['hover', 'focus']} 
                         key={'right'}
                         placement={'right'}
                         overlay={
@@ -126,7 +126,7 @@ const OrderProduct: React.FC<IMyOrderProductProps> = ({ product, order }) => {
                   <div>
                      <b>Payment code:</b>
                      <OverlayTrigger
-                        trigger="hover"
+                       trigger={['hover', 'focus']} 
                         key={'right'}
                         placement={'right'}
                         overlay={

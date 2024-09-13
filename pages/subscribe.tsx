@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { useAccount, useDisconnect } from 'wagmi';
 import { getSubscriptionPeriod, isDateExpired } from '@/utils/utils';
 
-import { useSession } from 'next-auth/react';
+import { getSession, GetSessionParams, useSession } from 'next-auth/react';
 import { SessionExt } from '@/types/SessionExt';
 import Spinner from 'react-bootstrap/Spinner';
 
@@ -365,3 +365,22 @@ const Subscribe = () => {
 //     };
 // });
 export default Subscribe;
+// export async function getServerSideProps(context: GetSessionParams | undefined ) {
+//     const session :  SessionExt | null  = await getSession(context); // Recupera la sessione come preferisci
+//     console.log("🚀 ~ getServerSideProps ~ session:", session)
+  
+//     if (!session || session.email === '' || session.verified === false) {
+//         return {
+//             redirect: {
+//                 destination: '/verify-email',
+//                 permanent: false,
+//             },
+//         };
+//     }
+
+//     return {
+//         props: {
+//             session,
+//         },
+//     };
+// }

@@ -24,7 +24,6 @@ const useOrderManagement = () => {
             if (signer && config?.order_contract) {
                 try {
                     const abi = await fetchAbiFromDatabase('order');
-                    console.log("🚀 ~ loadContract ~ abi:", abi)
                     if (abi) {
                         const contract = new ethers.Contract(
                             config.order_contract as `0x${string}`,
@@ -32,7 +31,6 @@ const useOrderManagement = () => {
                             signer
                         );
                         setContract(contract);
-                        console.log('Order Contract contract set successfully:', contract);
                     }
                 } catch (error) {
                     console.error('Errore nel caricamento dell\'ABI o nella creazione del contratto:', error);

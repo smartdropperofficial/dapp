@@ -60,11 +60,24 @@ export default async function auth(req: any, res: any) {
             strategy: 'jwt',
         },
         secret: process.env.NEXTAUTH_SECRET!,
-        callbacks: {
+        callbacks: { 
+            async jwt({ token, user }) {
+                // Quando l'utente si autentica per la prima volta
+                if (user) {
+                  const userRole = await getUserRole(user.id!); // Recupera il ruolo dell'utente
+                  console.log("🚀 ~ jwt ~ userRole:", userRole)
+                  token.email = userRole?.email;
+                  token.verified = userRole?.is_verified;
+                  token.isPromoter = userRole?.is_promoter;
+                  token.is_promoter_active = userRole?.is_promoter_active;
+                  token.isAdmin = userRole?.is_admin;
+                  token.config_db = userRole?.config;
+                }
+                return token;
+              },
             async session({ session, token }: { session: any; token: any }) {
                 if (token) {
                     const userRole = await getUserRole(token.sub);
-                    console.log("🚀 ~ session ~ userRole:", userRole)
                     if (userRole) {
                         token.email = userRole?.email;
                         token.verified = userRole?.is_verified;
@@ -104,7 +117,7 @@ async function getUserRole(wallet: string | undefined) {
 
         if (!user) {
             const { data: configData, error: configError } = await supabase.from('config').select('*').eq('is_on', true);
-            console.log("🚀 ~ getUserRole ~ configData:", configData)
+            // console.log("🚀 ~ getUserRole ~ configData:", configData)
 
             if (configError) {
                 console.error('🚀 Error fetching config:', configError);
@@ -134,7 +147,7 @@ async function getUserRole(wallet: string | undefined) {
                     }
                 } else if (configData && configData.length === 1) {
                     console.log('🚀 ~ getUserRole ~ configData.length:', configData.length);
-                    const { data: newUser, error: newUserError } = await supabase.from('users').insert([{ wallet }]);
+                    const { data: newUser, error: newUserError } = await supabase.from('users').insert([{ wallet_address:wallet }]);
 
                     if (newUserError) {
                         console.error('🚀 ERROR adding new user:', newUserError);

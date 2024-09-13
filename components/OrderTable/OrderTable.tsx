@@ -139,7 +139,17 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
                 return <span className="col-10 col-xl-8 text-danger text-center my-1 p-2 rounded-2" style={{ backgroundColor: '#ffc7c7' }}><b> Error </b></span>
 
             case OrderStatus.PAYMENT_RECEIVED:
-                return <span className="col-10 col-xl-8 text-success text-center my-1 p-2 rounded-2" style={{ backgroundColor: '#d3ffcb' }}><b> Paid</b></span>
+                return <span className="col-10 col-xl-8 text-success text-center my-1 p-2 rounded-2" style={{ backgroundColor: '#d3ffcb' }}><b> Paid</b></span> 
+
+            case OrderStatus.PRODUCT_UNAVAILABLE:
+            return <span className="col-10 col-xl-8 text-success text-center my-1 p-2 rounded-2" style={{ backgroundColor: '#d3ffcb' }}><b> Product Unavailable</b></span> 
+
+            case OrderStatus.ERROR:
+                return <span className="col-10 col-xl-8 text-success text-center my-1 p-2 rounded-2" style={{ backgroundColor: '#d3ffcb' }}><b> Errro</b></span>
+
+            case OrderStatus.SENT_TO_AMAZON:
+                return <span className="col-10 col-xl-8  text-center my-1 p-2 rounded-2" style={{ backgroundColor: '#a2d1ff', color: '#0c41a5' }}><b> Sent to Retailer</b></span>
+
         }
     }
 
@@ -191,7 +201,7 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
                         Created At {orderBy === 'created_at' && (sort === 'asc' ? <FaSortUp /> : <FaSortDown />)}
                     </th>
                     <th data-key="action" onClick={handleSort} style={{ cursor: 'pointer' }}>
-                        Payment {orderBy === 'action' && (sort === 'asc' ? <FaSortUp /> : <FaSortDown />)}
+                        Status {orderBy === 'action' && (sort === 'asc' ? <FaSortUp /> : <FaSortDown />)}
                     </th>
                     <th data-key="details" style={{ cursor: 'pointer' }}>
                         Order details {orderBy === 'details' && (sort === 'asc' ? <FaSortUp /> : <FaSortDown />)}

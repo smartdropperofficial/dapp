@@ -189,7 +189,6 @@ const SubscriptionContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
             if (getSubscriptionModels && subscriptionsModels.length === 0) {
                 try {
                     const result = await getSubscriptionModels();
-                    console.log("🚀 ~  fetchSubscriptions :", result)
                     setTimeout(() => {
                         setSubscriptionModels(result!);
                     }, 3000);

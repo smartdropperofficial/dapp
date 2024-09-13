@@ -2,7 +2,7 @@ import Card from '../components/UI/Card';
 import { useContext, useEffect, useState } from 'react';
 import { OrderSB } from '../types/OrderSB';
 import MyOrderList from '../components/orders/MyOrderList';
-import { useSession } from 'next-auth/react';
+import { getSession, GetSessionParams, useSession } from 'next-auth/react';
 import Loading from '../components/UI/Loading';
 import { encryptData } from '../utils/utils';
 import { SessionExt } from '../types/SessionExt';
@@ -70,7 +70,7 @@ const MyOrders = () => {
     return (
         <>
             <Head>
-                <title>My Orders | Smartshopper</title>
+                <title>My Orders | Smart Dropper</title>
                 {/* Remove suppressHydrationWarning if it's causing any issues */}
                 {/* <time dateTime="2016-10-25" suppressHydrationWarning /> */}
 
@@ -119,3 +119,24 @@ const MyOrders = () => {
 //     };
 // });
 export default MyOrders;
+
+
+// export async function getServerSideProps(context: GetSessionParams | undefined ) {
+//     const session :  SessionExt | null  = await getSession(context); // Recupera la sessione come preferisci
+//     console.log("🚀 ~ getServerSideProps ~ session:", session)
+  
+//     if (!session || session.email === '' || session.verified === false) {
+//         return {
+//             redirect: {
+//                 destination: '/verify-email',
+//                 permanent: false,
+//             },
+//         };
+//     }
+
+//     return {
+//         props: {
+//             session,
+//         },
+//     };
+// }

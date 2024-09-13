@@ -22,6 +22,8 @@ import Image from 'next/image';
 import { useSession } from "next-auth/react";
 import { SessionExt } from "@/types/SessionExt";
 
+import StatusSteps from "./StatusSteps";
+
 interface IMyOrderProps {
      order: OrderSB;
 }
@@ -199,16 +201,21 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
      const renderSwitch = (status: OrderStatus, asin: string, isReturned: boolean) => {
           switch (status) {
                case OrderStatus.PAYMENT_RECEIVED:
-                    return (
-                         <button onClick={() => showInfoSwal("We are placing your order on Amazon, please come back later")} className="btn btn-secondary col-lg-6 col-md-8 col-sm-12 col-xs-12">
-                              Awaiting order creation on Retailer Store
+                    return ( 
+                         <button onClick={() => showInfoSwal("We are placing your order on Amazon, please come back later")} className="btn btn-primary col-lg-6 col-md-8 col-sm-12 col-xs-12" 
+                         style={{backgroundColor:'#ffd595', color:'white'}}>
+                              Placing order on retailer...
                          </button>
                     );
-               case OrderStatus.SENT_TO_AMAZON:
-                    return (
-                         <button className="btn btn-primary  col-10 col-xl-8" onClick={() => setShowModal({ show: true, type: "View Status", asin: asin })}>
-                              View Status
-                         </button>
+                   case OrderStatus.SENT_TO_AMAZON:
+                    return ( 
+                         <div className="d-flex flex-column  justify-content-center align-items-center mt-5 ">
+                         <span className="h2 fw-bold text-center  col-10 col-xl-8" onClick={() => setShowModal({ show: true, type: "View Status", asin: asin })}>
+                              Order Status
+                         </span> 
+                              <StatusSteps  asin={asin} amazonStatus={amazonStatus} /> 
+                              </div>
+
                     );
                case OrderStatus.RETURNED:
                     if (isReturned) {
@@ -229,7 +236,7 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
                          return (
                               <button className="btn btn-secondary col-10 col-xl-8 " onClick={() => setShowModal({ show: true, type: "View Return Status" })}>
                                    View Return Status
-                              </button>
+                              </button> 
                          );
                     } else {
                          return (
@@ -245,7 +252,8 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
                          <button onClick={() => showInfoSwal("Your order have been canceled")} className="btn btn-danger col-lg-6 col-md-8 col-sm-12 col-xs-12">
                               Order canceled
                          </button>
-                    );
+                    ); 
+                   
                case OrderStatus.SHIPPING_ADDRESS_REFUSED:
                     return (
                          <>
@@ -301,8 +309,8 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
                     {orderItems?.map((product, i) => {
                          return (
                               <div key={`${order.order_id}-${i}-order`} className="mt-4 mb-5">
-                                   <OrderProduct product={product} order={order} /> 
-                                   <div className="order-buttons mt-3 text-end d-flex justify-content-center">{order.status && renderSwitch(order.status, product.asin, true)}</div>
+                                    <OrderProduct product={product} order={order} />   
+                                    <div className="my-5 order-buttons mt-3 text-end d-flex justify-content-center">{order.status && renderSwitch(order.status, product.asin, true)}</div>
 
                               </div>
                          );
@@ -310,7 +318,8 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
                     {returnItems?.map((product, i) => {
                          return (
                               <div key={`${order.order_id}-${i}-return`} className="mt-4 mb-5">
-                                   <OrderProduct product={product} />
+                                   <OrderProduct product={product} /> 
+                                   
                                    <div className="order-buttons mt-3 text-end d-flex justify-content-center">{order.status && renderSwitch(order.status, product.asin, true)}</div>
                               </div>
                          );
@@ -348,7 +357,7 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
                               <div className="d-flex col-10 col-xl-8">
                                    <span className="disclaimer alert alert-warning my-1 text-center">
                                         {" "}
-                                        <b>* If you don&apos;t see any update after 1 hour please contact support on Discord</b>{" "}
+                                        <b>* If you don&apos;t see any update after 1 hour please contact support on Telegram.</b>{" "}
                                    </span>
                                    {/* <div className="m-auto">
                                         <a href="https://discord.gg/FnMwpGfezw" target="_blank">
@@ -370,7 +379,7 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
                          <div className=" d-flex justify-content-center flex-column align-items-center">
                               <span className="my-2 col-10 col-xl-8 fw-bold">Error during the request, please try again or contact the support</span>
                               <button className="btn btn-danger d-flex col-10 col-xl-8 " onClick={() => openNewRequest(order.order_id!)} >
-                                   Please, contact us
+                                   Please, contact us on Telegram
                               </button>
                          </div>
                     )}

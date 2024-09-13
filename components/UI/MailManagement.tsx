@@ -19,11 +19,32 @@ function MailManagement() {
     const [emailError, setEmailError] = useState(false);
     const [emailOk, setEmailOk] = useState(false);
     const [verificationCode, setVerificationCode] = useState('');
-    const [insertedCode, setInsertedCode] = useState('');
-    const { countdownSeconds } = useSendCode(30, verificationCode, setVerificationCode);
+    const [insertedCode, setInsertedCode] = useState(''); 
+    const [time, setTime] = useState(600);
+    const [timeLeft, setTimeLeft] = useState(time);
+
+    const { countdownSeconds } = useSendCode(timeLeft, verificationCode, setVerificationCode); 
     const [loading, setLoading] = useState(false);
     const [confirmedCode, setConfirmedCode] = useState(false);
-
+    useEffect(() => {
+        // Se il tempo è finito, ferma il countdown
+        if (timeLeft === 0) return;
+    
+        // Imposta un intervallo per decrementare il tempo ogni secondo
+        const intervalId = setInterval(() => {
+          setTimeLeft((prevTime) => prevTime - 1);
+        }, 1000);
+    
+        // Pulisce l'intervallo quando il componente viene smontato o il tempo cambia
+        return () => clearInterval(intervalId);
+      }, [timeLeft]);
+    
+      // Funzione per formattare il tempo in formato MM:SS
+      const formatTime = (seconds:number) => {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+      };
     const handleEmailVerification = (email: string) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -112,7 +133,8 @@ function MailManagement() {
         setVerificationCode('');
         setInsertedCode('');
     };
-    const generateRandomCode = () => {
+    const generateRandomCode = () => { 
+        setTimeLeft(time); 
         setVerificationCode(Math.floor(100000 + Math.random() * 900000).toString());
     };
     const sendEmailVerification = async (data: any) => {
@@ -130,20 +152,20 @@ function MailManagement() {
     };
     useEffect(() => {
         if (verificationCode !== '' && verificationCode !== null && verificationCode !== undefined && emailOk) {
-            Swal.fire({ icon: 'success', title: verificationCode });
+            // Swal.fire({ icon: 'success', title: verificationCode });
             sendEmailVerification({ email: email, code: verificationCode });
         }
     }, [verificationCode, emailOk]);
 
 
-    useEffect(() => {
-        if (!address) {
-            router.push('/login');
-        }
-    }, [address]);
+    // useEffect(() => {
+    //     if (!address) {
+    //         router.push('/login');
+    //     }
+    // }, [address]);
     useEffect(() => {
         if (confirmedCode) {
-            router.push('/mail-verified');
+           location.reload();           
         }
     }, [confirmedCode]);
 
@@ -215,7 +237,7 @@ function MailManagement() {
                                 Confirm
                             </Button>
                             <Button className="btn  my-3" onClick={generateRandomCode} disabled={countdownSeconds > 0} style={{ backgroundColor: '#dfdfdf', color: '#000' }}>
-                                Resend code {countdownSeconds === 0 ? '' : `in ${countdownSeconds} seconds`}
+                                Resend code {countdownSeconds === 0 ? '' : `in ${formatTime(timeLeft)} minutes`}
                             </Button>
                             <Button className="btn  my-3" onClick={changeMailHandler} style={{ backgroundColor: '#dfdfdf', color: '#000' }}>
                                 Change email

@@ -14,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         'Content-Type': 'application/json',
         'authorization': "Bearer " + process.env.MAILER_TOKEN!
       };
-      const url = `${process.env.MAILER_WEBHOOK!}/mailverification`
+      const url = `${process.env.MAILER_WEBHOOK!}/opt`
       const response = await fetch(url, {
         method: 'POST',
         headers: headers,

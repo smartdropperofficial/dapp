@@ -4,7 +4,7 @@ import Confetti from 'react-confetti';
 import { FiCopy } from 'react-icons/fi';
 import Card from '../components/UI/Card';
 import { supabase } from '../utils/supabaseClient';
-import { signOut, useSession } from 'next-auth/react';
+import { getSession, GetSessionParams, signOut, useSession } from 'next-auth/react';
 import Skeleton from 'react-loading-skeleton';
 import usePromoterContract from '../hooks/Contracts/Subscription/customHooks/usePromoterManagement';
 import useSubscriptionManagement from '../hooks/Contracts/Subscription/customHooks/useSubscriptionManagement';
@@ -521,3 +521,22 @@ const Referral = () => {
 //     };
 // });
 export default Referral;
+// export async function getServerSideProps(context: GetSessionParams | undefined ) {
+//     const session :  SessionExt | null  = await getSession(context); // Recupera la sessione come preferisci
+//     console.log("🚀 ~ getServerSideProps ~ session:", session)
+  
+//     if (!session || session.email === '' || session.verified === false) {
+//         return {
+//             redirect: {
+//                 destination: '/verify-email',
+//                 permanent: false,
+//             },
+//         };
+//     }
+
+//     return {
+//         props: {
+//             session,
+//         },
+//     };
+// }

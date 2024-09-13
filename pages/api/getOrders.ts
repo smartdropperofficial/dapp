@@ -22,7 +22,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if (error) {
           res.status(400).json(error);
         } else if (data) {
-          console.log("🚀 ~ handler ~ data:", data);
           res.status(200).json(data);
         } else {
           res.status(400).json({});

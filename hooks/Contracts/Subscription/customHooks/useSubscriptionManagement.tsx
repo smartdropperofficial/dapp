@@ -29,7 +29,6 @@ const useSubscriptionManagement = () => {
             if (signer && config?.subscription_management_contract) {
                 try {
                     const abi = await fetchAbiFromDatabase('subscription_management');
-                    console.log("🚀 ~ loadContract ~ abi:", abi)
                     if (abi) {
                         const contract = new ethers.Contract(
                             config.subscription_management_contract as `0x${string}`,
@@ -37,10 +36,8 @@ const useSubscriptionManagement = () => {
                             signer
                         );
                         setContract(contract);
-                        console.log('Subscription Management contract set successfully:', contract);
                     }
                 } catch (error) {
-                    console.error('Errore nel caricamento dell\'ABI o nella creazione del contratto:', error);
                 }
             }
         };

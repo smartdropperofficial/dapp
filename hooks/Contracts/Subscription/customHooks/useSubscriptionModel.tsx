@@ -34,8 +34,6 @@ const useSubscriptionPlan = () => {
             try {
                 const abi: ethers.ContractInterface = await fetchAbiFromDatabase('subscription_plan');
                 if (abi) { 
-                    console.log("Contract Address:", config.subscription_contract);
-                    console.log("Contract ABI:", abi);
                     const subscriptionContract = new ethers.Contract(
                         config.subscription_contract as `0x${string}`,
                         abi,

@@ -5,13 +5,13 @@ import { supabase } from "../../utils/supabaseClient";
 export const SendEmailVerificationCode = async (data: any) => {
      try {
           const encripedEmail = encryptData(JSON.stringify(data));
-          const response = await fetch("/api/sendEmailConfirmation", {
+          const response = await fetch("/api/sendOpt", {
                method: "POST",
                body: encripedEmail,
                headers: { "Content-Type": "plain/text" },
           });
 
-          console.log("🚀 ~ file: EmailController.ts ~ line 47 ~ SendEmailVerificationCode ~ response", response);
+          console.log("🚀 ~ file: EmailController.ts ~ line 47 ~ SendEmailVerificationCode ~ response", response.status);
 
           switch (response.status) {
                case 200:
@@ -30,15 +30,15 @@ export const SendEmailOrderReceived = async (orderId: string) => {
           //   const order: any = await supabase.from("orders").select("*").eq("order_id", orderId).single();
           const { data: order, error } = await supabase.from("orders").select("*").eq("order_id", orderId).single();
 
-          console.log("🚀 ~ SendEmailOrderReceived ~ order:", order);
+          console.log("🚀  EmailController ~ SendEmailOrderReceived ~ order:", order);
           const data = encryptData(JSON.stringify(order));
-          console.log("🚀 ~ SendEmailOrderReceived ~ data:", data);
 
           const response = await fetch("/api/sendEmailOrderReceived", {
                method: "POST",
                body: data,
                headers: { "Content-Type": "plain/text" },
           });
+          console.log("🚀 EmailController  ~ SendEmailOrderReceived ~ data:", response.status);
 
           switch (response.status) {
                case 200:
@@ -47,7 +47,7 @@ export const SendEmailOrderReceived = async (orderId: string) => {
                     return null;
           }
      } catch (error) {
-          console.log("🚀 ~ file: EmailController.ts ~ line 47 ~ SendEmailOrderReceived ~ error", error);
+          console.log("🚀 ~ file: EmailController.ts ~ SendEmailOrderReceived ~ error", error);
           return null;
      }
 };

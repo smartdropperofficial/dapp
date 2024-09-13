@@ -170,7 +170,6 @@ export const fetchAbiFromDatabase = async (contractName: string): Promise<any | 
 
         // Handle errors returned by Supabase
         if (error) {
-            console.error(`Errore durante il recupero dell'ABI per il contratto ${contractName}:`, error);
             return null;
         }
 
@@ -179,20 +178,16 @@ export const fetchAbiFromDatabase = async (contractName: string): Promise<any | 
             try {
                 // Attempt to parse the ABI
                 const abi = JSON.parse(data[contractName as keyof typeof data]);
-                console.log('ABI recuperato con successo:', abi);
                 return abi;
             } catch (parseError) {
-                console.error('Errore durante il parsing dell\'ABI:', parseError);
                 return null;
             }
         } else {
             // No ABI data found for the given contractName
-            console.error(`Nessun ABI trovato per la colonna: ${contractName}`);
             return null;
         }
     } catch (exception) {
         // Catch unexpected errors outside of Supabase or JSON parsing
-        console.error('Errore inatteso durante il recupero dell\'ABI:', exception);
         return null;
     }
 };

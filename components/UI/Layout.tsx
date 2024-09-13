@@ -31,7 +31,29 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
         if (!address) {
             router.push('/login');
         }
-    }, [address]);
+    }, [address]);  
+
+    useEffect(() => {
+        // Funzione di controllo della sessione
+        const checkSession = () => {
+            if (session?.email === '' || session?.verified === false) {
+                router.push('/verify-email');
+            }
+        };
+
+        // Controllo iniziale quando si monta il componente
+        checkSession();
+
+        // Aggiungi un listener per intercettare i cambi di pagina
+        router.events.on('routeChangeComplete', checkSession);
+
+        // Cleanup del listener quando il componente viene smontato
+        return () => {
+            router.events.off('routeChangeComplete', checkSession);
+        };
+    }, [router, session]);
+    
+    
 
     useEffect(() => {
         if (session?.address && address && session?.address !== address) {
@@ -67,13 +89,9 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
     useEffect(() => {
 
         if (ctxConfig) {
-            console.log("configuration:", ctxConfig.config!)
         }
     }, [ctxConfig])
 
-
-
-        ;
     return (
         <>
 
@@ -149,7 +167,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                                         </li>
 
                                         <li className=" d-xl-none d-flex justify-content-center align-items-center">
-                                            <a href="https://discord.gg/utrGNQxAqB" target="_blank">
+                                            <a href="https://t.me/SmartDropperSupport_Bot?start" target="_blank">
                                                 <div className="d-flex justify-content-center align-items-center text-black">
                                                     <Image src="/icons/discord.png" alt="discord" width={50} height={50} />
                                                     <b>
@@ -258,7 +276,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                                     </ul>
                                 </nav>
                                 <div className="telegram ms-5 d-none d-xl-flex d-flex justify-content-center align-items-center">
-                                    <a href="https://discord.gg/utrGNQxAqB" target="_blank">
+                                    <a href="https://t.me/SmartDropperSupport_Bot?start" target="_blank">
                                         <div className="d-flex justify-content-center align-items-center text-black">
                                             <Image src="/icons/telegram.png" alt="discord" width={50} height={50} />
                                             <b>

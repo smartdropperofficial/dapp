@@ -24,7 +24,11 @@ function VerifyEmail() {
         }
     }, [session?.verified])
 
-
+    useEffect(() => {
+        if (!address) {
+            router.push('/login');
+        }
+    }, [address]);
 
     return <MailManagement/>;
 }

@@ -18,6 +18,8 @@ import Basket from '@/components/orders/Basket';
 import { useAccount, useDisconnect } from 'wagmi';
 import router from 'next/router';
 import { GetServerSideProps } from 'next';
+import { getSession, GetSessionParams } from 'next-auth/react';
+import { SessionExt } from '@/types/SessionExt';
 // import { withAuth } from '@/withAuth';
 
 export default function Home() {
@@ -184,11 +186,22 @@ export default function Home() {
         </>
     );
 }
-// export const getServerSideProps: GetServerSideProps = withAuth(async (context) => {
-//     // Logica aggiuntiva per la tua pagina
+// export async function getServerSideProps(context: GetSessionParams | undefined ) {
+//     const session :  SessionExt | null  = await getSession(context); // Recupera la sessione come preferisci
+//     console.log("🚀 ~ getServerSideProps ~ session:", session)
+  
+//     if (!session || session.email === '' || session.verified === false) {
+//         return {
+//             redirect: {
+//                 destination: '/verify-email',
+//                 permanent: false,
+//             },
+//         };
+//     }
+
 //     return {
 //         props: {
-//             // Props aggiuntive per il tuo componente
+//             session,
 //         },
 //     };
-// });
+// }

@@ -25,7 +25,6 @@ const usePromoterManagement = () => {
             if (signer && config?.promoter_contract) {
                 try {
                     const abi = await fetchAbiFromDatabase('promoter');
-                    console.log("🚀 ~ loadContract ~ abi:", abi)
                     if (abi) {
                         const contract = new ethers.Contract(
                             config.promoter_contract as `0x${string}`,
@@ -33,10 +32,8 @@ const usePromoterManagement = () => {
                             signer
                         );
                         setContract(contract);
-                        console.log('promoter ontract set successfully:', contract);
                     }
                 } catch (error) {
-                    console.error('Errore nel caricamento dell\'ABI o nella creazione del contratto:', error);
                 }
             }
         };

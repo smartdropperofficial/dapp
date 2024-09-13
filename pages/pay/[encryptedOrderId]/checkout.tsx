@@ -139,6 +139,7 @@ const Checkout = () => {
     const fetchOrderPrice = async () => {
         try {
             const amazonAmountToPay = await getAmountToPay(configContext, order?.tax_request_id!);
+            console.log("🚀 ~ fetchOrderPrice ~ amazonAmountToPay:", amazonAmountToPay)
 
             if (amazonAmountToPay) {
                 setAmountToPay(amazonAmountToPay);
