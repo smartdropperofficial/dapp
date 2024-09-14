@@ -155,7 +155,7 @@ main {
 
 .card {
     padding: 50px;
-    border-radius: 20px;
+    border-radius: 0px;
 
     @media (max-width: $large) {
         padding: 20px;
@@ -277,13 +277,15 @@ main {
 .form-control {
     background-color: #ececec;
     height: 55px;
-    border-radius: 5px;
-    padding: 25px;
+    border-radius: 0px; 
+    border-width: 2px; 
+    border-color: #727272;
+    padding: 0px 25px;
 
     &:focus,
     &:active {
-        box-shadow: 0 0 0 0.25rem rgba(255, 153, 1, 0.5);
-        background-color: #ececec;
+        box-shadow: 0 0 0 0.25rem rgba(163, 163, 163, 0.5);
+        background-color: #e6f2ff;
     }
 }
 .overlay-payment { 
@@ -346,7 +348,7 @@ main {
 .btn {
     padding: 14px 37px;
     border: 0;
-    border-radius: 10px;
+    border-radius: 0px;
     color: #fff;
     font-weight: 600;
     display: inline-flex;

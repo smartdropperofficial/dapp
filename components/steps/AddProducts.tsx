@@ -265,7 +265,7 @@ const AddProducts = () => {
                             value={link}
                             disabled={subContext.currentSubscription?.subscriptionModel.shopLimit !== 0 && subContext.currentSubscription?.totShopAmountPaid! >= subContext.currentSubscription?.subscriptionModel.shopLimit!}
                         />
-                        <button className="btn btn-add-in sn btn-primary  rounded-3" onClick={addProduct} disabled={subContext.currentSubscription?.subscriptionModel.shopLimit !== 0 && subContext.currentSubscription?.totShopAmountPaid! >= subContext.currentSubscription?.subscriptionModel.shopLimit!}>
+                        <button className="btn btn-add-in sn btn-primary  rounded-0 " onClick={addProduct} disabled={subContext.currentSubscription?.subscriptionModel.shopLimit !== 0 && subContext.currentSubscription?.totShopAmountPaid! >= subContext.currentSubscription?.subscriptionModel.shopLimit!}>
                             Add Item
                         </button>
                     </div>

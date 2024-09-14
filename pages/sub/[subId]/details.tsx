@@ -1,7 +1,7 @@
 import GetSubscription from '@/hooks/Contracts/Subscription/components/GetSubscription';
 import { useRouter } from 'next/router';
 import React from 'react'
-import SubDetails from '../components/subDetails';
+import SubcriptionDetails from '../components/SubcriptionDetails';
 import { GetServerSideProps } from 'next';
 import { withAuth } from '@/withAuth';
 
@@ -9,7 +9,7 @@ function Details() {
     const router = useRouter();
     const { subId } = router.query;
     return (
-        <div> <SubDetails subId={Number(subId)}></SubDetails></div>
+        <div> <SubcriptionDetails subId={Number(subId)}></SubcriptionDetails></div>
     )
 }
 // export const getServerSideProps: GetServerSideProps = withAuth(async (context) => {

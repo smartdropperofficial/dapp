@@ -69,7 +69,7 @@ const ShippingInfo: React.FC = () => {
                                                        <b>(Receiver)</b> Email address*
                                                   </label>{" "}
                                                   &nbsp;
-                                                  <span className="disclaimer d-flex align-items-center">(the person who will receive the pack)</span>
+                                                  <span className="disclaimer d-flex align-items-center">(The person receiving the package)</span>
                                              </div>
                                              <input type="email" onChange={(e) => inputHandler(e, "email")} value={ctx?.shippingInfo?.email} className="form-control mt-2" />
                                              {ctx.showErrors && !ctx.shippingInfo?.email && <small className="d-block text-danger mt-2">Field Required.</small>}
@@ -122,9 +122,9 @@ const ShippingInfo: React.FC = () => {
                                    </div>
                                    <div className="col-lg-12 mb-4">
                                         <div className="form-group">
-                                             <div className="d-flex">
-                                                  <label>Phone Number*</label> &nbsp; &nbsp;
-                                                  <span className="disclaimer">( Mandatory to reach out to the courier if necessary)</span>
+                                             <div className="d-flex align-items-center">
+                                                  <label> <b>(Receiver)</b> Phone Number*</label> &nbsp; &nbsp;
+                                                  <span className="disclaimer m-0">( mandatory in order to be contacted by the courier if necessary.)</span>
                                              </div>
 
                                              <input

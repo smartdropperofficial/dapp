@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { Alert, Card } from 'react-bootstrap';
-import useSubscriptionPlan from '../../../hooks/Contracts/Subscription/customHooks/useSubscriptionModel';
+import useSubscriptionPlan from '../../../hooks/Contracts/Subscription/customHooks/useSubscriptionPlan';
 import { SubscriptionType, SubscriptionPeriod, SubscriptionModel } from '../../../hooks/Contracts/Subscription/types';
 import useSubscriptionManagement from '@/hooks/Contracts/Subscription/customHooks/useSubscriptionManagement';
 import { SubscriptionContext } from '@/store/subscription-context';

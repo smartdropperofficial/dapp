@@ -1,7 +1,7 @@
 import React, { createContext, useEffect } from 'react';
 import { useState } from 'react';
 import { PromoterModel, SubscriptionManagementModel, SubscriptionModel } from '@/hooks/Contracts/Subscription/types';
-import useSubscriptionPlan from '@/hooks/Contracts/Subscription/customHooks/useSubscriptionModel';
+import useSubscriptionPlan from '@/hooks/Contracts/Subscription/customHooks/useSubscriptionPlan';
 import useSubscriptionManagement from '@/hooks/Contracts/Subscription/customHooks/useSubscriptionManagement';
 import { useSession } from 'next-auth/react';
 import { SessionExt } from '@/types/SessionExt';

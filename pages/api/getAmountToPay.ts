@@ -22,7 +22,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     headers.append("Authorization", `Basic ${Buffer.from(`${amazon_api}:`).toString("base64")}`);
 
                     headers.append("Content-Type", "application/json");
-                    console.log("🚀 ~  api/getAmountToPay ~ headers:", headers);
 
                     const response = await fetch(`${process.env.ORDER_API_URL}/orders/${taxRequestId}`, {
                          method: "GET",

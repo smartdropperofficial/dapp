@@ -1,17 +1,14 @@
 import useSubscriptionManagement from '@/hooks/Contracts/Subscription/customHooks/useSubscriptionManagement';
+import useSubscriptionPlan from '@/hooks/Contracts/Subscription/customHooks/useSubscriptionPlan';
 import { SubscriptionManagementModel } from '@/hooks/Contracts/Subscription/types';
-import { SubscriptionContext } from '@/store/subscription-context';
 import { isDateExpired } from '@/utils/utils';
-import { withAuth } from '@/withAuth';
-import { GetServerSideProps } from 'next';
-import { useSession } from 'next-auth/react';
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Card } from 'react-bootstrap';
 import Skeleton from 'react-loading-skeleton';
 
-function SubDetails({ subId }: { subId: number }) {
+function SubcriptionPlanDetails({ subId }: { subId: number }) {
 
-    const { changeTotShopAmountPaidOnBC: changeTotShopAmountPaid, getSubscriptionByIdOnBC: getSubscriptionById } = useSubscriptionManagement();
+    const { changeTotShopAmountPaidOnBC: changeTotShopAmountPaid, getSubscriptionByIdOnBC: getSubscriptionById } = useSubscriptionPlan();
     const [subscription, setSubscription] = useState<SubscriptionManagementModel | null>(null); // Fix this
     const [newTotShopAmountPaid, setNewTotShopAmountPaid] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
@@ -189,4 +186,4 @@ function SubDetails({ subId }: { subId: number }) {
     )
 }
 
-export default SubDetails
+export default SubcriptionPlanDetails

@@ -694,25 +694,11 @@ const Checkout = () => {
                                                     </a>
                                                 </p>
                                             </div>
-                                        </div>
-                                        <hr />
+                                        </div> 
                                         <div className="subtotal d-flex justify-content-between mt-5">
                                             <div className="d-flex flex-column flex-xl-row justify-content-between align-content-center col-12">
                                                 <div>
-                                                    <strong>OUR COMMISSIONS: </strong>
-                                                </div>{' '}
-                                                <div className="d-flex justify-content-xl-center  justify-content-end jus align-content-center">
-                                                    <span className="text-center m-0">
-                                                        ( {sspCommissions}% ) - <b> $ {fees!.toFixed(2)}</b>
-                                                    </span>
-                                                </div>
-                                                {/* )} */}
-                                            </div>
-                                        </div>
-                                        <div className="subtotal d-flex justify-content-between mt-5">
-                                            <div className="d-flex flex-column flex-xl-row justify-content-between align-content-center col-12">
-                                                <div>
-                                                    <strong>(CRYPTO exchange): </strong>
+                                                    <strong>(Crypto to Fiat exchange fee): </strong>
                                                 </div>{' '}
                                                 <div className="d-flex justify-content-xl-center  justify-content-end jus align-content-center">
                                                     <span className="text-center m-0">
@@ -722,6 +708,22 @@ const Checkout = () => {
                                                 {/* )} */}
                                             </div>
                                         </div>
+                                        <hr /> 
+                                       
+                                        <div className="subtotal d-flex justify-content-between mt-5">
+                                            <div className="d-flex flex-column flex-xl-row justify-content-between align-content-center col-12">
+                                                <div>
+                                                    <strong>Smart Dropper fee: </strong>
+                                                </div>{' '}
+                                                <div className="d-flex justify-content-xl-center  justify-content-end jus align-content-center">
+                                                    <span className="text-center m-0">
+                                                        ( {sspCommissions}% ) - <b> $ {fees!.toFixed(2)}</b>
+                                                    </span>
+                                                </div>
+                                                {/* )} */}
+                                            </div>
+                                        </div>
+                                       
 
                                         <div className={`row mt-5 justify-content-evenly d-flex flex-column align-items-center `}>
                                             {!subsContext.currentSubscription && subsContext.selectedPackage?.id! > FreeSubId && (

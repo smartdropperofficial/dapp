@@ -167,7 +167,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                                         </li>
 
                                         <li className=" d-xl-none d-flex justify-content-center align-items-center">
-                                            <a href="https://t.me/SmartDropperSupport_Bot?start" target="_blank">
+                                            {/* <a href="https://t.me/SmartDropperSupport_Bot?start" target="_blank"> */}
+                                            <a href="https://t.me/SmartDropperOfficial" target="_blank">
                                                 <div className="d-flex justify-content-center align-items-center text-black">
                                                     <Image src="/icons/discord.png" alt="discord" width={50} height={50} />
                                                     <b>
@@ -276,7 +277,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                                     </ul>
                                 </nav>
                                 <div className="telegram ms-5 d-none d-xl-flex d-flex justify-content-center align-items-center">
-                                    <a href="https://t.me/SmartDropperSupport_Bot?start" target="_blank">
+                                    {/* <a href="https://t.me/SmartDropperSupport_Bot?start" target="_blank"> */}
+                                    <a href="https://t.me/SmartDropperOfficial" target="_blank">
                                         <div className="d-flex justify-content-center align-items-center text-black">
                                             <Image src="/icons/telegram.png" alt="discord" width={50} height={50} />
                                             <b>

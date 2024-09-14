@@ -63,8 +63,8 @@ const generateAmazonOrderObject = (payload: any): OrderAmazon | null => {
                 phone_number: payload.shipping_address.phoneNumber,
             },
             webhooks: {
-                request_succeeded: '',
-                request_failed: '',
+                request_succeeded:  `${process.env.MAILER_WEBHOOK!}/request-succeeded`,
+                request_failed:  `${process.env.MAILER_WEBHOOK!}/request-failed`,
                 tracking_obtained: `${process.env.MAILER_WEBHOOK!}/tracking`,
             },
             shipping: {

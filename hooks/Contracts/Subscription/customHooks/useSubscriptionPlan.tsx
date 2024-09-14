@@ -50,7 +50,7 @@ const useSubscriptionPlan = () => {
         loadContract();
     }, [signer, config]);
 
-    const getSubscriptionByPeriod = useCallback(
+    const getSubscriptionByPeriodOnBC = useCallback(
         async (subscriptionPeriod: number): Promise<SubscriptionManagementModel[]> => {
             if (!contract) throw new Error('Contract is not initialized');
             try {
@@ -74,7 +74,7 @@ const useSubscriptionPlan = () => {
         [contract]
     );
 
-    const getSubscriptionByType = useCallback(
+    const getSubscriptionByTypeOnBC = useCallback(
         async (subscriptionType: number): Promise<SubscriptionManagementModel[]> => {
             if (!contract) return [];
             try {
@@ -98,7 +98,7 @@ const useSubscriptionPlan = () => {
         [contract]
     );
 
-    const addSubscriptionContract = useCallback(
+    const addSubscriptionContractOnBC = useCallback(
         async (
             subscriptionType: number,
             subscriptionPeriod: number,
@@ -129,7 +129,7 @@ const useSubscriptionPlan = () => {
         [contract]
     );
 
-    const changeSubscriptionTypeFees = useCallback(
+    const changeSubscriptionTypeFeesOnBC = useCallback(
         async (subscriptionId: number, newFees: number) => {
             if (!contract) throw new Error('Contract is not initialized');
             try {
@@ -142,7 +142,7 @@ const useSubscriptionPlan = () => {
         [contract]
     );
 
-    const changeSubscriptionPrice = useCallback(
+    const changeSubscriptionPriceOnBC = useCallback(
         async (subscriptionId: number, newPrice: number) => {
             if (!contract) throw new Error('Contract is not initialized');
             try {
@@ -155,7 +155,7 @@ const useSubscriptionPlan = () => {
         [contract]
     );
 
-    const changeSubscriptionTypeShopLimit = useCallback(
+    const changeSubscriptionTypeShopLimitOnBC = useCallback(
         async (subscriptionId: number, newLimit: number) => {
             if (!contract) throw new Error('Contract is not initialized');
             try {
@@ -199,12 +199,12 @@ const useSubscriptionPlan = () => {
 
     return {
         account,
-        getSubscriptionByPeriod,
-        getSubscriptionByType,
-        addSubscriptionContract,
-        changeSubscriptionTypeFees,
-        changeSubscriptionPrice,
-        changeSubscriptionTypeShopLimit,
+        getSubscriptionByPeriod: getSubscriptionByPeriodOnBC,
+        getSubscriptionByType: getSubscriptionByTypeOnBC,
+        addSubscriptionContract: addSubscriptionContractOnBC,
+        changeSubscriptionTypeFees: changeSubscriptionTypeFeesOnBC,
+        changeSubscriptionPrice: changeSubscriptionPriceOnBC,
+        changeSubscriptionTypeShopLimit: changeSubscriptionTypeShopLimitOnBC,
         getSubscriptionModels,
     };
 };

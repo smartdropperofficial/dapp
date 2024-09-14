@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Form, Button, Col } from 'react-bootstrap';
 import { useSession } from 'next-auth/react';
 import useSubscriptionManagement from '../customHooks/useSubscriptionManagement';
-import useSubscriptionPlan from '../customHooks/useSubscriptionModel';
+import useSubscriptionPlan from '../customHooks/useSubscriptionPlan';
 import { PromoterModel, SubscriptionModel } from '../types';
 import { SessionExt } from '../../../../types/SessionExt';
 import usePromoterManagement from '../customHooks/usePromoterManagement';
