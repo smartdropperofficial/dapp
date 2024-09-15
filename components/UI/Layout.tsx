@@ -10,10 +10,9 @@ import { useAccount, useDisconnect } from 'wagmi';
 import Swal from 'sweetalert2';
 import { ConfigContext } from '@/store/config-context';
 import Messages from './Messages';
-
+import LogoutButton from './LogoutButton';
 
 const Layout: React.FC<{ children: React.ReactNode }> = props => {
-
     const ctx = useContext(OrderContext);
     const ctxConfig = useContext(ConfigContext);
     const { data: session }: { data: SessionExt | null; status: string } = useSession() as { data: SessionExt | null; status: string };
@@ -31,7 +30,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
         if (!address) {
             router.push('/login');
         }
-    }, [address]);  
+    }, [address]);
 
     useEffect(() => {
         // Funzione di controllo della sessione
@@ -52,8 +51,6 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
             router.events.off('routeChangeComplete', checkSession);
         };
     }, [router, session]);
-    
-    
 
     useEffect(() => {
         if (session?.address && address && session?.address !== address) {
@@ -87,15 +84,12 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
     }, [windowWidth]);
     // Assicurati di includere isChrome nell'array delle dipendenze
     useEffect(() => {
-
         if (ctxConfig) {
         }
-    }, [ctxConfig])
+    }, [ctxConfig]);
 
     return (
         <>
-
-
             <div className="d-flex flex-column justify-content-between align-items-between">
                 <div className={`menu-resp ${showMenuResp && 'active'}`}>
                     <div className="btn-close-menu sticky-top px-2 " onClick={() => setShowMenuResp(false)}></div>
@@ -165,12 +159,15 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                                                 </a>
                                             </Link>
                                         </li>
+                                        <li className="d-xl-none">
+                                            <LogoutButton />
+                                        </li>
 
                                         <li className=" d-xl-none d-flex justify-content-center align-items-center">
                                             {/* <a href="https://t.me/SmartDropperSupport_Bot?start" target="_blank"> */}
                                             <a href="https://t.me/SmartDropperOfficial" target="_blank">
                                                 <div className="d-flex justify-content-center align-items-center text-black">
-                                                    <Image src="/icons/discord.png" alt="discord" width={50} height={50} />
+                                                    <Image src="/icons/telegram.png" alt="telegram icon" width={50} height={50} />
                                                     <b>
                                                         <span className="mx-2" style={{ fontSize: '15px' }}>
                                                             Support
@@ -202,7 +199,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                                         <li className=" d-none d-xl-flex justify-content-between align-items-center mx-0">
                                             <Link href="/" legacyBehavior>
                                                 <div className="logo-header position-relative w-100">
-                                                    <Image src="/icons/SD_icon_orange.svg" width={50} height={50} alt="SmartShopper Logo" />
+                                                    <Image src="/icon.png" width={50} height={50} alt="Smart Dropper Logo" />
                                                 </div>
                                             </Link>
                                         </li>
@@ -221,59 +218,44 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                                         </li>
                                         <li className="d-none d-xl-inline-block">
                                             <Link href="/subscribe" legacyBehavior>
-                                                <a className={`${isMounted && router.asPath !== '/subscribe' && 'text-black'}`} onClick={() => { }}>
+                                                <a className={`${isMounted && router.asPath !== '/subscribe' && 'text-black'}`} onClick={() => {}}>
                                                     Subscribe
                                                 </a>
                                             </Link>
                                         </li>
                                         <li className="d-none d-xl-inline-block">
                                             <Link href="/my-orders" legacyBehavior>
-                                                <a
-                                                    className={`${isMounted && router.asPath !== '/my-orders' && 'text-black  text-center'}`}
-                                                    onClick={() => { }}
-                                                >
+                                                <a className={`${isMounted && router.asPath !== '/my-orders' && 'text-black  text-center'}`} onClick={() => {}}>
                                                     My Orders
                                                 </a>
                                             </Link>
                                         </li>
-
                                         <li className="d-inline-block d-xl-none mx-3">
                                             <Link href="/" legacyBehavior>
                                                 <a className="d-block position-relative w-100 h-100">
-                                                    <Image src="/assets/logo-mobile.svg" width={50} height={50} alt="SmartShopper Logo Mobile" />
+                                                    <Image src="/icon.png" width={50} height={50} alt="SmartShopper Logo Mobile" />
                                                 </a>
                                             </Link>
                                         </li>
-
-                                        <li>
-                                            <ConnectButton showBalance={{ smallScreen: false, largeScreen: false }} />
-                                        </li>
                                         <li className="d-none d-xl-inline-block">
                                             <Link href="/settings" legacyBehavior>
-                                                <a
-                                                    className={`${isMounted && router.asPath !== '/Settings' && 'text-black  text-center'}`}
-                                                    onClick={() => { }}
-                                                >
+                                                <a className={`${isMounted && router.asPath !== '/Settings' && 'text-black  text-center'}`} onClick={() => {}}>
                                                     Settings
                                                 </a>
                                             </Link>
                                         </li>
                                         <li className="d-none d-xl-inline-block fw-bold">
                                             <Link href="/referral" legacyBehavior>
-                                                <a className={`${isMounted}`}>Referral</a>
+                                                <a className={`${isMounted} p-1`} style={{ borderStyle: 'dotted' }}>
+                                                    Referral
+                                                </a>
                                             </Link>
                                         </li>
-                                        <li className="ms-3 d-xl-none">
+                                        <li className="d-xl-none">
                                             <button className="btn p-0 open-menu d-xl-none" onClick={() => setShowMenuResp(true)}>
                                                 <Image src="/assets/menu.png" alt="SmartShopper Menu Icon" width={40} height={40} />
                                             </button>
                                         </li>
-                                        <li>
-                                            {/* <Messages /> */}
-
-                                        </li>
-                                        {/* <PromoterWrapper> */}
-                                        {/* </PromoterWrapper> */}
                                     </ul>
                                 </nav>
                                 <div className="telegram ms-5 d-none d-xl-flex d-flex justify-content-center align-items-center">
@@ -288,6 +270,9 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                                             </b>
                                         </div>
                                     </a>
+                                </div>
+                                <div className="telegram ms-5 d-none d-xl-flex d-flex justify-content-center align-items-center">
+                                    <LogoutButton />
                                 </div>
                             </div>
                         </div>
@@ -319,7 +304,6 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                         <Loading dark={true} />
                     </ModalOverlay> */}
             </div>
-
         </>
     );
 };

@@ -11,26 +11,25 @@ import { useAccount } from 'wagmi';
 import router from 'next/router';
 import MailManagement from '@/components/UI/MailManagement';
 
-function VerifyEmail() { 
+function VerifyEmail() {
     const { address } = useAccount();
 
     const { data: session }: { data: SessionExt | null } = useSession() as { data: SessionExt | null };
 
     useEffect(() => {
-        if (session?.verified) {
+        if (session?.email) {
             router.push('/');
         } else {
-            router.push('/verify-email');
         }
-    }, [session?.verified])
+    }, [session?.email]);
 
-    useEffect(() => {
-        if (!address) {
-            router.push('/login');
-        }
-    }, [address]);
+    // useEffect(() => {
+    //     if (!address) {
+    //         router.push('/login');
+    //     }
+    // }, [address]);
 
-    return <MailManagement/>;
+    return <MailManagement />;
 }
 
 export default VerifyEmail;

@@ -1,44 +1,41 @@
+import { SessionExt } from '@/types/SessionExt';
+import { useSession } from 'next-auth/react';
+import router from 'next/router';
+import { useEffect } from 'react';
+import { useAccount } from 'wagmi';
+import LoginForm from './components/LoginForm';
+import { Button, Card } from 'react-bootstrap';
 
-
-import { SessionExt } from "@/types/SessionExt";
-import { supabase } from "@/utils/supabaseClient";
-import { getSession, GetSessionParams, useSession } from "next-auth/react";
-import router from "next/router";
-import { useEffect, useState } from "react";
-import { Button, Card } from "react-bootstrap";
-import Swal from "sweetalert2";
-import { useAccount } from "wagmi"; 
-import MailManagement from "@/components/UI/MailManagement";
-
-const Settings = () => {     
+const Settings = () => {
     const { address } = useAccount();
 
     const { data: session }: { data: SessionExt | null } = useSession() as { data: SessionExt | null };
     useEffect(() => {
-        if (!address) {
+        if (!session) {
             router.push('/login');
         }
-    }, [address]);
-    return <MailManagement/>;
+    }, [session]);
+    return (
+        <div className="container my-5 d-flex justify-content-center">
+            <Card className="text-center" style={{ maxWidth: '1000px' }}>
+                <Card.Body className="d-flex flex-column justify-content-center">
+                    <Card.Title as="h2" className="mb-3">
+                        <div className="d-flex flex-column">
+                            <span> Change Email</span>
+                        </div>
+                    </Card.Title>
+                    <div>
+                        <>Here you can change your email address.</> <br />{' '}
+                        <p className="disclaimer mt-3">
+                            Email is the only personal data we gather from our customers. We will use this email for all our communications with you. If you
+                            can&apos;t find our application received email, please check your spam inbox
+                        </p>
+                    </div>
+                    <LoginForm />
+                </Card.Body>
+            </Card>
+        </div>
+    );
 };
 
 export default Settings;
-// export async function getServerSideProps(context: GetSessionParams | undefined ) {
-//     const session :  SessionExt | null  = await getSession(context); // Recupera la sessione come preferisci
-//     console.log("🚀 ~ getServerSideProps ~ session:", session)
-  
-//     if (!session || session.email === '' || session.verified === false) {
-//         return {
-//             redirect: {
-//                 destination: '/verify-email',
-//                 permanent: false,
-//             },
-//         };
-//     }
-
-//     return {
-//         props: {
-//             session,
-//         },
-//     };
-// }

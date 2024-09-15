@@ -13,6 +13,8 @@ declare module 'next-auth' {
     interface User {
         id?: string | null;
         wallet?: string | null;
+        emailVerified?: string | null; 
+        config?:string | null;
     }
     interface Session {
         user?: {

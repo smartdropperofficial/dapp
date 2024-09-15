@@ -13,19 +13,20 @@ import ConfigContextProvider from '../store/config-context';
 import { getDefaultWallets, RainbowKitProvider, lightTheme, Theme } from '@rainbow-me/rainbowkit';
 import '@rainbow-me/rainbowkit/styles.css';
 import { GetSiweMessageOptions, RainbowKitSiweNextAuthProvider } from '@rainbow-me/rainbowkit-siwe-next-auth';
-import { SessionProvider } from 'next-auth/react';
+import { SessionProvider, useSession } from 'next-auth/react';
 import { publicProvider } from 'wagmi/providers/public';
 import merge from 'lodash.merge';
 import Head from 'next/head';
 import 'react-loading-skeleton/dist/skeleton.css';
-import "react-datepicker/dist/react-datepicker.css";
+import 'react-datepicker/dist/react-datepicker.css';
+import { ReactNode, useEffect } from 'react';
+import { useRouter } from 'next/router';
 
 const isDev = process.env.NODE_ENV === 'development';
 
 const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
 const CHAINS = isDev ? [hardhat, polygon] : [polygon, hardhat];
 // const CHAINS = [hardhat];
-
 
 const { provider, chains } = configureChains(CHAINS, [alchemyProvider({ apiKey: alchemyId! }), publicProvider()]);
 
@@ -53,9 +54,10 @@ const myTheme = merge(lightTheme(), {
         accentColor: '#ff9900',
     },
 } as Theme);
-
+const authRequiredRoutes = ['/dashboard', '/profile', '/protected-page'];
 export default function App({ Component, pageProps }: AppProps) {
-
+    const router = useRouter();
+    const isAuthRequired = authRequiredRoutes.includes(router.pathname);
     const metadata = {
         title: 'Smart Dropper | Shop on Amazon using Crypto  ',
         description:
@@ -67,7 +69,6 @@ export default function App({ Component, pageProps }: AppProps) {
 
         viewport: 'minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, viewport-fit=cover',
     };
-
 
     return (
         <>
@@ -88,7 +89,13 @@ export default function App({ Component, pageProps }: AppProps) {
                                 <SubscriptionContextProvider>
                                     <OrderContextProvider>
                                         <Layout>
-                                            <Component {...pageProps} />
+                                            {isAuthRequired ? (
+                                                <ProtectedRoute>
+                                                    <Component {...pageProps} />
+                                                </ProtectedRoute>
+                                            ) : (
+                                                <Component {...pageProps} />
+                                            )}
                                         </Layout>
                                     </OrderContextProvider>
                                 </SubscriptionContextProvider>
@@ -99,4 +106,26 @@ export default function App({ Component, pageProps }: AppProps) {
             </WagmiConfig>
         </>
     );
+}
+interface ProtectedRouteProps {
+    children: ReactNode;
+}
+
+function ProtectedRoute({ children }: ProtectedRouteProps) {
+    const { data: session, status } = useSession();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (status === 'loading') return;
+
+        if (!session) {
+            router.push('/login');
+        }
+    }, [session, status, router]);
+
+    if (!session) {
+        return null;
+    }
+
+    return <>{children}</>;
 }

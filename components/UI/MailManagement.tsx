@@ -19,32 +19,32 @@ function MailManagement() {
     const [emailError, setEmailError] = useState(false);
     const [emailOk, setEmailOk] = useState(false);
     const [verificationCode, setVerificationCode] = useState('');
-    const [insertedCode, setInsertedCode] = useState(''); 
+    const [insertedCode, setInsertedCode] = useState('');
     const [time, setTime] = useState(600);
     const [timeLeft, setTimeLeft] = useState(time);
 
-    const { countdownSeconds } = useSendCode(timeLeft, verificationCode, setVerificationCode); 
+    const { countdownSeconds } = useSendCode(timeLeft, verificationCode, setVerificationCode);
     const [loading, setLoading] = useState(false);
     const [confirmedCode, setConfirmedCode] = useState(false);
     useEffect(() => {
         // Se il tempo è finito, ferma il countdown
         if (timeLeft === 0) return;
-    
+
         // Imposta un intervallo per decrementare il tempo ogni secondo
         const intervalId = setInterval(() => {
-          setTimeLeft((prevTime) => prevTime - 1);
+            setTimeLeft(prevTime => prevTime - 1);
         }, 1000);
-    
+
         // Pulisce l'intervallo quando il componente viene smontato o il tempo cambia
         return () => clearInterval(intervalId);
-      }, [timeLeft]);
-    
-      // Funzione per formattare il tempo in formato MM:SS
-      const formatTime = (seconds:number) => {
+    }, [timeLeft]);
+
+    // Funzione per formattare il tempo in formato MM:SS
+    const formatTime = (seconds: number) => {
         const minutes = Math.floor(seconds / 60);
         const remainingSeconds = seconds % 60;
         return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
-      };
+    };
     const handleEmailVerification = (email: string) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -133,8 +133,8 @@ function MailManagement() {
         setVerificationCode('');
         setInsertedCode('');
     };
-    const generateRandomCode = () => { 
-        setTimeLeft(time); 
+    const generateRandomCode = () => {
+        setTimeLeft(time);
         setVerificationCode(Math.floor(100000 + Math.random() * 900000).toString());
     };
     const sendEmailVerification = async (data: any) => {
@@ -157,7 +157,6 @@ function MailManagement() {
         }
     }, [verificationCode, emailOk]);
 
-
     // useEffect(() => {
     //     if (!address) {
     //         router.push('/login');
@@ -165,7 +164,7 @@ function MailManagement() {
     // }, [address]);
     useEffect(() => {
         if (confirmedCode) {
-           location.reload();           
+            location.reload();
         }
     }, [confirmedCode]);
 
@@ -184,12 +183,11 @@ function MailManagement() {
                     <Card.Body className="d-flex flex-column justify-content-center">
                         <Card.Title as="h2" className="mb-3">
                             <div className="d-flex flex-column">
-                                <span> Verify Email</span>
-                                <h6> (or Change Email)</h6>
+                                <span> Change Email</span>
                             </div>
                         </Card.Title>
                         <div>
-                            <>Here you can verify or change your email address.</> <br />{' '}
+                            <>Here you can change your email address.</> <br />{' '}
                             <p className="disclaimer mt-3">
                                 Email is the only personal data we gather from our customers. We will use this email for all our communications with you. If you
                                 can&apos;t find our application received email, please check your spam inbox
@@ -236,7 +234,12 @@ function MailManagement() {
                             <Button className="btn btn-primary my-3" onClick={confirmCodeHandler} disabled={!verificationCode}>
                                 Confirm
                             </Button>
-                            <Button className="btn  my-3" onClick={generateRandomCode} disabled={countdownSeconds > 0} style={{ backgroundColor: '#dfdfdf', color: '#000' }}>
+                            <Button
+                                className="btn  my-3"
+                                onClick={generateRandomCode}
+                                disabled={countdownSeconds > 0}
+                                style={{ backgroundColor: '#dfdfdf', color: '#000' }}
+                            >
                                 Resend code {countdownSeconds === 0 ? '' : `in ${formatTime(timeLeft)} minutes`}
                             </Button>
                             <Button className="btn  my-3" onClick={changeMailHandler} style={{ backgroundColor: '#dfdfdf', color: '#000' }}>

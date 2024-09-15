@@ -3,6 +3,7 @@ import { OrderSB } from "../../types/OrderSB";
 import { supabase } from "../../utils/supabaseClient";
 
 export const SendEmailVerificationCode = async (data: any) => {
+     console.log("🚀 ~ SendEmailVerificationCode ~ data:", data)
      try {
           const encripedEmail = encryptData(JSON.stringify(data));
           const response = await fetch("/api/sendOpt", {

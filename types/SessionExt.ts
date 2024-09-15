@@ -1,6 +1,7 @@
 import { Session } from 'next-auth';
 
-export interface SessionExt extends Session {
+export interface SessionExt extends Session { 
+    id:string | null;
     address?: string | null;
     userid?: number | null;
     email?: string | null;

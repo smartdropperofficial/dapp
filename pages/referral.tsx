@@ -23,7 +23,7 @@ import { formatUnits } from 'ethers/lib/utils.js';
 import { ethers } from 'ethers';
 import { SubscriptionContext } from '@/store/subscription-context';
 import { ReferralCodeGenerator } from '@/utils/utils';
-import Image from "next/image";
+import Image from 'next/image';
 
 const Referral = () => {
     const subContext = useContext(SubscriptionContext);
@@ -36,7 +36,7 @@ const Referral = () => {
     const { addPromoterOnBC, getPromoterOnBC, registerAsPromoterOnBC } = usePromoterContract();
     const { addPromoterOnDB } = usePromoter();
 
-    const { getAllPromotersSubscriptionsOnBC, withdrawPromoterProfitOnBC, } = useSubscriptionManagement();
+    const { getAllPromotersSubscriptionsOnBC, withdrawPromoterProfitOnBC } = useSubscriptionManagement();
     const { width, height } = useWindowSize();
     const { address } = useAccount();
 
@@ -55,20 +55,26 @@ const Referral = () => {
     const [showRegistration, setShowRegistration] = useState<boolean>(false);
     const retryRef = useRef(0); // Ref to track retry attempts
     const inputRef = useRef<HTMLInputElement>(null); // Ref for the input field
+    // useEffect(() => {
+    //     if (!address) {
+    //         disconnect();
+    //         router.push('/login');
+    //     } else if (address && session?.address && session?.address === address) {
+    //     }
+    // }, [address, session?.address]);
     useEffect(() => {
-        if (!address) {
-            disconnect();
+        if (!session?.id) {
             router.push('/login');
         } else if (address && session?.address && session?.address === address) {
         }
-    }, [address, session?.address]);
+    }, [session?.id]);
     useEffect(() => {
         const fetchSubscriptions = async (address: string) => {
             if (!getAllPromotersSubscriptionsOnBC) return;
             try {
                 const result = await getAllPromotersSubscriptionsOnBC(address);
                 const subs = filterWithdrawnSusbcriptions(result);
-                console.log("🚀 ~ fetchSubscriptions ~ subs:", subs)
+                console.log('🚀 ~ fetchSubscriptions ~ subs:', subs);
                 setPromoterSubscriptions(subs);
                 setIsLoadingContract(false);
             } catch (error) {
@@ -86,7 +92,7 @@ const Referral = () => {
                 try {
                     const data: PromoterModel | null = await getPromoterOnBC(address);
                     if (data) {
-                        console.log("🚀 ~ data:", data)
+                        console.log('🚀 ~ data:', data);
                         if (data.referralCode && data.isActive) {
                             setReferralCode(data?.referralCode);
                             setPromoter(data);
@@ -135,7 +141,7 @@ const Referral = () => {
     }, [isLoaded, subContext.promoter, referralcode]);
 
     const calcPromoterProfit = useCallback(() => {
-        promoterSubscriptions.map((item) => console.log(item.promoterProfit));
+        promoterSubscriptions.map(item => console.log(item.promoterProfit));
         const tot = promoterSubscriptions.reduce((acc, item) => acc + Number(item.promoterProfit), 0);
         setProfit(tot);
     }, [promoterSubscriptions]);
@@ -177,11 +183,11 @@ const Referral = () => {
             const promoterResult: PromoterModel | null = await registerAsPromoterOnBC(referral);
             if (!promoterResult) {
                 Swal.fire({ title: 'Error', text: 'Error adding promoter on blockchain', icon: 'error' });
-                console.log("🚀 ~ subscribeAsPromoterHandler ~ _promoter:", promoterResult);
+                console.log('🚀 ~ subscribeAsPromoterHandler ~ _promoter:', promoterResult);
                 return;
             } else {
                 try {
-                    addPromoterOnDB(promoterResult.promoterAddress, promoterResult.referralCode);   // Add promoter to DB  
+                    addPromoterOnDB(promoterResult.promoterAddress, promoterResult.referralCode); // Add promoter to DB
                     subContext.setPromoterHandler(promoterResult);
 
                     Swal.fire({
@@ -190,15 +196,12 @@ const Referral = () => {
                     });
                 } catch (error) {
                     Swal.fire({ title: 'subscribeAsPromoterHandler', text: 'Error adding promoter on Supabase', icon: 'error' });
-                    return
+                    return;
                 }
-
             }
-
         } catch (error) {
             Swal.fire({ title: 'Error', text: 'Error adding promoter', icon: 'error' });
             console.error(error);
-
         } finally {
             setIsSubscribing(false);
         }
@@ -238,12 +241,7 @@ const Referral = () => {
         }
 
         try {
-
-            const { data, error } = await supabase
-                .from('users')
-                .update({ youtube_channel: youtubeChannel })
-                .eq('wallet_address', session?.address)
-                .select()
+            const { data, error } = await supabase.from('users').update({ youtube_channel: youtubeChannel }).eq('wallet_address', session?.address).select();
 
             if (error) {
                 Swal.fire({ title: 'Error', text: 'Error sending channel', icon: 'error' });
@@ -251,7 +249,6 @@ const Referral = () => {
                 Swal.fire({ title: 'Success', text: 'Channel sent!', icon: 'success' });
             }
             setYoutubeChannel('');
-
         } catch (error) {
             Swal.fire({ title: 'Error', text: 'Error sending channel', icon: 'error' });
             console.error(error);
@@ -267,11 +264,11 @@ const Referral = () => {
         }
     }, [youtubeChannel]);
 
-    useEffect(() => {
-        if (!address) {
-            router.push('/login');
-        }
-    }, [address, session?.address])
+    // useEffect(() => {
+    //     if (!address) {
+    //         router.push('/login');
+    //     }
+    // }, [address, session?.address]);
 
     function RenderDashboard() {
         return (
@@ -329,21 +326,24 @@ const Referral = () => {
                                             <h4>
                                                 {' '}
                                                 <b>Are you an INFLUENCER?</b> Work with us!!!{' '}
-
                                             </h4>
-                                            <Image src="/assets/youtuber.png" width={250} height={200} style={{ objectFit: "contain" }} alt="SmartDropper Logo Black" />
+                                            <Image
+                                                src="/assets/youtuber.png"
+                                                width={250}
+                                                height={200}
+                                                style={{ objectFit: 'contain' }}
+                                                alt="SmartDropper Logo Black"
+                                            />
                                             <br />
-                                            <h5 >
+                                            <h5>
                                                 Get up to <b>20%</b>
                                                 <span> on each subscription.</span>
                                             </h5>{' '}
                                             <div className="col-12 col-lg-12 d-flex flex-column align-items-center justify-content-center ">
-
                                                 <div className="col-10  d-flex flex-column  align-items-center justify-content-center  ">
-                                                    <div className='col-12'>
-                                                    </div>
+                                                    <div className="col-12"></div>
                                                     <span></span>
-                                                    <div className='col-10'>
+                                                    <div className="col-10">
                                                         <Form.Control
                                                             ref={inputRef}
                                                             type="text"
@@ -439,7 +439,7 @@ const Referral = () => {
                                             onClick={withdrawHandler}
                                         >
                                             <img src="/icons/usdt.svg" alt="usdt" width={30} height={30} />
-                                            <div className='d-flex align-items-center justify-content-center w-100'>
+                                            <div className="d-flex align-items-center justify-content-center w-100">
                                                 <span>Usdt - {Number(profit).toFixed(2)}</span>
                                             </div>
                                         </button>
@@ -467,7 +467,14 @@ const Referral = () => {
                                             Activate your dedicated promoter section independently to manage and promote your activities.
                                         </h5>
                                         <br />
-                                        <Button variant="primary" type="submit" className="col-12 my-5 w-75 text-start" size="sm" onClick={subscribeAsPromoterHandler} disabled={isSubscribing}>
+                                        <Button
+                                            variant="primary"
+                                            type="submit"
+                                            className="col-12 my-5 w-75 text-start"
+                                            size="sm"
+                                            onClick={subscribeAsPromoterHandler}
+                                            disabled={isSubscribing}
+                                        >
                                             {isSubscribing ? 'Loading...' : 'Activate'}
                                         </Button>
                                     </Container>
@@ -524,7 +531,7 @@ export default Referral;
 // export async function getServerSideProps(context: GetSessionParams | undefined ) {
 //     const session :  SessionExt | null  = await getSession(context); // Recupera la sessione come preferisci
 //     console.log("🚀 ~ getServerSideProps ~ session:", session)
-  
+
 //     if (!session || session.email === '' || session.verified === false) {
 //         return {
 //             redirect: {
