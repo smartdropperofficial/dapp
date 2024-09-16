@@ -6,10 +6,14 @@ export async function middleware(req: NextRequest) {
     const session = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
     // Controlla se l'utente è verificato
-    if (!session || !session.verified) {
+    if (session && session?.needsEmail) {
         // Fai il redirect alla pagina di verifica dell'email
-        return NextResponse.redirect(new URL('/verify-email', req.url));
-    }
+        return NextResponse.redirect(new URL('/link-email', req.url));
+    } 
+    if (!session ) {
+      // Fai il redirect alla pagina di verifica dell'email
+      return NextResponse.redirect(new URL('/login', req.url));
+  }
 
     // Permetti l'accesso se l'utente è verificato
     return NextResponse.next();

@@ -18,14 +18,15 @@ import { publicProvider } from 'wagmi/providers/public';
 import merge from 'lodash.merge';
 import Head from 'next/head';
 import 'react-loading-skeleton/dist/skeleton.css';
-import "react-datepicker/dist/react-datepicker.css";
-
+import 'react-datepicker/dist/react-datepicker.css';
+import SessionGuard from './SessionGuard';
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
 const isDev = process.env.NODE_ENV === 'development';
 
 const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
 const CHAINS = isDev ? [hardhat, polygon] : [polygon, hardhat];
 // const CHAINS = [hardhat];
-
 
 const { provider, chains } = configureChains(CHAINS, [alchemyProvider({ apiKey: alchemyId! }), publicProvider()]);
 
@@ -55,7 +56,6 @@ const myTheme = merge(lightTheme(), {
 } as Theme);
 
 export default function App({ Component, pageProps }: AppProps) {
-
     const metadata = {
         title: 'Smart Dropper | Shop on Amazon using Crypto  ',
         description:
@@ -67,7 +67,6 @@ export default function App({ Component, pageProps }: AppProps) {
 
         viewport: 'minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, viewport-fit=cover',
     };
-
 
     return (
         <>
@@ -88,7 +87,9 @@ export default function App({ Component, pageProps }: AppProps) {
                                 <SubscriptionContextProvider>
                                     <OrderContextProvider>
                                         <Layout>
-                                            <Component {...pageProps} />
+                                            <SessionGuard>
+                                                <Component {...pageProps} />
+                                            </SessionGuard>
                                         </Layout>
                                     </OrderContextProvider>
                                 </SubscriptionContextProvider>

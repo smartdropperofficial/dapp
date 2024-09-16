@@ -23,18 +23,8 @@ import { SessionExt } from '@/types/SessionExt';
 // import { withAuth } from '@/withAuth';
 
 export default function Home() {
-    const { disconnect } = useDisconnect();
-
-    const configCtx = useContext(ConfigContext);
-
     const { currentStep: step } = useContext(OrderContext);
-    const { address } = useAccount();
-    useEffect(() => {
-        if (!address) {
-            disconnect();
-            router.push('/login');
-        }
-    }, [address]);
+
     useEffect(() => {
         const middleOfPage = window.innerHeight / 2;
         window.scrollTo({ top: middleOfPage, behavior: 'smooth' });
@@ -80,7 +70,6 @@ export default function Home() {
         }
     };
 
-
     return (
         <>
             <Head>
@@ -120,12 +109,10 @@ export default function Home() {
                 />
             </Head>
 
-            {step === 3 ?
+            {step === 3 ? (
                 <div className="container h-100 d-flex justify-content-center align-items-start flex-column">
-
-
                     <div className="row w-100 justify-content-lg-start justify-content-center">
-                        <div className='d-flex flex-column flex-lg-row'>
+                        <div className="d-flex flex-column flex-lg-row">
                             <section className="col-md-10 col-lg-7 col-12 p-0 py-lg-3 mx-lg-3 mb-5 ">
                                 <Card>
                                     {SetDescription()}
@@ -134,14 +121,13 @@ export default function Home() {
                                     {/* <NextStep /> */}
                                 </Card>
                             </section>
-                            <section id='basket' className="col-md-10 col-lg-6 col-12  p-0 py-lg-3">
+                            <section id="basket" className="col-md-10 col-lg-6 col-12  p-0 py-lg-3">
                                 <Card>
                                     <Basket />
                                     <NextStep />
                                 </Card>
                             </section>
                         </div>
-
                     </div>
                     {/* <div className="row w-100 justify-content-lg-start justify-content-center">
                         <div className='d-flex flex-column flex-lg-row'>
@@ -156,7 +142,8 @@ export default function Home() {
                         </div>
 
                     </div> */}
-                </div> :
+                </div>
+            ) : (
                 <div className="container h-100 d-flex justify-content-center align-items-center">
                     <div className="row w-100 justify-content-center">
                         <div className="col-md-10 col-lg-8 p-0 py-1">
@@ -169,27 +156,23 @@ export default function Home() {
                                 <OrderSteps currentStep={step} />
                                 {stepContent()}
                                 <NextStep />
-
                             </Card>
-
                         </div>
                         {/* <div className="col-md-10 col-lg-8 p-0 py-lg-1">
                             <Card>
                                 <NextStep />
                             </Card>
                         </div> */}
-
                     </div>
-
-                </div>}
-
+                </div>
+            )}
         </>
     );
 }
 // export async function getServerSideProps(context: GetSessionParams | undefined ) {
 //     const session :  SessionExt | null  = await getSession(context); // Recupera la sessione come preferisci
 //     console.log("🚀 ~ getServerSideProps ~ session:", session)
-  
+
 //     if (!session || session.email === '' || session.verified === false) {
 //         return {
 //             redirect: {

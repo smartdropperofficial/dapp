@@ -11,9 +11,7 @@ import Swal from 'sweetalert2';
 import { ConfigContext } from '@/store/config-context';
 import Messages from './Messages';
 
-
 const Layout: React.FC<{ children: React.ReactNode }> = props => {
-
     const ctx = useContext(OrderContext);
     const ctxConfig = useContext(ConfigContext);
     const { data: session }: { data: SessionExt | null; status: string } = useSession() as { data: SessionExt | null; status: string };
@@ -31,7 +29,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
         if (!address) {
             router.push('/login');
         }
-    }, [address]);  
+    }, [address]);
 
     useEffect(() => {
         // Funzione di controllo della sessione
@@ -52,8 +50,6 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
             router.events.off('routeChangeComplete', checkSession);
         };
     }, [router, session]);
-    
-    
 
     useEffect(() => {
         if (session?.address && address && session?.address !== address) {
@@ -87,15 +83,12 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
     }, [windowWidth]);
     // Assicurati di includere isChrome nell'array delle dipendenze
     useEffect(() => {
-
         if (ctxConfig) {
         }
-    }, [ctxConfig])
+    }, [ctxConfig]);
 
     return (
         <>
-
-
             <div className="d-flex flex-column justify-content-between align-items-between">
                 <div className={`menu-resp ${showMenuResp && 'active'}`}>
                     <div className="btn-close-menu sticky-top px-2 " onClick={() => setShowMenuResp(false)}></div>
@@ -144,10 +137,11 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                                         <li className="d-xl-none">
                                             <Link href="/referral" legacyBehavior>
                                                 <a
-                                                    className={`d-flex align-items-center ${isMounted && router.asPath !== '/subscribe' && 'text-black'}`}
+                                                    className={`d-flex align-items-center  ${isMounted && router.asPath !== '/subscribe' && 'text-black'}`}
                                                     onClick={() => {
                                                         setShowMenuResp(false);
                                                     }}
+                                                    style={{ borderStyle: 'dotted' }}
                                                 >
                                                     Referral
                                                 </a>
@@ -183,7 +177,9 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                                         {/* <PromoterWrapper> */}
                                         <li className="d-none d-xl-inline-block fw-bold">
                                             <Link href="/referral" legacyBehavior>
-                                                <a className={`${isMounted}`}>Referral</a>
+                                                <a className={`${isMounted}`} style={{ borderStyle: 'dotted' }}>
+                                                    Referral
+                                                </a>
                                             </Link>
                                         </li>
                                         {/* </PromoterWrapper> */}
@@ -221,17 +217,14 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                                         </li>
                                         <li className="d-none d-xl-inline-block">
                                             <Link href="/subscribe" legacyBehavior>
-                                                <a className={`${isMounted && router.asPath !== '/subscribe' && 'text-black'}`} onClick={() => { }}>
+                                                <a className={`${isMounted && router.asPath !== '/subscribe' && 'text-black'}`} onClick={() => {}}>
                                                     Subscribe
                                                 </a>
                                             </Link>
                                         </li>
                                         <li className="d-none d-xl-inline-block">
                                             <Link href="/my-orders" legacyBehavior>
-                                                <a
-                                                    className={`${isMounted && router.asPath !== '/my-orders' && 'text-black  text-center'}`}
-                                                    onClick={() => { }}
-                                                >
+                                                <a className={`${isMounted && router.asPath !== '/my-orders' && 'text-black  text-center'}`} onClick={() => {}}>
                                                     My Orders
                                                 </a>
                                             </Link>
@@ -250,17 +243,16 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                                         </li>
                                         <li className="d-none d-xl-inline-block">
                                             <Link href="/settings" legacyBehavior>
-                                                <a
-                                                    className={`${isMounted && router.asPath !== '/Settings' && 'text-black  text-center'}`}
-                                                    onClick={() => { }}
-                                                >
+                                                <a className={`${isMounted && router.asPath !== '/Settings' && 'text-black  text-center'}`} onClick={() => {}}>
                                                     Settings
                                                 </a>
                                             </Link>
                                         </li>
                                         <li className="d-none d-xl-inline-block fw-bold">
                                             <Link href="/referral" legacyBehavior>
-                                                <a className={`${isMounted}`}>Referral</a>
+                                                <a className={`${isMounted} p-1`} style={{ borderStyle: 'dotted' }}>
+                                                    Referral
+                                                </a>
                                             </Link>
                                         </li>
                                         <li className="ms-3 d-xl-none">
@@ -268,10 +260,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                                                 <Image src="/assets/menu.png" alt="SmartShopper Menu Icon" width={40} height={40} />
                                             </button>
                                         </li>
-                                        <li>
-                                            {/* <Messages /> */}
-
-                                        </li>
+                                        <li>{/* <Messages /> */}</li>
                                         {/* <PromoterWrapper> */}
                                         {/* </PromoterWrapper> */}
                                     </ul>
@@ -305,7 +294,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                                 </Link>
                             </div>
                             <div className="col-lg-6 d-flex align-items-center justify-content-center my-4 my-md-0 flex-column">
-                                <p className="mb-0">© Smart Dropper LTD </p> <p className="disclaimer"> {year} - All rights Reserved</p>
+                                <p className="mb-0">© Smart Dropper LLP </p> <p className="disclaimer"> {year} - All rights Reserved</p>
                                 <p className="mb-0 ">124 City Road, EC1V 2NX </p>
                                 <p className="mb-0">London, UK </p>
                             </div>
@@ -319,7 +308,6 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                         <Loading dark={true} />
                     </ModalOverlay> */}
             </div>
-
         </>
     );
 };

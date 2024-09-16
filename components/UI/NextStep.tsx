@@ -195,7 +195,7 @@ const NextStep: React.FC = () => {
     };
     useEffect(() => {
         if (session) {
-            setGo(!session?.verified === false || session?.email === null || session?.address === null || session?.plan === null);
+            setGo(!session?.verified === false || session?.email === null || session?.address === null);
         }
     }, [session]);
 
@@ -218,10 +218,9 @@ const NextStep: React.FC = () => {
                     disabled={orderCtx.currentStep === 6 || !go}
                     onClick={nextStepHandler}
                 >
-                    <strong className="me-3">NEXT</strong>{' '}
+                    <strong className="me-3">NEXT </strong>{' '}
                     <Image src={'/assets/back.png'} className="btn-next" height={50} width={50} alt="SmartShopper Next Icon" />
                 </button>
-
                 <ModalOverlay show={isLoading}>
                     <Loading loadingText={'Loading'} />
                 </ModalOverlay>
