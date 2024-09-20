@@ -60,7 +60,6 @@ const AddProducts = () => {
             return;
         }
 
-
         if (CheckIsMinified()) {
             Swal.fire({
                 title: 'This is a link from Amazon<b> Mobile App</b>!',
@@ -113,7 +112,6 @@ const AddProducts = () => {
                                                     icon: 'error',
                                                 });
                                                 return;
-
                                             }
                                             break;
                                         case 'RAINFOREST':
@@ -129,7 +127,6 @@ const AddProducts = () => {
                                                     icon: 'error',
                                                 });
                                                 return;
-
                                             }
                                             break;
                                         case 'OXYLABS':
@@ -137,8 +134,6 @@ const AddProducts = () => {
                                             productInfo = resp.data.results[0].content as Content;
                                             // console.log("🚀 ~ file: AddProducts.tsx:118 ~ addProduct ~ productInfo:", productInfo)
                                             if (productInfo && checkShopLimit(productInfo?.price)) {
-
-
                                                 orderContext.itemsHandler(orderContext.items.length + 1, 'OXYLABS', 'add', productInfo);
                                             } else {
                                                 Swal.fire({
@@ -229,29 +224,29 @@ const AddProducts = () => {
         }
     };
     const checkShopLimit = (itemPrice: number): boolean => {
-        if (subContext.currentSubscription && subContext.currentSubscription?.subscriptionModel.shopLimit! > 0) {
-            if (subContext.currentSubscription?.totShopAmountPaid! + itemPrice >= subContext.currentSubscription?.subscriptionModel.shopLimit!) {
+        if (subContext.currentSubscription && subContext.currentSubscription?.subscriptionModel?.shopLimit! > 0) {
+            if (subContext.currentSubscription?.totShopAmountPaid! + itemPrice >= subContext.currentSubscription?.subscriptionModel?.shopLimit!) {
                 return false;
             }
         }
         return true;
-    }
+    };
     const amountLeft = (): string => {
-        if (subContext?.currentSubscription?.subscriptionModel.shopLimit! > 0) {
-            const tot = subContext?.currentSubscription?.subscriptionModel.shopLimit! - subContext?.currentSubscription?.totShopAmountPaid! - basketTotal();
-            // return tot.toFixed(2); 
+        if (subContext?.currentSubscription?.subscriptionModel?.shopLimit! > 0) {
+            const tot = subContext?.currentSubscription?.subscriptionModel?.shopLimit! - subContext?.currentSubscription?.totShopAmountPaid! - basketTotal();
+            // return tot.toFixed(2);
             return tot > 0 ? '$' + tot.toFixed(2) : '$0.00';
         } else {
-            return "Unlimited";
+            return 'Unlimited';
         }
-    }
+    };
     const basketTotal = (): number => {
         let total = 0;
-        orderContext.items.forEach((el) => {
+        orderContext.items.forEach(el => {
             total += el.price! * el.quantity;
         });
         return total;
-    }
+    };
     return (
         <section id="add-products" className="mt-5">
             <div className="row">
@@ -263,32 +258,48 @@ const AddProducts = () => {
                             placeholder="Insert Amazon Item Link"
                             onChange={e => setLink(e.target.value)}
                             value={link}
-                            disabled={subContext.currentSubscription?.subscriptionModel.shopLimit !== 0 && subContext.currentSubscription?.totShopAmountPaid! >= subContext.currentSubscription?.subscriptionModel.shopLimit!}
+                            disabled={
+                                subContext.currentSubscription?.subscriptionModel?.shopLimit !== 0 &&
+                                subContext.currentSubscription?.totShopAmountPaid! >= subContext.currentSubscription?.subscriptionModel?.shopLimit!
+                            }
                         />
-                        <button className="btn btn-add-in sn btn-primary  rounded-0 " onClick={addProduct} disabled={subContext.currentSubscription?.subscriptionModel.shopLimit !== 0 && subContext.currentSubscription?.totShopAmountPaid! >= subContext.currentSubscription?.subscriptionModel.shopLimit!}>
+                        <button
+                            className="btn btn-add-in sn btn-primary  rounded-0 "
+                            onClick={addProduct}
+                            disabled={
+                                subContext.currentSubscription?.subscriptionModel?.shopLimit !== 0 &&
+                                subContext.currentSubscription?.totShopAmountPaid! >= subContext.currentSubscription?.subscriptionModel?.shopLimit!
+                            }
+                        >
                             Add Item
                         </button>
                     </div>
-                    {subContext?.currentSubscription ? <div className='w-100 d-flex justify-content-end'>
-                        <div className='d-flex flex-column ' >
-                            <div className='d-flex align-items-center justify-content-end '>
-                                <div className='mx-2 fs-5  m-0' >
-                                    Monthly Shop budget left:
-                                </div>
-                                <div className='d-flex align-items-center  justify-content-end' style={{ width: '30%' }}  >
-                                    <label className='text-danger h4 ' htmlFor='spent-limit' >
-                                    </label>
-                                    <input disabled={true} style={{ textAlign: 'center', fontWeight: 'bold', color: amountLeft() === '$0.00' ? '#dc3545' : '#198754' }} id='spent-limit' className='mw-100 h4 rounded-3 border-0 p-3' value={amountLeft()} />
+                    {subContext?.currentSubscription ? (
+                        <div className="w-100 d-flex justify-content-end">
+                            <div className="d-flex flex-column ">
+                                <div className="d-flex align-items-center justify-content-end ">
+                                    <div className="mx-2 fs-5  m-0">
+                                        <b> Monthly Shop budget left0:</b>
+                                    </div>
+                                    <div className="d-flex align-items-center  justify-content-end" style={{ width: '30%' }}>
+                                        <label className="text-danger h4 " htmlFor="spent-limit"></label>
+                                        <input
+                                            disabled={true}
+                                            style={{ textAlign: 'center', fontWeight: 'bold', color: amountLeft() === '$0.00' ? '#dc3545' : '#198754' }}
+                                            id="spent-limit"
+                                            className="mw-100 h4 rounded-3 border-0 p-3"
+                                            value={amountLeft()}
+                                        />
+                                    </div>
                                 </div>
                             </div>
-
                         </div>
-                    </div> : <></>}
-
+                    ) : (
+                        <></>
+                    )}
                 </div>
             </div>
             <ModalOverlay show={isLoading}>
-
                 <div className="d-flex flex-column justify-content-center my-3 rounded  ">
                     <img src={'/Loading-Blockchain.gif'} alt="" height={200} className="rounded-4" />
                 </div>

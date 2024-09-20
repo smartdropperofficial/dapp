@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import React, { useContext } from 'react'
+import React, { useContext } from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import { OrderContext } from '../../store/order-context';
@@ -16,45 +16,41 @@ function Basket() {
 
     const incrementButtonHandler = (id: number, price: number) => {
         if (subContext?.currentSubscription?.subscriptionModel?.shopLimit! > 0) {
-            if ((price + basketTotal() + subContext?.currentSubscription?.totShopAmountPaid!) > subContext?.currentSubscription?.subscriptionModel?.shopLimit!) {
+            if (price + basketTotal() + subContext?.currentSubscription?.totShopAmountPaid! > subContext?.currentSubscription?.subscriptionModel?.shopLimit!) {
                 Swal.fire({
                     title: 'Warning',
                     text: 'You have reached the limit of your subscription',
                     icon: 'warning',
-                    confirmButtonText: 'Ok'
-                })
-
+                    confirmButtonText: 'Ok',
+                });
             } else {
-                orderContext.incrementHandler(id, 'add')
-
+                orderContext.incrementHandler(id, 'add');
             }
         } else {
-            // console.log('incrementButtonHandler', id)   
-            orderContext.incrementHandler(id, 'add')
+            // console.log('incrementButtonHandler', id)
+            orderContext.incrementHandler(id, 'add');
         }
-    }
+    };
     const basketTotal = (): number => {
         let total = 0;
-        orderContext.items.forEach((el) => {
+        orderContext.items.forEach(el => {
             total += el.price! * el.quantity;
         });
         return total;
-    }
+    };
     const amountLeft = (): string => {
-        if (subContext?.currentSubscription?.subscriptionModel.shopLimit! && subContext?.currentSubscription?.totShopAmountPaid! && basketTotal()) {
+        if (subContext?.currentSubscription?.subscriptionModel?.shopLimit! && subContext?.currentSubscription?.totShopAmountPaid! && basketTotal()) {
             const tot = subContext?.currentSubscription?.subscriptionModel.shopLimit! - subContext?.currentSubscription?.totShopAmountPaid! - basketTotal();
-            // return tot.toFixed(2); 
-            return tot > 0 ? "$" + tot.toFixed(2) : '$0.00';
+            // return tot.toFixed(2);
+            return tot > 0 ? '$' + tot.toFixed(2) : '$0.00';
         } else {
-            return "Unlimited";
+            return 'Unlimited';
         }
-    }
-
+    };
 
     return (
-        <section id='basket'>
+        <section id="basket">
             <div className="mt-4">
-
                 {orderContext.items.length < 1 && <h5 className="text-center pt-5 mb-3">Your Cart Items</h5>}
                 {orderContext.items.length < 1 && <small className="d-block text-center mb-3">No Items added.</small>}
                 {orderContext.items.length > 0 &&
@@ -79,8 +75,6 @@ function Basket() {
                                                 </Link>
                                             </div>
                                             {/* <b> Price: ${el.price!.toFixed(2)}  </b> */}
-
-
                                         </div>
                                         <div className="row d-flex mt-3 col-12 flex-column ">
                                             <div className="col-12   d-flex my-lg-0 my-3 align-items-center mb-5 ">
@@ -136,7 +130,6 @@ function Basket() {
                                                 {/* </div> */}
                                             </div>
                                         </div>
-
                                     </div>
                                 </ItemCard>
                             </div>
@@ -145,22 +138,15 @@ function Basket() {
             </div>
             <hr />
             <div className="my-4 mx-3 flex-column  d-flex align-items-end ">
-
-                <div className='d-flex flex-column align-items-end mb-5'>
-                    <h3>
-                        Total Basket
-                    </h3>
+                <div className="d-flex flex-column align-items-end mb-5">
+                    <h3>Total Basket</h3>
                     <h2>
-
                         <b>{'$' + basketTotal().toFixed(2)}</b>
                     </h2>
                 </div>
-
-
             </div>
-
         </section>
-    )
+    );
 }
 
-export default Basket
+export default Basket;

@@ -17,29 +17,29 @@ type ConfigType = {
     promoter_contract: string;
     subscription_contract: string;
     subscription_management_contract: string;
-    amazon_api: string; 
-    orderAbi:string, 
-    promoterAbi:string,
-    subscriptionPlanAbi:string,
-    subscriptionManagementAbi:string
-}; 
+    amazon_api: string;
+    orderAbi: string;
+    promoterAbi: string;
+    subscriptionPlanAbi: string;
+    subscriptionManagementAbi: string;
+};
 type AbiConfig = {
-    orderAbi:string, 
-    promoterAbi:string,
-    subscriptionPlanAbi:string,
-    subscriptionManagementAbi:string
-}
+    orderAbi: string;
+    promoterAbi: string;
+    subscriptionPlanAbi: string;
+    subscriptionManagementAbi: string;
+};
 
 export const ConfigContext = createContext({
-    config: null as ConfigType | null, 
-    abiConfig : null as  AbiConfig | null,
-    setConfigHandler: (config: ConfigType | null) => { },
+    config: null as ConfigType | null,
+    abiConfig: null as Partial<AbiConfig> | null,
+    setConfigHandler: (config: ConfigType | null) => {},
     setAbiConfigHandler: (abiConfig: Partial<AbiConfig> | null) => {},
 });
 
 const ConfigContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { data: session }: { data: SessionExt | null } = useSession() as { data: SessionExt | null };
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+    // const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const [config, setConfig] = useState<ConfigType | null>({
         id: 0,
@@ -54,25 +54,24 @@ const ConfigContextProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         promoter_contract: '',
         subscription_contract: '',
         subscription_management_contract: '',
-        amazon_api: '', 
-        orderAbi:'', 
-        promoterAbi:'',
-        subscriptionPlanAbi:'',
-        subscriptionManagementAbi:''
-    }); 
+        amazon_api: '',
+        orderAbi: '',
+        promoterAbi: '',
+        subscriptionPlanAbi: '',
+        subscriptionManagementAbi: '',
+    });
 
     const [configAbi, setConfigAbi] = useState<Partial<AbiConfig> | null>({
-         
-        orderAbi:'', 
-        promoterAbi:'',
-        subscriptionPlanAbi:'',
-        subscriptionManagementAbi:''
+        orderAbi: '',
+        promoterAbi: '',
+        subscriptionPlanAbi: '',
+        subscriptionManagementAbi: '',
     });
 
     const setAbiConfigHandler = (partialAbiConfig: Partial<AbiConfig> | null) => {
-        setConfigAbi((prevAbiConfig) => ({
+        setConfigAbi(prevAbiConfig => ({
             ...prevAbiConfig,
-            ...partialAbiConfig,  // Sovrascrive solo i campi specificati
+            ...partialAbiConfig, // Sovrascrive solo i campi specificati
         }));
     };
 
@@ -82,10 +81,10 @@ const ConfigContextProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
     const store = {
         config: config,
-        isLoading: isLoading,
+        // isLoading: isLoading,
         abiConfig: configAbi,
-        setConfigHandler, 
-        setAbiConfigHandler
+        setConfigHandler,
+        setAbiConfigHandler,
     };
 
     useEffect(() => {
@@ -114,10 +113,6 @@ const ConfigContextProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             fetchConfig();
         }
     }, [session, session?.config_db]);
-
-
-
-
 
     useEffect(() => {
         if (config) {

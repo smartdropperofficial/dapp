@@ -19,16 +19,16 @@ export const SubscriptionContext = createContext({
     canPay: false as boolean,
     subscriptionsModels: [] as SubscriptionModel[],
     promoter: null as PromoterModel | null,
-    setCurrentSubscriptionHandler: async (subscription: SubscriptionManagementModel | null) => { },
-    setSubscriptionModels: (models: SubscriptionModel[]) => { },
-    setSelectedPackageHandler: (subscription: number | null) => { },
-    setSubscriptionIdHandler: (id: number) => { },
-    setPromoterReferralHandler: (referral: string | null | undefined) => { },
-    setIsReferralCodeAppliedHandler: (isApplied: boolean) => { },
-    setDebouncedReferralCodeHandler: (code: string) => { },
-    setCanPayHandler: (canpay: boolean) => { },
-    setAllSubscriptionsHandler: (subscriptions: SubscriptionManagementModel[]) => { },
-    setPromoterHandler: (promoter: PromoterModel | null) => { },
+    setCurrentSubscriptionHandler: async (subscription: SubscriptionManagementModel | null) => {},
+    setSubscriptionModels: (models: SubscriptionModel[]) => {},
+    setSelectedPackageHandler: (subscription: number | null) => {},
+    setSubscriptionIdHandler: (id: number) => {},
+    setPromoterReferralHandler: (referral: string | null | undefined) => {},
+    setIsReferralCodeAppliedHandler: (isApplied: boolean) => {},
+    setDebouncedReferralCodeHandler: (code: string) => {},
+    setCanPayHandler: (canpay: boolean) => {},
+    setAllSubscriptionsHandler: (subscriptions: SubscriptionManagementModel[]) => {},
+    setPromoterHandler: (promoter: PromoterModel | null) => {},
 });
 
 const SubscriptionContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -82,7 +82,7 @@ const SubscriptionContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
     };
     const setPromoterHandler = (promoter: PromoterModel | null) => {
         setPromoter(promoter);
-    }
+    };
 
     const store = {
         currentSubscription: currentSubscription,
@@ -103,30 +103,44 @@ const SubscriptionContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
         setDebouncedReferralCodeHandler: setDebouncedReferralCodeHandler, // Add setDebouncedReferralCode property
         setCanPayHandler: setCanPayHandler, // Add setCanPay property
         setSubscriptionModels: setSubscriptionModels, // Add setSubscriptionModels property
-        setAllSubscriptionsHandler: setAllSubscriptionsHandler, // Add setAllSubscriptions property 
-        setPromoterHandler: setPromoterHandler, // Add setPromoter property 
+        setAllSubscriptionsHandler: setAllSubscriptionsHandler, // Add setAllSubscriptions property
+        setPromoterHandler: setPromoterHandler, // Add setPromoter property
     };
     useEffect(() => {
         if (currentSubscription !== null) {
-            if (currentSubscription?.subscriptionModel.shopLimit === 0) { // se il limite è 0   
+            if (currentSubscription?.subscriptionModel?.shopLimit === 0) {
+                // se il limite è 0
                 setCanPay(true);
             } else if (
-
                 currentSubscription && // se c'è un abbonamento attivo
-                currentSubscription?.subscriptionModel.shopLimit! > 0 && // se c'è un limite impostato per lo shop
-                currentSubscription?.totShopAmountPaid! >= currentSubscription?.subscriptionModel.shopLimit! // se il limite è stato raggiunto
+                currentSubscription?.subscriptionModel?.shopLimit! > 0 && // se c'è un limite impostato per lo shop
+                currentSubscription?.totShopAmountPaid! >= currentSubscription?.subscriptionModel?.shopLimit! // se il limite è stato raggiunto
             ) {
-                console.log("🚀 ~ useEffect ~ currentSubscription?.totShopAmountPaid! >= currentSubscription?.subscriptionModel.shopLimit!:", currentSubscription?.totShopAmountPaid! >= currentSubscription?.subscriptionModel.shopLimit!)
+                console.log(
+                    '🚀 ~ useEffect ~ currentSubscription?.totShopAmountPaid! >= currentSubscription?.subscriptionModel.shopLimit!:',
+                    currentSubscription?.totShopAmountPaid! >= currentSubscription?.subscriptionModel?.shopLimit!
+                );
 
                 setCanPay(false);
-            } else if (currentSubscription && currentSubscription?.subscriptionModel.shopLimit! > 0 && currentSubscription?.totShopAmountPaid! < currentSubscription?.subscriptionModel.shopLimit!) {
-                console.log("🚀 ~ useEffect ~ currentSubscription?.totShopAmountPaid! >= currentSubscription?.subscriptionModel.shopLimit!:", currentSubscription && currentSubscription?.subscriptionModel.shopLimit! > 0 && currentSubscription?.totShopAmountPaid! < currentSubscription?.subscriptionModel.shopLimit!)
+            } else if (
+                currentSubscription &&
+                currentSubscription?.subscriptionModel?.shopLimit! > 0 &&
+                currentSubscription?.totShopAmountPaid! < currentSubscription?.subscriptionModel?.shopLimit!
+            ) {
+                console.log(
+                    '🚀 ~ useEffect ~ currentSubscription?.totShopAmountPaid! >= currentSubscription?.subscriptionModel.shopLimit!:',
+                    currentSubscription &&
+                        currentSubscription?.subscriptionModel?.shopLimit! > 0 &&
+                        currentSubscription?.totShopAmountPaid! < currentSubscription?.subscriptionModel?.shopLimit!
+                );
 
                 setCanPay(true);
             }
-        } else if (currentSubscription === null) { // se non c'è un abbonamento attivo 
-            console.log(' se non cè un abbonamento attivo ')
-            if (selectedPackageId > -1) { // se c'è un pacchetto selezionato
+        } else if (currentSubscription === null) {
+            // se non c'è un abbonamento attivo
+            console.log(' se non cè un abbonamento attivo ');
+            if (selectedPackageId > -1) {
+                // se c'è un pacchetto selezionato
                 setCanPay(false);
             } else {
                 setCanPay(true);
@@ -135,18 +149,16 @@ const SubscriptionContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }, [selectedPackageId, currentSubscription]);
 
     //    useEffect(() => {
-    //        if(getSubscriptionById) { 
-    //         getSubscriptionById(Number(currentSubscription?.id)).then((res) => {    
-    //             setCurrentSubscription(res); 
+    //        if(getSubscriptionById) {
+    //         getSubscriptionById(Number(currentSubscription?.id)).then((res) => {
+    //             setCurrentSubscription(res);
     //         });
-    //     }   
+    //     }
 
     //    }, [currentSubscription])
 
     useEffect(() => {
-
         if (session?.address && address && getLastValidSubscription !== null && getSubscriptionById !== null) {
-
             getLastValidSubscription(session?.address).then(data => {
                 if (data !== null && data?.subscriber === session?.address && address) {
                     getSubscriptionById(data?.id!).then(sub => {
@@ -165,24 +177,23 @@ const SubscriptionContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
                 try {
                     const data: PromoterModel | null = await getPromoterOnBC(address);
                     if (data) {
-                        console.log("🚀 ~ data:", data)
+                        console.log('🚀 ~ data:', data);
                         if (data.referralCode && data.isActive) {
                             setPromoterHandler(data);
                         } else if (!data.isActive) {
                         }
                     } else {
                         setPromoterHandler(null);
-
                     }
                 } catch (error) {
                 } finally {
                 }
             }
         }
-        if (session?.address && address, getPromoterOnBC) {
+        if ((session?.address && address, getPromoterOnBC)) {
             getData();
         }
-    }, [session?.address, address, getPromoterOnBC])
+    }, [session?.address, address, getPromoterOnBC]);
 
     useEffect(() => {
         const fetchSubscriptions = async () => {
@@ -201,7 +212,6 @@ const SubscriptionContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
         if (subscriptionsModels.length === 0) {
             fetchSubscriptions();
         }
-
     }, [getSubscriptionModels]);
 
     useEffect(() => {

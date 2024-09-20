@@ -19,7 +19,7 @@ const LoadSubscripionsPackages: React.FC<{}> = () => {
     //                 const result = await getSubscriptionModels();
     //                 console.log("🚀 ~ fetchSubscriptions ~ result:", result)
     //                 setTimeout(() => {
-    //                     ctx.setSubscriptionModels(result!); 
+    //                     ctx.setSubscriptionModels(result!);
     //                     setIsLoading(false);
 
     //                 }, 3000);
@@ -95,14 +95,13 @@ const LoadSubscripionsPackages: React.FC<{}> = () => {
 
     return (
         <div className="subscription-packages mt-4 mb-5 d-flex flex-column flex-xl-rowjustify-content-center align-items-center m-auto">
-            <Alert className="alert-success">* You cannot activate a plan lower than the current active one.  </Alert>
+            <Alert className="alert-success">* You cannot activate a plan lower than the current active one. </Alert>
 
             <div className="col-xl-10 col-12 d-flex" id="pay-subs">
                 <div className="d-flex flex-wrap col-12 ">
                     {ctx.subscriptionsModels!.length < 1 ? (
                         <>
                             <RenderSkeleton />
-
                         </>
                     ) : (
                         <div className="subscription-packages mt-4 mb-5 d-flex flex-column flex-xl-rowjustify-content-center align-items-center m-auto">
@@ -113,17 +112,18 @@ const LoadSubscripionsPackages: React.FC<{}> = () => {
                                             <div key={sub.id} className="col-8 col-xl-6 mb-1 p-2 h-lg-50  ">
                                                 <button
                                                     className={`card align-items-center card-secondary px-5 h-md-100  d-flex justify-content-center justify-content-lg-start py-4  
-                                                  ${sub.id === ctx.selectedPackage?.id ? 'active' : ''}    ${sub.id === ctx.currentSubscription?.subscriptionModel.id! ? 'current-sub' : ''
-                                                        }    ${sub.id === ctx.selectedPackageId ? 'active' : ''}   `}
+                                                  ${sub.id === ctx.selectedPackage?.id ? 'active' : ''}    ${
+                                                        sub.id === ctx.currentSubscription?.subscriptionModel?.id! ? 'current-sub' : ''
+                                                    }    ${sub.id === ctx.selectedPackageId ? 'active' : ''}   `}
                                                     onClick={() => handlePackageSelect(sub)}
                                                     style={{
-                                                        ...renderButtonDisabledStyle(sub.id <= ctx.currentSubscription?.subscriptionModel.id!),
+                                                        ...renderButtonDisabledStyle(sub.id <= ctx.currentSubscription?.subscriptionModel?.id!),
                                                         width: '100%',
                                                     }}
-                                                    disabled={sub.id <= ctx.currentSubscription?.subscriptionModel.id!}
+                                                    disabled={sub.id <= ctx.currentSubscription?.subscriptionModel?.id!}
                                                 >
                                                     {' '}
-                                                    {sub.id === ctx.currentSubscription?.subscriptionModel.id! && (
+                                                    {sub.id === ctx.currentSubscription?.subscriptionModel?.id! && (
                                                         <div className="flag best-choice">Active</div>
                                                     )}
                                                     <div>
@@ -171,22 +171,18 @@ const LoadSubscripionsPackages: React.FC<{}> = () => {
                                                         </div>
                                                     </div>
                                                 </button>
-                                                {sub.id === ctx.currentSubscription?.subscriptionModel.id! && (
+                                                {sub.id === ctx.currentSubscription?.subscriptionModel?.id! && (
                                                     <h3 className="my-3 text-center">
                                                         <b>Your current plan</b>
                                                     </h3>
                                                 )}
-
                                             </div>
-
                                         ))}
-
                                 </div>
                             </div>
                             {/* <div className='overlay'>
 
                             </div> */}
-
                         </div>
                     )}
                 </div>

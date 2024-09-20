@@ -35,7 +35,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
         // Funzione di controllo della sessione
         const checkSession = () => {
             if (session?.email === '' || session?.verified === false) {
-                router.push('/verify-email');
+                router.push('/link-email');
             }
         };
 

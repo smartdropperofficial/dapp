@@ -1,174 +1,169 @@
-// pages/api/auth/[...nextauth].ts
-
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import EmailProvider from 'next-auth/providers/email';
 import { getCsrfToken } from 'next-auth/react';
 import { SiweMessage } from 'siwe';
-import { SupabaseAdapter } from '@next-auth/supabase-adapter';
-import axios from 'axios';
 import { supabase } from '../../../utils/supabaseClient';
+import { getUserByWalletAddress } from '@/utils/utils';
 
 export default async function auth(req: any, res: any) {
-  const providers = [
-    // Provider per Ethereum (SIWE)
-    CredentialsProvider({
-      name: 'Ethereum',
-      credentials: {
-        message: { label: 'Message', type: 'text', placeholder: '0x0' },
-        signature: { label: 'Signature', type: 'text', placeholder: '0x0' },
-      },
-      async authorize(credentials) {
-        try {
-          const siwe = new SiweMessage(JSON.parse(credentials?.message || '{}'));
-          const nextAuthUrl = process.env.NEXTAUTH_URL;
-          if (!nextAuthUrl) {
-            throw new Error('NEXTAUTH_URL non è definita nelle variabili d’ambiente');
-          }
-          console.log("🚀 ~ authorize ~ nextAuthUrl:", nextAuthUrl)
-          
-          const result = await siwe.verify({
-            signature: credentials?.signature || '',
-            domain: nextAuthUrl,
-            nonce: await getCsrfToken({ req }),
-          });
+    const providers = [
+        CredentialsProvider({
+            name: 'Ethereum',
+            credentials: {
+                message: {
+                    label: 'Message',
+                    type: 'text',
+                    placeholder: '0x0',
+                },
+                signature: {
+                    label: 'Signature',
+                    type: 'text',
+                    placeholder: '0x0',
+                },
+            },
+            async authorize(credentials) {
+                try {
+                    const siwe = new SiweMessage(JSON.parse(credentials?.message || '{}'));
+                    const nextAuthUrl = new URL(process.env.NEXTAUTH_URL!);
+                    console.log('🚀 ~ authorize ~ nextAuthUrl:', nextAuthUrl);
 
-          if (result.success) {
-            const walletAddress = siwe.address;
-            console.log("Verifica se il wallet è già associato a un'email");
-            const user = await getUserByWalletAddress(walletAddress);
-            console.log("🚀 ~ authorize ~ user:", user);
+                    const result = await siwe.verify({
+                        signature: credentials?.signature || '',
+                        domain: nextAuthUrl.host,
+                        nonce: await getCsrfToken({ req }),
+                    });
 
-            if (user) {
-              console.log("User trovato:", { id: siwe.address, ...user });
-              return { sub: siwe.address, ...user };
-            } else {
-              console.log("Nessun utente trovato, email necessaria:", { id: siwe.address, needsEmail: true });
-              return { sub: siwe.address, needsEmail: true };
-            }
-          }
-          return null;
-        } catch (error) {
-          console.error('Errore in authorization:', error);
-          return null;
-        }
-      },
-    }),
-    // Provider per Email
-    // EmailProvider({
-    //   server: '', // Non necessario se usi la tua API per inviare le email
-    //   from: 'noreply@example.com',
-    //   maxAge: 60 * 10, // Il token di verifica scade dopo 10 minuti
-    //   sendVerificationRequest: async ({ identifier, url }) => {
-    //     try {
-    //       // Chiamata alla tua API per inviare l'email di verifica
-    //       const response = await axios.post('http://localhost/send-login-email', {
-    //         email: identifier,
-    //         url: url,
-    //       });
+                    if (result.success) {
+                        // const userRole = await getUserRole(siwe?.address); // Fetch user role from database
+                        return {
+                          id: siwe.address,
+                            //role: userRole,
+                        };
+                    }
+                    return null;
+                } catch (error) {
+                    console.error('Error in authorization:', error);
+                    return null;
+                }
+            },
+        }),
+    ];
 
-    //       if (response.status !== 200) {
-    //         throw new Error(`Errore nell'invio dell'email: ${response.statusText}`);
-    //       }
-    //     } catch (error) {
-    //       console.error('Errore durante l’invio della richiesta di verifica:', error);
-    //       throw new Error('Errore nell’invio dell’email di verifica');
-    //     }
-    //   },
-    // }),
-  ];
+    const isDefaultSigninPage = req.method === 'GET' && req.query.nextauth.includes('signin');
 
-  const isDefaultSigninPage = req.method === 'GET' && req.query.nextauth.includes('signin');
-
-  if (isDefaultSigninPage) {
-    // Rimuovi il provider Ethereum dalla pagina di login predefinita
-    providers.pop();
-  }
-
-  return await NextAuth(req, res, {
-    providers,
-    adapter: SupabaseAdapter({
-      url: process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      secret: process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    }),
-    session: {
-      strategy: 'jwt',
-      maxAge: 7 * 24 * 60 * 60, // Sessione valida per 7 giorni 
-    },
-    secret: process.env.NEXTAUTH_SECRET!,
-    pages: {
-      signIn: '/login', // Pagina di login personalizzata
-      // Rimosso newUser: '/link-email' per gestire il redirect nel frontend
-    },
-    callbacks: {
-      async signIn({ user, account }: { user: any; account: any }) {     
-        if (account?.provider === 'credentials' && user?.needsEmail) {
-             user.isNewUser = true; // Imposta un flag personalizzato
-        }
-        return true; // Consenti comunque il login
-      },
-      
-      async jwt({ token, user }: { token: any; user: any }) { 
-        console.log("🚀 ~ jwt ~ user:", user)
-
-        if (user) { 
-          token.address = user.sub;  // Aggiungi l'ID del wallet al token
-          token.email = user.email;
-          token.verified = user.email_verified;
-          token.config = user.config;       
-          token.needsEmail = user.needsEmail || false;
-        }
-        return token;
-      },
-
-      async session({ session, token }: { session: any; token: any }) {
-        if (token) {
-          console.log("🚀 ~ session ~ token:", token);          
-          session.address = token.address;
-          session.email = token.email;
-          session.verified = token.verified;
-          session.config_db = token.config;
-          session.needsEmail = token.needsEmail;
-          console.log("🚀 ~ session :", session);
-        }
-        return session;
-      },
-
-     
-    },
-  });
-}
-
-async function getUserByWalletAddress(walletAddress: string) {
-  try {
-    const { data: userWallet, error } = await supabase
-      .from('user_wallets')
-      .select(`
-        wallet_address,
-        user:users!inner (
-          id,
-          email,
-          email_verified,config
-        )
-      `)
-      .eq('wallet_address', walletAddress)
-      .single();
-
-    if (error || !userWallet) {
-      console.log("🚀 ~ getUserByWalletAddress ~ errore:", error);
-      return null;
+    if (isDefaultSigninPage) {
+        providers.pop();
     }
 
-    console.log("🚀 ~ getUserByWalletAddress ~ userWallet:", userWallet);
+    return await NextAuth(req, res, {
+        providers,
+        session: {
+            strategy: 'jwt',
+        },
+        secret: process.env.NEXTAUTH_SECRET!,
+        callbacks: {
+            async session({ session, token}: { session: any; token: any }) { 
+             console.log("🚀 ~ session ~ token:", token)
+             console.log("🚀 ~ session ~ session:", session)           
+             
+                    const userRole = await getUserByWalletAddress(token.sub) as any;
+                    console.log("🚀 ~ session ~ userRole:", userRole)
+                     /* eslint-disable */
+                    if (userRole && userRole?.email_verified) {        
 
-    const user = userWallet.user;
+                        // eslint-disable-next-line
+                        token.email = userRole?.email;
+                        // eslint-disable-next-line
+                        token.verified = userRole?.email_verified;
+                        // eslint-disable-next-line
+                        token.isPromoter = userRole?.is_promoter;
+                        // eslint-disable-next-line
+                        token.is_promoter_active = userRole?.is_promoter_active;
+                        // eslint-disable-next-line
+                        token.isAdmin = userRole?.is_admin;
+                        // eslint-disable-next-liney
+                        token.config_db = userRole?.config_db;
 
-    return {
-      ...user,
-      address: walletAddress,
-    };
-  } catch (error) {
-    console.error('Errore in getUserByWalletAddress:', error);
-    return null;
-  }
+                    } else {
+                        token.verified = false;
+                    }
+              
+
+                session.address = token.sub;
+                session.email = token?.email; // Add user email to session
+                session.verified = token?.verified; // Add user email to session
+                session.isPromoter = token?.isPromoter; // Add user email to session
+                session.is_promoter_active = token?.is_promoter_active;
+                session.isAdmin = token?.isAdmin; // Add user email to session
+                session.config_db = token?.config_db; // Add user email to session
+                console.log("🚀 ~ session ~ session:", session)
+
+                return session;
+            },
+        },
+    });
+}
+
+async function getUserRole(wallet: string | undefined) {
+    try {
+        let { data: user, error } = await supabase
+            .from('users')
+            .select('email,is_verified,is_promoter,is_admin,is_promoter_active,config')
+            .eq('wallet_address', wallet)
+            .single();
+
+        if (error) {
+            console.log('🚀 ~ getUserRole ~ error:', error);
+        }
+
+        if (!user) {
+            const { data: configData, error: configError } = await supabase.from('config').select('*').eq('is_on', true);
+            console.log("🚀 ~ getUserRole ~ configData:", configData)
+
+            if (configError) {
+                console.error('🚀 Error fetching config:', configError);
+            } else {
+                if (configData && configData.length > 1) {
+                    const { data: lastInsertedRecord, error: lastInsertedError } = await supabase
+                        .from('users')
+                        .select('*')
+                        .order('id', { ascending: false })
+                        .limit(1)
+                        .single();
+                    if (lastInsertedError && lastInsertedError.details !== 'Results contain 0 rows') {
+                        console.error('🚀 Error retrieving last row inserted:', lastInsertedError);
+                    } else {
+                        console.log('🚀 Value of LAST inserted record was:', lastInsertedRecord.config);
+                        if (lastInsertedRecord && !lastInsertedError) {
+                            const newUserConfig = !lastInsertedRecord.config;
+                            console.log('🚀 Value of NEXT inserted record was:', newUserConfig);
+
+                            const { data: newUser, error: newUserError } = await supabase.from('users').insert([{ wallet, config: newUserConfig }]);
+                            if (newUserError) {
+                                console.error('🚀 ERROR adding new user:', newUserError);
+                            } else {
+                                console.log('🚀 New user added successfully:', newUser);
+                            }
+                        }
+                    }
+                } else if (configData && configData.length === 1) {
+                    console.log('🚀 ~ getUserRole ~ configData.length:', configData.length);
+                    const { data: newUser, error: newUserError } = await supabase.from('users').insert([{ wallet }]);
+
+                    if (newUserError) {
+                        console.error('🚀 ERROR adding new user:', newUserError);
+                    } else {
+                        console.log('🚀 New user added successfully:', newUser);
+                    }
+                } else {
+                    console.log('🚀 No rows returned from the query');
+                }
+            }
+        }
+
+        return user || null;
+    } catch (error) {
+        console.error('nextAuth - getUserRole() - Error fetching user role:', error);
+        return null;
+    }
 }

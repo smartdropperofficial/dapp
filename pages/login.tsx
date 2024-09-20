@@ -20,11 +20,10 @@ function Login() {
         // }
     }, [session, address, router.query.redirect]);
     useEffect(() => {
-        // Verifica che l'indirizzo esista e che non ci si trovi già sulla homepage
-        if (session && router.pathname) {
-            router.push('/'); // Reindirizza solo se l'utente non si trova già sulla homepage
+        if (session && address) {
+            router.push('/');
         }
-    }, [session, router.pathname]); // Assicurati di includere solo le dipendenze necessarie
+    }, [session, router.pathname, address]);
     return (
         <div className="container h-100 d-flex justify-content-center align-items-center">
             <div className="row w-100 justify-content-center">

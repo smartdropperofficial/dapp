@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect } from 'react';
 import { Card } from 'react-bootstrap';
 import { useRouter } from 'next/router';
 import { getSession, GetSessionParams, useSession } from 'next-auth/react';
@@ -9,8 +9,7 @@ function MailVerified() {
     const { data: session }: { data: SessionExt | null } = useSession() as { data: SessionExt | null };
 
     const GoToHomeHandler = async () => {
-
-        location.reload();
+        router.push('/');
     };
     useEffect(() => {
         if (session && session?.verified === true) {
@@ -18,9 +17,7 @@ function MailVerified() {
         } else {
             // alert('Email not verified')
         }
-
-    }, [session])
-
+    }, [session]);
 
     return (
         <div className="container my-5 d-flex justify-content-center">
@@ -41,7 +38,6 @@ function MailVerified() {
             </Card>
         </div>
     );
-};
+}
 
-
-export default MailVerified
+export default MailVerified;

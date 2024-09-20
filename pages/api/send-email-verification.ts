@@ -7,6 +7,7 @@ import axios from 'axios';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { email, walletAddress } = req.body;
+  console.log("🚀 ~ handler ~  req.body:",  req.body)
 
   // Genera un token di verifica
   const token = uuidv4();
@@ -25,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const verifyUrl = `${process.env.NEXTAUTH_URL}/verify-mail?token=${token}`;
 
   try {
-    const response = await axios.post('http://localhost/send-login-email', {
+    const response = await axios.post(`${process.env.MAILER_WEBHOOK}/send-login-email`, {
       email: email,
       url: verifyUrl,
     });

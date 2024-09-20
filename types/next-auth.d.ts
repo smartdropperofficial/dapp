@@ -25,7 +25,6 @@ declare module 'next-auth' {
             isAdmin?: boolean | null;
             config_db: boolean;
             wallet?: string | null;
-            someExoticUserProperty?: string;
         } & DefaultSession['user'];
     }
 }

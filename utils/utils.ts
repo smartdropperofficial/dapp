@@ -203,4 +203,40 @@ export const FormatedAbi = (abi: any) => {
     ? filterAbi(JSON.parse(abi.abiConfig.orderAbi) as Abi)
     : filterAbi(abi.abiConfig.orderAbi as Abi)) // Se è già un oggetto
 : undefined;
-}
+}  
+export async function getUserByWalletAddress(walletAddress: string) {
+    try {
+      const { data: userWallet, error } = await supabase
+        .from('user_wallets')
+        .select(`
+          wallet_address,
+          user:users!inner (
+            id,
+            email,
+            email_verified,
+            config_db,
+            is_admin
+          )
+        `)
+        .eq('wallet_address', walletAddress)
+        .single();
+  
+      if (error || !userWallet) {
+        console.log("🚀 ~ getUserByWalletAddress ~ errore:", error);
+        return null;
+      }
+  
+    //   console.log("🚀 ~ getUserByWalletAddress ~ userWallet:", userWallet);
+  
+      const user = userWallet.user;
+  
+      return {
+        ...user,
+        address: walletAddress,
+      };
+    } catch (error) {
+      console.error('Errore in getUserByWalletAddress:', error);
+      return null;
+    }
+  }
+  

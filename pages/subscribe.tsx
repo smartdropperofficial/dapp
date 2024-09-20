@@ -144,12 +144,12 @@ const Subscribe = () => {
                                                     ctx.allSubscriptions?.map((sub, index) => {
                                                         return (
                                                             <tr key={index}>
-                                                                <td>{sub.subscriptionModel.name}</td>
-                                                                <td>{getSubscriptionPeriod(sub.subscriptionModel.subscriptionPeriod)}</td>
-                                                                <td>${sub.subscriptionModel.price.toFixed(2)}</td>
+                                                                <td>{sub.subscriptionModel?.name}</td>
+                                                                <td>{getSubscriptionPeriod(sub?.subscriptionModel?.subscriptionPeriod!)}</td>
+                                                                <td>${sub.subscriptionModel?.price.toFixed(2)}</td>
                                                                 <td>
                                                                     <Link href={`https://polygonscan.com/tx/${sub.paymentTx}`} target="_blank">
-                                                                        {sub.paymentTx.substring(0, 10)}...
+                                                                        {sub.paymentTx?.substring(0, 10)}...
                                                                     </Link>
                                                                 </td>
                                                                 <td>{sub.start}</td>

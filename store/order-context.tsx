@@ -30,8 +30,7 @@ type CheckoutType = {
     tax: number;
     total?: number;
     canpay?: boolean;
-
-}
+};
 interface OrderContextProps {
     items: ContextProductInfo[];
     checkout: CheckoutType;
@@ -72,7 +71,7 @@ interface OrderContextProps {
 // export const OrderContext = createContext(
 //     {
 //     items: [] as ContextProductInfo[],
-//     checkout: {} as CheckoutType,   
+//     checkout: {} as CheckoutType,
 //     retailer: '',
 //     zone: '',
 //     email: '',
@@ -90,7 +89,7 @@ interface OrderContextProps {
 //         phoneNumber: '',
 //     },
 //     scraper: '',
-//     showErrors: false, 
+//     showErrors: false,
 //     infoHandler: (payload: ShippingInfoType) => {},
 //     itemsHandler: (
 //         id: number,
@@ -112,12 +111,12 @@ interface OrderContextProps {
 //     showErrorsToggle: () => {},
 //     updateScraper: (scraper: string) => {},
 //     isLoadingHandler: (loading: boolean) => {},
-//     emailHandler: (payload: string) => {}, 
-//     checkoutHander: (payload: CheckoutType) => {},   
-//     basketTotal: () => {} ,  
+//     emailHandler: (payload: string) => {},
+//     checkoutHander: (payload: CheckoutType) => {},
+//     basketTotal: () => {} ,
 // }
 
-// );  
+// );
 export const OrderContext = createContext<OrderContextProps>(null as unknown as OrderContextProps);
 
 export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -423,7 +422,7 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const checkoutHandler = (payload: CheckoutType) => {
         setCheckout({
             ...payload,
-            canpay: (payload.items + subContext.currentSubscription?.totShopAmountPaid!) <= subContext.currentSubscription?.subscriptionModel.shopLimit!,
+            canpay: payload.items + subContext.currentSubscription?.totShopAmountPaid! <= subContext.currentSubscription?.subscriptionModel?.shopLimit!,
             total: payload.items + payload.zincFees + payload.shippingFees + payload.exchangeFees + payload.fees + payload.tax,
         });
     };
@@ -499,7 +498,6 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
             {children}
         </OrderContext.Provider>
     );
-
 };
 // const store = {
 //     items: items,
@@ -510,7 +508,7 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
 //     shippingInfo: shippingInfo,
 //     showErrors: showErrors,
 //     scraper: scraper,
-//     email: email,  
+//     email: email,
 //     checkout: checkout,
 //     infoHandler: shippingInfoHandler,
 //     itemsHandler: itemsHandler,
@@ -524,11 +522,8 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
 //     isLoadingHandler: isLoadingHandler,
 //     basketTotal: basketTotal,
 //     emailHandler: emailHandler,
-//     zoneHandler: zoneHandler, 
-//     checkoutHander: checkoutHander, 
+//     zoneHandler: zoneHandler,
+//     checkoutHander: checkoutHander,
 // };
-
-
-
 
 export default OrderContextProvider;

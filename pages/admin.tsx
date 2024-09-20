@@ -22,7 +22,7 @@ import GetFunds from '@/hooks/Contracts/Subscription/components/GetFunds';
 const Admin: React.FC = () => {
     const { disconnect } = useDisconnect();
 
-    const { address, isConnected, } = useAccount();
+    const { address, isConnected } = useAccount();
     const { data: session }: { data: SessionExt | null } = useSession() as { data: SessionExt | null };
     const [isLoading, setIsLoading] = useState(true);
 
@@ -34,7 +34,7 @@ const Admin: React.FC = () => {
     //     } else {
 
     //     }
-    // }, [address, isConnected, session?.address, session?.isAdmin]); 
+    // }, [address, isConnected, session?.address, session?.isAdmin]);
     useEffect(() => {
         if (!address) {
             disconnect();
@@ -47,10 +47,8 @@ const Admin: React.FC = () => {
         if (address && isConnected && session?.address === address && !session?.isAdmin) {
             router.push('/NotAuthorized');
         } else {
-
         }
     }, [address, isConnected, session?.address, session?.isAdmin]);
-
 
     // if (isLoading) {
     //     return <ModalOverlay show={isLoading}><Loading loadingText={"Loading..."}></Loading></ModalOverlay>; // Puoi sostituirlo con un indicatore di caricamento o uno spinner
@@ -75,30 +73,28 @@ const Admin: React.FC = () => {
                 </div>
                 <div className="col-12 mb-3 p-1">
                     <Card className="col-lg-12 ">
-                        <div className='my-3'>
+                        <div className="my-3">
                             <GetPromoter></GetPromoter>
                         </div>
-
                     </Card>
-
                 </div>
                 <div className="col-12 mb-3 p-1">
                     <Card>
-                        <div className='my-3'>
+                        <div className="my-3">
                             <GetSubscription></GetSubscription>
                         </div>
                     </Card>
                 </div>
                 <div className="col-12 mb-3 p-1">
                     <Card>
-                        <div className='my-3'>
+                        <div className="my-3">
                             <AddOrder></AddOrder>
                         </div>
                     </Card>
                 </div>
                 <div className="col-12 mb-3 p-1">
                     <Card>
-                        <div className='my-3'>
+                        <div className="my-3">
                             <FindSubsByAddress></FindSubsByAddress>
                         </div>
                     </Card>
@@ -108,13 +104,12 @@ const Admin: React.FC = () => {
     );
 };
 
-export const getServerSideProps: GetServerSideProps = withAuth(async (context) => {
-    // Logica aggiuntiva per la tua pagina
-    return {
-        props: {
-            // Props aggiuntive per il tuo componente
-        },
-    };
-});
+// export const getServerSideProps: GetServerSideProps = withAuth(async (context) => {
+//     // Logica aggiuntiva per la tua pagina
+//     return {
+//         props: {
+//             // Props aggiuntive per il tuo componente
+//         },
+//     };
+// });
 export default Admin;
-

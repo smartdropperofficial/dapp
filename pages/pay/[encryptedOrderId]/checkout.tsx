@@ -59,7 +59,7 @@ const Checkout = () => {
     const [exchangeFees, setExchangeFees] = useState<number>();
     const [slippage, setSlippage] = useState<number>(0.8);
     const [loadingReferral, setLoadingReferral] = useState(false);
-    const [loadingPrices,setLoadingPrices] = useState(true) ; 
+    const [loadingPrices, setLoadingPrices] = useState(true);
     const [isBestChoice, setIsBestChoice] = useState<boolean>(false);
     const showCheckout = useRef<{ isSameWallet: boolean; hasFetchedSC: boolean }>({
         isSameWallet: false,
@@ -71,7 +71,7 @@ const Checkout = () => {
         subsContext.setPromoterReferralHandler(event?.target?.value.trim());
     };
     useEffect(() => {
-        console.log("🚀 ~ useEffect ~ subsContext.promoter?.referralCode:", subsContext.promoterReferral)
+        console.log('🚀 ~ useEffect ~ subsContext.promoter?.referralCode:', subsContext.promoterReferral);
 
         if (subsContext.promoterReferral && subsContext.promoter?.referralCode) {
             let handler;
@@ -119,27 +119,26 @@ const Checkout = () => {
     }, [getExchangeTax]);
 
     useEffect(() => {
-
         if (subsContext.currentSubscription) {
-            setSSPCommissions(subsContext.currentSubscription.subscriptionModel.fees);
-            setWaitForSub(false)
+            setSSPCommissions(subsContext.currentSubscription?.subscriptionModel?.fees);
+            setWaitForSub(false);
         } else {
             setSSPCommissions(7);
-            setWaitForSub(false)
+            setWaitForSub(false);
         }
-    }, [subsContext.currentSubscription])
-
+    }, [subsContext.currentSubscription]);
 
     useEffect(() => {
         setIsBestChoice(
-            subsContext.selectedPackage?.subscriptionType === SubscriptionType.BUSINESS && subsContext.selectedPackage?.subscriptionPeriod === SubscriptionPeriod.ANNUAL
+            subsContext.selectedPackage?.subscriptionType === SubscriptionType.BUSINESS &&
+                subsContext.selectedPackage?.subscriptionPeriod === SubscriptionPeriod.ANNUAL
         );
     }, [subsContext.selectedPackage]);
 
     const fetchOrderPrice = async () => {
         try {
             const amazonAmountToPay = await getAmountToPay(configContext, order?.tax_request_id!);
-            console.log("🚀 ~ fetchOrderPrice ~ amazonAmountToPay:", amazonAmountToPay)
+            console.log('🚀 ~ fetchOrderPrice ~ amazonAmountToPay:', amazonAmountToPay);
 
             if (amazonAmountToPay) {
                 setAmountToPay(amazonAmountToPay);
@@ -175,11 +174,10 @@ const Checkout = () => {
         }
     }, [order, address, sspCommissions, session]);
     useEffect(() => {
-        return () => { };
+        return () => {};
     }, [subsContext]);
 
     useEffect(() => {
-
         let FeeAmountToPay;
         if (amountToPay?.total) {
             FeeAmountToPay = amountToPay?.total;
@@ -204,36 +202,35 @@ const Checkout = () => {
         }
 
         if (subsContext.selectedPackage === null || (subsContext.selectedPackage === undefined && subsContext?.currentSubscription! === null)) {
-            console.log("🚀 ~ useEffect ~ sspCommissions: 7%", sspCommissions)
-            console.log("🚀 ~ useEffect ~ FeeAmountToPay:", FeeAmountToPay)
+            console.log('🚀 ~ useEffect ~ sspCommissions: 7%', sspCommissions);
+            console.log('🚀 ~ useEffect ~ FeeAmountToPay:', FeeAmountToPay);
 
             setFees((FeeAmountToPay * 7) / 100);
         } else if (subsContext.selectedPackage! && subsContext?.currentSubscription! === null) {
-            console.log("🚀 ~ useEffect ~ sspCommissions:", sspCommissions + '%')
-            console.log("🚀 ~ useEffect ~ FeeAmountToPay:", FeeAmountToPay)
+            console.log('🚀 ~ useEffect ~ sspCommissions:', sspCommissions + '%');
+            console.log('🚀 ~ useEffect ~ FeeAmountToPay:', FeeAmountToPay);
 
             setFees((FeeAmountToPay * subsContext?.selectedPackage?.fees!) / 100);
         } else if (subsContext?.currentSubscription!) {
-            console.log("🚀 ~ useEffect ~ sspCommissions:", sspCommissions + '%')
-            console.log("🚀 ~ useEffect ~ FeeAmountToPay:", FeeAmountToPay)
+            console.log('🚀 ~ useEffect ~ sspCommissions:', sspCommissions + '%');
+            console.log('🚀 ~ useEffect ~ FeeAmountToPay:', FeeAmountToPay);
             setFees((FeeAmountToPay * subsContext?.currentSubscription?.subscriptionModel?.fees!) / 100);
         }
-    }, [sspCommissions, amountToPay?.total])
-
+    }, [sspCommissions, amountToPay?.total]);
 
     useEffect(() => {
         const calculateZincFee = (total: number): number => {
-            console.log("🚀 ~ calculateZincFee ~ total:", total)
-            console.log("🚀 ~ calculateZincFee ~ sspCommissions:", sspCommissions)
-            console.log("🚀 ~ calculateZincFee ~ sspCommissions:", sspCommissions)
+            console.log('🚀 ~ calculateZincFee ~ total:', total);
+            console.log('🚀 ~ calculateZincFee ~ sspCommissions:', sspCommissions);
+            console.log('🚀 ~ calculateZincFee ~ sspCommissions:', sspCommissions);
 
             const result = (total / 100) * sspCommissions!;
             return Number(result.toFixed(2));
-        }
+        };
         if (fees && amountToPay?.total && sspCommissions) {
-            console.log(" fees % : ", calculateZincFee(amountToPay?.total));
+            console.log(' fees % : ', calculateZincFee(amountToPay?.total));
         }
-    }, [fees, amountToPay?.total, sspCommissions])
+    }, [fees, amountToPay?.total, sspCommissions]);
 
     const { isLoading: loadingPaymentTx } = useWaitForTransaction({
         chainId: 137,
@@ -243,13 +240,13 @@ const Checkout = () => {
             isCreatingOrder.current = true;
             processOrder();
         },
-    }); 
-  
-    useContractReads({ 
+    });
+
+    useContractReads({
         contracts: [
             {
-                address: configContext.config?.order_contract  as `0x${string}`,
-                abi:FormatedAbi(configContext.abiConfig?.orderAbi!),
+                address: configContext.config?.order_contract as `0x${string}`,
+                abi: FormatedAbi(configContext.abiConfig?.orderAbi!),
                 functionName: 'getOrder',
                 args: [orderId],
             },
@@ -266,7 +263,7 @@ const Checkout = () => {
                 showCheckout.current.hasFetchedSC = true;
             }
         },
-        onError(error) { },
+        onError(error) {},
     });
 
     useEffect(() => {
@@ -335,7 +332,8 @@ const Checkout = () => {
                 },
                 before: async () => {
                     const currentOrder = await getOrder(orderId);
-                    const amountExpeted = Number(amountToPay?.subtotal?.toFixed(2)) + Number(amountToPay?.tax?.toFixed(2)) + zincFee + shippingFees! + exchangeFees!;
+                    const amountExpeted =
+                        Number(amountToPay?.subtotal?.toFixed(2)) + Number(amountToPay?.tax?.toFixed(2)) + zincFee + shippingFees! + exchangeFees!;
                     if (currentOrder?.status !== OrderStatus.WAITING_PAYMENT || acceptobj.amount !== Number(amountExpeted)) {
                         console.error(
                             `Depay - Payment - before : Amount expected:(${amountExpeted}) but the amount into the Widget has a different amount. acceptobj is (${acceptobj.amount}) `
@@ -402,8 +400,7 @@ const Checkout = () => {
             });
         }
     };
-    
-    
+
     useEffect(() => {
         if (loadingPaymentTx) {
             setOrderStep(OrderSteps.WAITING_CONFIRMATION);
@@ -417,10 +414,10 @@ const Checkout = () => {
                 shippingFees: shippingFees,
                 exchangeFees: exchangeFees,
                 fees: fees,
-                tax: Number(amountToPay.tax)
-            }); 
-            setLoadingPrices(false)
-        } 
+                tax: Number(amountToPay.tax),
+            });
+            setLoadingPrices(false);
+        }
     }, [fees, amountToPay, exchangeFees, zincFee, shippingFees]);
     // useEffect(() => {
     //     configCtx.setIsLoadingHandler(false);
@@ -430,11 +427,8 @@ const Checkout = () => {
     //     };
     // }, [configCtx]);
     const RenderPricesSkeleton = () => {
-         return (
-            <Skeleton height={20} count={6} />
-
-         ); 
-    }
+        return <Skeleton height={20} count={6} />;
+    };
     return (
         <div>
             {waitForSub ? (
@@ -492,7 +486,7 @@ const Checkout = () => {
                                                             <h3 className="mt-5 text-center text-lg-start " style={{ color: '#808080' }}>
                                                                 <p className="m-0 ">Your current Plan is:</p>
                                                                 <h1>
-                                                                    <b style={{ color: '#000' }}>{subsContext.currentSubscription?.subscriptionModel.name}</b>{' '}
+                                                                    <b style={{ color: '#000' }}>{subsContext?.currentSubscription?.subscriptionModel?.name}</b>{' '}
                                                                 </h1>
                                                             </h3>
                                                         </div>
@@ -501,10 +495,14 @@ const Checkout = () => {
                                                                 {/* Your current Plan is:{' '}
                                                                 <b style={{ color: '#808080' }}>{ctx.currentSubscription?.subscriptionModel.name}</b>{' '} */}
                                                             </h2>
-                                                            <div className="mt-3  text-center text-lg-start" >
+                                                            <div className="mt-3  text-center text-lg-start">
                                                                 <b className="h5 "> Monthly Shop Limit - </b>
-                                                                {subsContext.currentSubscription?.subscriptionModel.subscriptionType === SubscriptionType.BUSINESS ? (
-                                                                    <b className='fs-5 text-success  p-2 rounded-2' style={{ backgroundColor: 'efefef' }}> UNLIMITED</b>
+                                                                {subsContext?.currentSubscription?.subscriptionModel?.subscriptionType ===
+                                                                SubscriptionType.BUSINESS ? (
+                                                                    <b className="fs-5 text-success  p-2 rounded-2" style={{ backgroundColor: 'efefef' }}>
+                                                                        {' '}
+                                                                        UNLIMITED
+                                                                    </b>
                                                                 ) : (
                                                                     <ul className="d-flex  list-unstyled  justify-content-start flex-column text-center  ">
                                                                         <li className="m-0  text-center text-lg-start">
@@ -512,9 +510,7 @@ const Checkout = () => {
                                                                                 <b>Limit:</b>
                                                                             </span>
                                                                             <span className="text-success mx-2">
-                                                                                $
-                                                                                {(
-                                                                                    subsContext.currentSubscription?.subscriptionModel.shopLimit!).toFixed(2)}
+                                                                                ${subsContext?.currentSubscription?.subscriptionModel?.shopLimit!.toFixed(2)}
                                                                             </span>
                                                                         </li>
                                                                         <li className="m-0 text-center text-lg-start">
@@ -529,7 +525,9 @@ const Checkout = () => {
                                                                             <span className="">
                                                                                 <b>Fees:</b>
                                                                             </span>
-                                                                            <span className=" mx-2">{subsContext.currentSubscription?.subscriptionModel.fees!}%</span>
+                                                                            <span className=" mx-2">
+                                                                                {subsContext?.currentSubscription?.subscriptionModel?.fees!}%
+                                                                            </span>
                                                                         </li>
                                                                     </ul>
                                                                 )}
@@ -628,7 +626,7 @@ const Checkout = () => {
                         )}
                         <section id="payment-details" className="col-12 col-xl-4 h-100  py-xl-3 my-3 mx-xl-1 sticky -lg-top">
                             <Card>
-                                {amountToPay && !loadingPrices ?  (
+                                {amountToPay && !loadingPrices ? (
                                     <>
                                         <div className="subtotal d-flex justify-content-between mt-3">
                                             <strong>
@@ -639,7 +637,7 @@ const Checkout = () => {
                                                 <p>$ {amountToPay.subtotal?.toFixed(2)}</p>
                                             </strong>
                                         </div>
-                                        {!subsContext.currentSubscription! && (subsContext.selectedPackage?.id! > FreeSubId) && (
+                                        {!subsContext.currentSubscription! && subsContext.selectedPackage?.id! > FreeSubId && (
                                             <div className="subtotal d-flex justify-content-between mt-3">
                                                 <div>
                                                     <strong>SUBSCRIPTION:</strong>
@@ -694,7 +692,7 @@ const Checkout = () => {
                                                     </a>
                                                 </p>
                                             </div>
-                                        </div> 
+                                        </div>
                                         <div className="subtotal d-flex justify-content-between mt-5">
                                             <div className="d-flex flex-column flex-xl-row justify-content-between align-content-center col-12">
                                                 <div>
@@ -708,8 +706,8 @@ const Checkout = () => {
                                                 {/* )} */}
                                             </div>
                                         </div>
-                                        <hr /> 
-                                       
+                                        <hr />
+
                                         <div className="subtotal d-flex justify-content-between mt-5">
                                             <div className="d-flex flex-column flex-xl-row justify-content-between align-content-center col-12">
                                                 <div>
@@ -723,7 +721,6 @@ const Checkout = () => {
                                                 {/* )} */}
                                             </div>
                                         </div>
-                                       
 
                                         <div className={`row mt-5 justify-content-evenly d-flex flex-column align-items-center `}>
                                             {!subsContext.currentSubscription && subsContext.selectedPackage?.id! > FreeSubId && (
@@ -747,8 +744,8 @@ const Checkout = () => {
                                                                                     backgroundColor: '#fff',
                                                                                     color: '#494949',
                                                                                     width: '100%',
-                                                                                }} 
-                                                                                className='fw-bolder'
+                                                                                }}
+                                                                                className="fw-bolder"
                                                                             >
                                                                                 ${subsContext.selectedPackage?.promoPrice.toFixed(2)}
                                                                             </h1>
@@ -778,18 +775,24 @@ const Checkout = () => {
                                                                             onChange={handleChangeReferralCode}
                                                                             style={
                                                                                 subsContext.promoterReferral === '' ||
-                                                                                    subsContext.promoterReferral === undefined ||
-                                                                                    subsContext.promoterReferral === null
+                                                                                subsContext.promoterReferral === undefined ||
+                                                                                subsContext.promoterReferral === null
                                                                                     ? {
-                                                                                        borderColor: '',
-                                                                                        borderWidth: '',
-                                                                                        backgroundColor: '',
-                                                                                    }
+                                                                                          borderColor: '',
+                                                                                          borderWidth: '',
+                                                                                          backgroundColor: '',
+                                                                                      }
                                                                                     : {
-                                                                                        borderColor: !subsContext.isReferralCodeApplied && !loadingReferral ? 'red' : 'green',
-                                                                                        borderWidth: '4px',
-                                                                                        backgroundColor: !subsContext.isReferralCodeApplied && !loadingReferral ? '#f8d7da' : '#d4edda',
-                                                                                    }
+                                                                                          borderColor:
+                                                                                              !subsContext.isReferralCodeApplied && !loadingReferral
+                                                                                                  ? 'red'
+                                                                                                  : 'green',
+                                                                                          borderWidth: '4px',
+                                                                                          backgroundColor:
+                                                                                              !subsContext.isReferralCodeApplied && !loadingReferral
+                                                                                                  ? '#f8d7da'
+                                                                                                  : '#d4edda',
+                                                                                      }
                                                                             }
                                                                         />
                                                                     </div>
@@ -827,10 +830,11 @@ const Checkout = () => {
                                                                 <PaySubscription
                                                                     Package={subsContext.selectedPackage!}
                                                                     promoterReferralCode={subsContext.debouncedReferralCode}
-                                                                    setIsReferralCodeApplied={(subType: boolean) => subsContext.setIsReferralCodeAppliedHandler(subType)}
+                                                                    setIsReferralCodeApplied={(subType: boolean) =>
+                                                                        subsContext.setIsReferralCodeAppliedHandler(subType)
+                                                                    }
                                                                     setLoadingReferral={(isloading: boolean) => setLoadingReferral(isloading)}
                                                                     loadingReferral={loadingReferral}
-
                                                                 />
                                                             </div>
                                                         </div>
@@ -863,9 +867,9 @@ const Checkout = () => {
                                                         style={
                                                             !subsContext.canPay || subsContext.selectedPackage?.id! > FreeSubId
                                                                 ? {
-                                                                    color: '#ececec',
-                                                                    borderColor: '#ececec',
-                                                                }
+                                                                      color: '#ececec',
+                                                                      borderColor: '#ececec',
+                                                                  }
                                                                 : { color: '#ffa500' }
                                                         }
                                                     >
@@ -880,9 +884,9 @@ const Checkout = () => {
                                                         style={
                                                             subsContext.canPay === false
                                                                 ? {
-                                                                    color: '#ececec',
-                                                                    borderColor: '#ececec',
-                                                                }
+                                                                      color: '#ececec',
+                                                                      borderColor: '#ececec',
+                                                                  }
                                                                 : { color: '#000' }
                                                         }
                                                     >
@@ -893,19 +897,22 @@ const Checkout = () => {
                                                     </div>
                                                     <button
                                                         disabled={subsContext.canPay === false}
-                                                        className={`btn form-control  mt-2 col-12 col-xl-10 ${subsContext.canPay === false ? 'btn-disabled' : 'btn-success'
-                                                            }`}
+                                                        className={`btn form-control  mt-2 col-12 col-xl-10 ${
+                                                            subsContext.canPay === false ? 'btn-disabled' : 'btn-success'
+                                                        }`}
                                                         onClick={openPaymentDepayWidgetHandler}
                                                     >
                                                         $
-                                                        {Number((
-                                                            Number(fees!.toFixed(2)) +
-                                                            Number(amountToPay?.subtotal?.toFixed(2)) +
-                                                            Number(amountToPay?.tax?.toFixed(2)) +
-                                                            zincFee +
-                                                            shippingFees! +
-                                                            exchangeFees!
-                                                        ).toFixed(2))}
+                                                        {Number(
+                                                            (
+                                                                Number(fees!.toFixed(2)) +
+                                                                Number(amountToPay?.subtotal?.toFixed(2)) +
+                                                                Number(amountToPay?.tax?.toFixed(2)) +
+                                                                zincFee +
+                                                                shippingFees! +
+                                                                exchangeFees!
+                                                            ).toFixed(2)
+                                                        )}
                                                     </button>
                                                     {/* <CoinbaseButton
                                                         amount={Number((
@@ -949,13 +956,15 @@ const Checkout = () => {
                                             </div>
                                         </div>
                                     </>
-                                ) :RenderPricesSkeleton() }
+                                ) : (
+                                    RenderPricesSkeleton()
+                                )}
                             </Card>
                         </section>
                     </section>
                 </div>
             ) : (
-                // <Loading loadingText="Loading details" dark={true} />  
+                // <Loading loadingText="Loading details" dark={true} />
                 <ModalOverlay show={true}>
                     <Loading loadingText="Checking tax..." />
                 </ModalOverlay>

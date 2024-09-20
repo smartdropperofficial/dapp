@@ -9,37 +9,28 @@ import { ConfigContext } from '@/store/config-context';
 import { formatUnits } from 'ethers/lib/utils.js';
 
 const useSubscriptionPlan = () => {
-    const { config,setAbiConfigHandler } = useContext(ConfigContext);
+    const { config, setAbiConfigHandler } = useContext(ConfigContext);
     const { data: signer } = useSigner();
     const { address: account } = useAccount();
     const [contract, setContract] = useState<ethers.Contract | null>(null);
     useEffect(() => {
         if (!signer || !config?.subscription_contract) return;
         try {
-            const subscriptionContract = new ethers.Contract(
-                config?.subscription_contract as `0x${string}`,
-                subscriptionModelABI,
-                signer
-            );
+            const subscriptionContract = new ethers.Contract(config?.subscription_contract as `0x${string}`, subscriptionModelABI, signer);
             setContract(subscriptionContract);
         } catch (error) {
             console.error('Error creating contract:', error);
         }
     }, [signer, config]);
 
-
     useEffect(() => {
         const loadContract = async () => {
             if (!signer || !config?.subscription_contract) return;
-            try { 
+            try {
                 const abiJson = await fetchAbiFromDatabase('subscription_plan');
-                if (abiJson) { 
-                    const subscriptionContract = new ethers.Contract(
-                        config.subscription_contract as `0x${string}`,
-                        abiJson,
-                        signer
-                    );
-                    setContract(subscriptionContract); 
+                if (abiJson) {
+                    const subscriptionContract = new ethers.Contract(config.subscription_contract as `0x${string}`, abiJson, signer);
+                    setContract(subscriptionContract);
                     setAbiConfigHandler({ orderAbi: abiJson });
                 }
             } catch (error) {
@@ -74,11 +65,11 @@ const useSubscriptionPlan = () => {
         [contract]
     );
 
-    const getSubscriptionByTypeOnBC = useCallback(
-        async (subscriptionType: number): Promise<SubscriptionManagementModel[]> => {
-            if (!contract) return [];
+    const getSubscriptionByIdOnBC = useCallback(
+        async (Id: number): Promise<SubscriptionManagementModel> => {
+            if (!contract) return {};
             try {
-                const result = await contract.getSubscriptionByType(subscriptionType);
+                const result = await contract.getSubscriptionById(Id);
                 return result.map((sub: any) => ({
                     id: sub.id,
                     subscriptionType: sub.subscriptionType,
@@ -92,7 +83,7 @@ const useSubscriptionPlan = () => {
                 }));
             } catch (error: any) {
                 checkErrorMessage(error.message);
-                return [] as SubscriptionManagementModel[];
+                return {};
             }
         },
         [contract]
@@ -178,7 +169,7 @@ const useSubscriptionPlan = () => {
                     subscriptionPeriod: Number(sub.subscriptionPeriod),
                     name: sub.name,
                     // price: convertToDecimal(sub?.price),
-                    // promoPrice: convertToDecimal(sub?.promoPrice), 
+                    // promoPrice: convertToDecimal(sub?.promoPrice),
                     price: Number(formatUnits(sub?.price, 6)),
                     promoPrice: Number(formatUnits(sub?.promoPrice, 6)),
                     period: sub.period,
@@ -187,7 +178,7 @@ const useSubscriptionPlan = () => {
                     shopLimit: Number(formatUnits(sub.shopLimit, 4)),
                 }));
             } catch (error: any) {
-                console.log("🚀 ~ getSubscriptionModels ~ error:", error)
+                console.log('🚀 ~ getSubscriptionModels ~ error:', error);
                 checkErrorMessage(error.message);
 
                 return [] as SubscriptionModel[];
@@ -200,7 +191,7 @@ const useSubscriptionPlan = () => {
     return {
         account,
         getSubscriptionByPeriod: getSubscriptionByPeriodOnBC,
-        getSubscriptionByType: getSubscriptionByTypeOnBC,
+        getSubscriptionByIdOnBC,
         addSubscriptionContract: addSubscriptionContractOnBC,
         changeSubscriptionTypeFees: changeSubscriptionTypeFeesOnBC,
         changeSubscriptionPrice: changeSubscriptionPriceOnBC,

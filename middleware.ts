@@ -1,19 +1,18 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
+import { getSession } from 'next-auth/react';
 
 export async function middleware(req: NextRequest) {
-    const session = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+    const token = await getToken({req});
 
     // Controlla se l'utente è verificato
-    if (session && session?.needsEmail) {
-        // Fai il redirect alla pagina di verifica dell'email
+    if (token && token?.verified ===  false) {
         return NextResponse.redirect(new URL('/link-email', req.url));
     } 
-    if (!session ) {
-      // Fai il redirect alla pagina di verifica dell'email
-      return NextResponse.redirect(new URL('/login', req.url));
-  }
+  //   if (!token ) {
+  //     return NextResponse.redirect(new URL('/login', req.url));
+  // }
 
     // Permetti l'accesso se l'utente è verificato
     return NextResponse.next();

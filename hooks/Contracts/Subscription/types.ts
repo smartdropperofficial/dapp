@@ -37,15 +37,15 @@ export interface SubscriptionModel {
 }
 
 export interface SubscriptionManagementModel {
-    id: number;
-    subscriber: string;
-    promoterAddress: string;
-    start: string;
-    end: string;
-    subscriptionModel: SubscriptionModel;
-    totAmountPaid: number;
-    totShopAmountPaid: number;
-    paymentTx: string;
-    promoterProfit: number;
-    promoterWithdrawn: boolean;
+    id?: number;
+    subscriber?: string;
+    promoterAddress?: string;
+    start?: string;
+    end?: string;
+    subscriptionModel?: SubscriptionModel;
+    totAmountPaid?: number;
+    totShopAmountPaid?: number;
+    paymentTx?: string;
+    promoterProfit?: number;
+    promoterWithdrawn?: boolean;
 }

@@ -68,8 +68,9 @@ const LoadPackages: React.FC<{
             <div className="col-xl-4 mx-1 h-auto d-flex align-items-lg-center" id="free-sub" style={{ height: '300px' }}>
                 <div className="col-12 mb-3 h-xl-100 h-50" style={{ height: '100%' }}>
                     <button
-                        className={`card align-items-center card-secondary px-3 w-100 h-100 ${(ctx.selectedPackageId === -1 || ctx.selectedPackage === null) && ctx.currentSubscription === null ? 'active' : ''
-                            }  justify-content-center`}
+                        className={`card align-items-center card-secondary px-3 w-100 h-100 ${
+                            (ctx.selectedPackageId === -1 || ctx.selectedPackage === null) && ctx.currentSubscription === null ? 'active' : ''
+                        }  justify-content-center`}
                         disabled={ctx.currentSubscription?.id! > -1}
                         onClick={() => handlePackageSelect(null)}
                         style={renderButtonDisabledStyle(ctx.currentSubscription?.subscriptionModel?.id! > -1)}
@@ -89,8 +90,9 @@ const LoadPackages: React.FC<{
                     {subscriptions?.map(sub => (
                         <div key={sub.id} className="col-12 col-xl-6 mb-1 p-2 h-lg-50">
                             <button
-                                className={`card align-items-center card-secondary px-5 h-md-100  d-flex justify-content-center justify-content-lg-start py-4    ${sub.id === ctx.selectedPackage?.id || sub.id === ctx.currentSubscription?.subscriptionModel.id! ? 'active' : ''
-                                    }   `}
+                                className={`card align-items-center card-secondary px-5 h-md-100  d-flex justify-content-center justify-content-lg-start py-4    ${
+                                    sub.id === ctx.selectedPackage?.id || sub.id === ctx.currentSubscription?.subscriptionModel?.id! ? 'active' : ''
+                                }   `}
                                 onClick={() => handlePackageSelect(sub)}
                                 style={{ ...renderButtonDisabledStyle(ctx.currentSubscription?.id! > -1), width: '100%' }}
                                 disabled={ctx.currentSubscription?.id! > -1}
