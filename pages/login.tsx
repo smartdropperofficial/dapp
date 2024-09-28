@@ -6,18 +6,18 @@ import { SessionExt } from '../types/SessionExt';
 import { useSession } from 'next-auth/react';
 
 function Login() {
-    const { address, isConnected } = useAccount();
+    const { address } = useAccount();
     const { data: session } = useSession() as { data: SessionExt | null };
     const router = useRouter();
 
     useEffect(() => {
         console.log('login - router- Redirect: ', router.query.redirect);
 
-        // if (session && address) {
-        //   const redirect = router.query.redirect || '/';
-        //   console.log("🚀 ~ useEffect ~ Redirect to:", redirect);
-        //   router.push(redirect as string);
-        // }
+        if (session && address) {
+            const redirect = router.query.redirect || '/';
+            console.log('🚀 ~ useEffect ~ Redirect to:', redirect);
+            router.push(redirect as string);
+        }
     }, [session, address, router.query.redirect]);
     useEffect(() => {
         if (session && address) {

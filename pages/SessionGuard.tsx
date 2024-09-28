@@ -1,42 +1,82 @@
+import { useState, useEffect, ReactNode } from 'react';
 import Loading from '@/components/UI/Loading';
 import ModalOverlay from '@/components/UI/ModalOverlay';
-import { SessionExt } from '@/types/SessionExt';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
-import { ReactNode, useEffect } from 'react';
 import { useAccount, useDisconnect } from 'wagmi';
+import { SessionExt } from '@/types/SessionExt';
 
 const SessionGuard = ({ children }: { children: ReactNode }) => {
-    const { data: session } = useSession() as { data: SessionExt | null };
-    const { address } = useAccount();
+    const { status: sessionStatus } = useSession();
+    const { address, isConnected } = useAccount();
     const { disconnect } = useDisconnect();
-
     const router = useRouter();
+    const { data: session }: { data: SessionExt | null } = useSession() as { data: SessionExt | null };
 
-    // useEffect(() => {
-    //     if (address && session && session?.verified) {
-    //         router.push('/link-email');
-    //     }
-    // }, [status, session, address]);
+    const [loading, setLoading] = useState(true);
+
+    // Definisci i percorsi pubblici, inclusi i pattern delle rotte dinamiche
+    const publicPaths = [
+        '/login',
+        '/link-email',
+        /^\/order\/[^/]+\/order-details$/, // Regex per la rotta dinamica
+    ];
+
     useEffect(() => {
-        if ((address && session && session?.verified == undefined) || session?.verified === false) {
-            router.push('/link-email');
-        }
-    }, [session, address]);
+        const handleStart = (url: string) => {
+            setLoading(true);
+        };
+
+        const handleComplete = (url: string) => {
+            setLoading(false);
+        };
+
+        router.events.on('routeChangeStart', handleStart);
+        router.events.on('routeChangeComplete', handleComplete);
+        router.events.on('routeChangeError', handleComplete);
+
+        return () => {
+            router.events.off('routeChangeStart', handleStart);
+            router.events.off('routeChangeComplete', handleComplete);
+            router.events.off('routeChangeError', handleComplete);
+        };
+    }, [router]);
 
     useEffect(() => {
-        if (!address) {
-            disconnect();
-            router.push('/login');
+        if (sessionStatus === 'loading') {
+            return;
         }
-    }, [address]);
 
-    if (status === 'loading') {
+        // Funzione per verificare se l'URL corrente corrisponde a un percorso pubblico
+        const isPublicPath = publicPaths.some(path => {
+            if (typeof path === 'string') {
+                return path === router.pathname;
+            } else if (path instanceof RegExp) {
+                return path.test(router.asPath);
+            }
+            return false;
+        });
+
+        if (isPublicPath) {
+            setLoading(false);
+            return;
+        }
+
+        if (!isConnected || !address) {
+            router.replace('/login');
+        } else if (session && session.verified === false) {
+            router.replace('/link-email');
+        } else {
+            setLoading(false);
+        }
+    }, [sessionStatus, session, isConnected, address, router.pathname, router.asPath]);
+
+    if (loading) {
         return (
             <ModalOverlay show={true}>
                 <Loading dark={true} />
             </ModalOverlay>
-        ); // Puoi mostrare un loader mentre la sessione si carica
+        );
     }
 
     return <>{children}</>;
