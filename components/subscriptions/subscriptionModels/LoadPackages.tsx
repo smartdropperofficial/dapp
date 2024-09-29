@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { Card } from 'react-bootstrap';
 import useSubscriptionPlan from '../../../hooks/Contracts/Subscription/customHooks/useSubscriptionPlan';
-import { SubscriptionType, SubscriptionPeriod, SubscriptionModel } from '../../../hooks/Contracts/Subscription/types';
+import { SubscriptionType, SubscriptionPeriod, SubscriptionPlans } from '../../../hooks/Contracts/Subscription/types';
 import useSubscriptionManagement from '@/hooks/Contracts/Subscription/customHooks/useSubscriptionManagement';
 import { SubscriptionContext } from '@/store/subscription-context';
 
 const LoadPackages: React.FC<{
     activePackage: number;
-    selectedPackage: SubscriptionModel;
+    selectedPackage: SubscriptionPlans;
     subscriptionId: number;
     setSubscriptionId: (id: number) => void;
     selectPackage: (subType: number) => void;
@@ -15,7 +15,7 @@ const LoadPackages: React.FC<{
     const ctx = useContext(SubscriptionContext);
     const { account, getSubscriptionModels } = useSubscriptionPlan();
 
-    const [subscriptions, setSubscriptions] = useState<SubscriptionModel[]>([]);
+    const [subscriptions, setSubscriptions] = useState<SubscriptionPlans[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -34,7 +34,7 @@ const LoadPackages: React.FC<{
         fetchSubscriptions();
     }, [getSubscriptionModels]);
 
-    const handlePackageSelect = (subType: SubscriptionModel | null) => {
+    const handlePackageSelect = (subType: SubscriptionPlans | null) => {
         if (subType === null) {
             ctx.setSelectedPackageHandler(null);
             ctx.setSubscriptionIdHandler(-1);
@@ -52,14 +52,14 @@ const LoadPackages: React.FC<{
         return isActive ? { backgroundColor: '#f7f7f7', border: 'none', color: 'grey' } : {};
     };
 
-    const getSubscriptionPeriod = (sub: SubscriptionModel): string => {
+    const getSubscriptionPeriod = (sub: SubscriptionPlans): string => {
         if ([SubscriptionType.BUSINESS, SubscriptionType.RETAILER].includes(sub.subscriptionType)) {
             return sub.subscriptionPeriod === SubscriptionPeriod.MONTHLY ? 'Month' : 'Annual';
         }
         return '';
     };
 
-    const isBestChoice = (sub: SubscriptionModel): boolean => {
+    const isBestChoice = (sub: SubscriptionPlans): boolean => {
         return sub.subscriptionType === SubscriptionType.BUSINESS && sub.subscriptionPeriod === SubscriptionPeriod.ANNUAL;
     };
 
