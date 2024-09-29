@@ -2,7 +2,6 @@ import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { getCsrfToken } from 'next-auth/react';
 import { SiweMessage } from 'siwe';
-import { supabase } from '../../../utils/supabaseClient';
 import { getUserByWalletAddress } from '@/utils/utils';
 
 export default async function auth(req: any, res: any) {
@@ -94,7 +93,6 @@ export default async function auth(req: any, res: any) {
                 session.is_promoter_active = token?.is_promoter_active;
                 session.isAdmin = token?.isAdmin; // Add user email to session
                 session.config_db = token?.config_db; // Add user email to session
-                // console.log("🚀 ~ session ~ session:", session)
 
                 return session;
             },
@@ -102,66 +100,66 @@ export default async function auth(req: any, res: any) {
     });
 }
 
-async function getUserRole(wallet: string | undefined) {
-    try {
-        let { data: user, error } = await supabase
-            .from('users')
-            .select('email,is_verified,is_promoter,is_admin,is_promoter_active,config')
-            .eq('wallet_address', wallet)
-            .single();
+// async function getUserRole(wallet: string | undefined) {
+//     try {
+//         let { data: user, error } = await supabase
+//             .from('users')
+//             .select('email,is_verified,is_promoter,is_admin,is_promoter_active,config')
+//             .eq('wallet_address', wallet)
+//             .single();
 
-        if (error) {
-            console.log('🚀 ~ getUserRole ~ error:', error);
-        }
+//         if (error) {
+//             console.log('🚀 ~ getUserRole ~ error:', error);
+//         }
 
-        if (!user) {
-            const { data: configData, error: configError } = await supabase.from('config').select('*').eq('is_on', true);
-            console.log("🚀 ~ getUserRole ~ configData:", configData)
+//         if (!user) {
+//             const { data: configData, error: configError } = await supabase.from('config').select('*').eq('is_on', true);
+//             console.log("🚀 ~ getUserRole ~ configData:", configData)
 
-            if (configError) {
-                console.error('🚀 Error fetching config:', configError);
-            } else {
-                if (configData && configData.length > 1) {
-                    const { data: lastInsertedRecord, error: lastInsertedError } = await supabase
-                        .from('users')
-                        .select('*')
-                        .order('id', { ascending: false })
-                        .limit(1)
-                        .single();
-                    if (lastInsertedError && lastInsertedError.details !== 'Results contain 0 rows') {
-                        console.error('🚀 Error retrieving last row inserted:', lastInsertedError);
-                    } else {
-                        console.log('🚀 Value of LAST inserted record was:', lastInsertedRecord.config);
-                        if (lastInsertedRecord && !lastInsertedError) {
-                            const newUserConfig = !lastInsertedRecord.config;
-                            console.log('🚀 Value of NEXT inserted record was:', newUserConfig);
+//             if (configError) {
+//                 console.error('🚀 Error fetching config:', configError);
+//             } else {
+//                 if (configData && configData.length > 1) {
+//                     const { data: lastInsertedRecord, error: lastInsertedError } = await supabase
+//                         .from('users')
+//                         .select('*')
+//                         .order('id', { ascending: false })
+//                         .limit(1)
+//                         .single();
+//                     if (lastInsertedError && lastInsertedError.details !== 'Results contain 0 rows') {
+//                         console.error('🚀 Error retrieving last row inserted:', lastInsertedError);
+//                     } else {
+//                         console.log('🚀 Value of LAST inserted record was:', lastInsertedRecord.config);
+//                         if (lastInsertedRecord && !lastInsertedError) {
+//                             const newUserConfig = !lastInsertedRecord.config;
+//                             console.log('🚀 Value of NEXT inserted record was:', newUserConfig);
 
-                            const { data: newUser, error: newUserError } = await supabase.from('users').insert([{ wallet, config: newUserConfig }]);
-                            if (newUserError) {
-                                console.error('🚀 ERROR adding new user:', newUserError);
-                            } else {
-                                console.log('🚀 New user added successfully:', newUser);
-                            }
-                        }
-                    }
-                } else if (configData && configData.length === 1) {
-                    console.log('🚀 ~ getUserRole ~ configData.length:', configData.length);
-                    const { data: newUser, error: newUserError } = await supabase.from('users').insert([{ wallet }]);
+//                             const { data: newUser, error: newUserError } = await supabase.from('users').insert([{ wallet, config: newUserConfig }]);
+//                             if (newUserError) {
+//                                 console.error('🚀 ERROR adding new user:', newUserError);
+//                             } else {
+//                                 console.log('🚀 New user added successfully:', newUser);
+//                             }
+//                         }
+//                     }
+//                 } else if (configData && configData.length === 1) {
+//                     console.log('🚀 ~ getUserRole ~ configData.length:', configData.length);
+//                     const { data: newUser, error: newUserError } = await supabase.from('users').insert([{ wallet }]);
 
-                    if (newUserError) {
-                        console.error('🚀 ERROR adding new user:', newUserError);
-                    } else {
-                        console.log('🚀 New user added successfully:', newUser);
-                    }
-                } else {
-                    console.log('🚀 No rows returned from the query');
-                }
-            }
-        }
+//                     if (newUserError) {
+//                         console.error('🚀 ERROR adding new user:', newUserError);
+//                     } else {
+//                         console.log('🚀 New user added successfully:', newUser);
+//                     }
+//                 } else {
+//                     console.log('🚀 No rows returned from the query');
+//                 }
+//             }
+//         }
 
-        return user || null;
-    } catch (error) {
-        console.error('nextAuth - getUserRole() - Error fetching user role:', error);
-        return null;
-    }
-}
+//         return user || null;
+//     } catch (error) {
+//         console.error('nextAuth - getUserRole() - Error fetching user role:', error);
+//         return null;
+//     }
+// }
