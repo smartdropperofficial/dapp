@@ -3,7 +3,7 @@ import { Form, Button, Col } from 'react-bootstrap';
 import { useSession } from 'next-auth/react';
 import useSubscriptionManagement from '../customHooks/useSubscriptionManagement';
 import useSubscriptionPlan from '../customHooks/useSubscriptionPlan';
-import { PromoterModel, SubscriptionModel } from '../types';
+import { PromoterModel, SubscriptionPlans } from '../types';
 import { SessionExt } from '../../../../types/SessionExt';
 import usePromoterManagement from '../customHooks/usePromoterManagement';
 import { SubscriptionContext } from '@/store/subscription-context';
@@ -12,7 +12,7 @@ import PromotersTable from './PromotersTable';
 import { BigNumber } from 'ethers';
 import { checkErrorMessage } from '@/utils/utils';
 import Swal from 'sweetalert2';
-import DatePicker from "react-datepicker";
+import DatePicker from 'react-datepicker';
 const AddSubscription: React.FC = () => {
     const { data: session }: { data: SessionExt | null } = useSession() as { data: SessionExt | null };
     const ctx = useContext(SubscriptionContext);
@@ -35,15 +35,14 @@ const AddSubscription: React.FC = () => {
         setError(null);
         let endDate;
         const subPeriod = Number(ctx?.subscriptionsModels?.find(sub => sub.id === parseInt(subscriptionTypeId))?.subscriptionPeriod);
-        console.log("🚀 ~ handleSubmit ~ subPeriod:", subPeriod)
+        console.log('🚀 ~ handleSubmit ~ subPeriod:', subPeriod);
 
         if (subPeriod === 0) {
             endDate = formatedDate + 30 * 24 * 60 * 60; // 365 giorni * 24 ore * 60 minuti * 60 secondi
-        }
-        else if (subPeriod === 1) {
+        } else if (subPeriod === 1) {
             endDate = formatedDate + 365 * 24 * 60 * 60; // 365 giorni * 24 ore * 60 minuti * 60 secondi
         }
-        console.log("🚀 ~ handleSubmit ~ endDate:", endDate)
+        console.log('🚀 ~ handleSubmit ~ endDate:', endDate);
 
         try {
             const res = await createSubscription(parseInt(subscriptionTypeId), subscriber, paymentTx, promoterAddress || undefined, formatedDate, endDate);
@@ -51,7 +50,7 @@ const AddSubscription: React.FC = () => {
                 resetForm();
             } else if (res.error) {
                 const errorMessage = checkErrorMessage(res.error.reason);
-                console.log("🚀 ~ handleSubmit ~ errorMessage:", errorMessage)
+                console.log('🚀 ~ handleSubmit ~ errorMessage:', errorMessage);
                 setError(errorMessage! ?? res.error.reason);
             }
         } catch (err) {
@@ -66,14 +65,11 @@ const AddSubscription: React.FC = () => {
     };
     useEffect(() => {
         if (startDate) {
-            const formatDateTime: number = (Math.floor(new Date(startDate).getTime() / 1000)) ?? 0;
-            console.log("🚀 ~ useEffect ~ formatDateTime:", formatDateTime)
+            const formatDateTime: number = Math.floor(new Date(startDate).getTime() / 1000) ?? 0;
+            console.log('🚀 ~ useEffect ~ formatDateTime:', formatDateTime);
             setFormatedDate(formatDateTime);
-
         }
-    }, [startDate])
-
-
+    }, [startDate]);
 
     const resetForm = () => {
         setSubscriptionTypeId('');
@@ -82,7 +78,7 @@ const AddSubscription: React.FC = () => {
         setPromoterAddress('');
         setError(null);
     };
-    useEffect(() => { }, [ctx]);
+    useEffect(() => {}, [ctx]);
 
     useEffect(() => {
         const fetchSubscriptions = async () => {
@@ -112,8 +108,7 @@ const AddSubscription: React.FC = () => {
                 setPromoterAddress('');
             }
         }
-    }, [promoterAddress, subscriber])
-
+    }, [promoterAddress, subscriber]);
 
     useEffect(() => {
         if (session) {
@@ -170,26 +165,24 @@ const AddSubscription: React.FC = () => {
             </Form.Group>
             <Form.Group as={Col} controlId="paymentTx" className="my-2">
                 <Form.Label>Payment Tx</Form.Label>
-                <Form.Control
-                    type="text"
-                    value={paymentTx}
-                    onChange={e => setPaymentTx(e.target.value)}
-                    required
-                    placeholder="Insert payment Tx"
-                />
+                <Form.Control type="text" value={paymentTx} onChange={e => setPaymentTx(e.target.value)} required placeholder="Insert payment Tx" />
             </Form.Group>
-            {Number(subscriptionTypeId) === 3 ? <Form.Group as={Col} controlId="promoterAddress" className="my-2">
-                <Form.Label>Promoter Address (optional)</Form.Label>
-                <Form.Control
-                    type="text"
-                    value={promoterAddress}
-                    onChange={e => setPromoterAddress(e.target.value.trim())}
-                    placeholder="Insert wallet Address"
-                />
-            </Form.Group> : <></>}
+            {Number(subscriptionTypeId) === 3 ? (
+                <Form.Group as={Col} controlId="promoterAddress" className="my-2">
+                    <Form.Label>Promoter Address (optional)</Form.Label>
+                    <Form.Control
+                        type="text"
+                        value={promoterAddress}
+                        onChange={e => setPromoterAddress(e.target.value.trim())}
+                        placeholder="Insert wallet Address"
+                    />
+                </Form.Group>
+            ) : (
+                <></>
+            )}
             <Form.Group as={Col} controlId="start-date" className="my-2 d-flex flex-column">
                 <Form.Label>Start Date (optional)</Form.Label>
-                <DatePicker selected={startDate} onChange={handleChangeDate} className='form-control' />
+                <DatePicker selected={startDate} onChange={handleChangeDate} className="form-control" />
             </Form.Group>
             {error && <p className="text-danger">{error}</p>}
             <Button variant="primary" type="submit" className="col-12 my-5" size="sm" disabled={isSubmitting}>

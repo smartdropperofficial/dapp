@@ -13,6 +13,7 @@ import { ConfigContext } from '@/store/config-context';
 import { GetServerSideProps } from 'next';
 import OrderTable from '@/components/OrderTable/OrderTable';
 import ModalOverlay from '@/components/UI/ModalOverlay';
+import { withAuth } from '@/withAuth';
 
 const MyOrders = () => {
     const { disconnect } = useDisconnect();
@@ -57,15 +58,14 @@ const MyOrders = () => {
         }
     }, [session?.address, address]);
 
-    useEffect(() => {
-        if (!address) {
-            disconnect();
-            router.push('/login');
-        } else if (address && session?.address && session?.address === address) {
-        }
-    }, [address, session?.address]);
-
-
+    // useEffect(() => {
+    //     if (!address) {
+    //         disconnect();
+    //         router.push('/login');
+    //     } else if (address && session?.address && session?.address === address) {
+    //         router.push('/');
+    //     }
+    // }, [address, session?.address]);
 
     return (
         <>
@@ -85,7 +85,7 @@ const MyOrders = () => {
                                 <div className="row mt-5">
                                     <div className="col-12 justify-content-center text-center">
                                         {!isLoading && session?.address && orders && orders.length > 0 ? (
-                                            // <MyOrderList orders={orders} /> 
+                                            // <MyOrderList orders={orders} />
                                             <OrderTable ordersProps={orders} />
                                         ) : !isLoading && session?.address && address && (!orders || orders.length < 1) ? (
                                             <Card>
@@ -96,7 +96,7 @@ const MyOrders = () => {
                                             // <div className="text-center">Connect wallet to view your orders.</div>
                                             <></>
                                         ) : (
-                                            // <Loading dark={true} />  
+                                            // <Loading dark={true} />
                                             <ModalOverlay show={true}>
                                                 <Loading loadingText="Checking tax..." />
                                             </ModalOverlay>
@@ -111,32 +111,13 @@ const MyOrders = () => {
         </>
     );
 };
-// export const getServerSideProps: GetServerSideProps = withAuth(async (context) => {
 
-//     return {
-//         props: {
-//         },
-//     };
-// });
 export default MyOrders;
 
-
-// export async function getServerSideProps(context: GetSessionParams | undefined ) {
-//     const session :  SessionExt | null  = await getSession(context); // Recupera la sessione come preferisci
-//     console.log("🚀 ~ getServerSideProps ~ session:", session)
-  
-//     if (!session || session.email === '' || session.verified === false) {
-//         return {
-//             redirect: {
-//                 destination: '/verify-email',
-//                 permanent: false,
-//             },
-//         };
-//     }
-
-//     return {
-//         props: {
-//             session,
-//         },
-//     };
-// }
+export const getServerSideProps = withAuth(async (context: any, session: any) => {
+    return {
+        props: {
+            session,
+        },
+    };
+});

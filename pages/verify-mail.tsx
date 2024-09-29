@@ -1,61 +1,69 @@
-// pages/verify-email.tsx
-
+import { useState, useEffect, ReactNode } from 'react';
 import Loading from '@/components/UI/Loading';
 import ModalOverlay from '@/components/UI/ModalOverlay';
-import { SessionExt } from '@/types/SessionExt';
-import { getCsrfToken, getSession, signIn, useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
-import { SiweMessage } from 'siwe';
-import Swal from 'sweetalert2';
-import { signMessage } from 'viem/_types/accounts/utils/signMessage';
-import { useAccount } from 'wagmi';
+import { useAccount, useDisconnect } from 'wagmi';
+import { SessionExt } from '@/types/SessionExt';
 
-export default function VerifyEmailPage() {
-    const router = useRouter();
-    const { token } = router.query;
+const SessionGuard = ({ children }: { children: ReactNode }) => {
+    const { status: sessionStatus } = useSession();
+    const { data: session }: { data: SessionExt | null; status: string } = useSession() as { data: SessionExt | null; status: string };
+
     const { address, isConnected } = useAccount();
-    // const { data: session, update} = useSession() as { data: SessionExt | null };
-    const { data: session, update } = useSession();
+    const { disconnect } = useDisconnect();
+    const router = useRouter();
+
+    const [loading, setLoading] = useState(true);
+    const publicPaths = ['/login', '/link-email'];
 
     useEffect(() => {
-        if (token && session) {
-            console.log('🚀 ~ useEffect ~ token:', token);
-            verifyEmail(token as string);
+        // Se la sessione è in caricamento, attendi
+        if (sessionStatus === 'loading') {
+            return;
         }
-    }, [token, session]);
 
-    // useEffect(() => {
-    //     // Esegui qualche operazione per verificare lo stato della sessione
-    //     const checkSession = async () => {
-    //         const session = await getSession();
-    //         console.log('Session corrente:', session);
-    //     };
-
-    //     checkSession();
-    // }, []);
-    const verifyEmail = async (token: string) => {
-        const res = await fetch('/api/verify-email', {
-            method: 'POST',
-            body: JSON.stringify({ token }),
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-        console.log('res', res);
-        if (res.ok) {
-            const updateSession = await update({ verified: true });
-            console.log('🚀 ~ verifyEmail ~ updateSession:', updateSession);
-            Swal.fire({ icon: 'success', title: 'Mail has been verified!' });
-        } else {
-            // alert('Errore nella verifica dell’email.');
-            // Swal.fire({ icon: 'success', title: 'Mail has been verified!' });
+        // Se siamo su una pagina pubblica, non fare nulla
+        if (publicPaths.includes(router.pathname)) {
+            setLoading(false);
+            return;
         }
-    };
 
-    return (
-        <ModalOverlay show={true}>
-            <Loading dark={true} />
-        </ModalOverlay>
-    );
-}
+        // Caso 1: Utente non connesso tramite wallet
+        if (!isConnected || !address) {
+            router.replace('/login');
+            setLoading(false);
+            return;
+        }
+
+        // Caso 2: Utente connesso ma email non verificata
+        if (session && session.verified === false) {
+            router.replace('/link-email');
+            setLoading(false);
+            return;
+        }
+
+        // Caso 3: Wallet non corrisponde a session.address
+        if (session && address && session.address !== address) {
+            disconnect();
+            router.replace('/login');
+            setLoading(false);
+            return;
+        }
+
+        // Caso 4: Tutto ok, consenti l'accesso
+        setLoading(false);
+    }, [sessionStatus, session, isConnected, address, router.pathname]);
+
+    if (loading) {
+        return (
+            <ModalOverlay show={true}>
+                <Loading dark={true} />
+            </ModalOverlay>
+        );
+    }
+
+    return <>{children}</>;
+};
+
+export default SessionGuard;

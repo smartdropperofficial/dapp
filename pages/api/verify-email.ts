@@ -45,10 +45,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     if (!user) {
-      // L'utente non esiste, crealo
       const { data: newUser, error: newUserError } = await supabase
         .from('users')
-        .insert([{ email, email_verified: new Date() }])
+        .insert([{ email, email_verified: true }])
         .single();
 
       if (newUserError) {

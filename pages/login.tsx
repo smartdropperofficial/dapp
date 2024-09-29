@@ -9,21 +9,26 @@ function Login() {
     const { address } = useAccount();
     const { data: session } = useSession() as { data: SessionExt | null };
     const router = useRouter();
-
+    function decodeFromUrl(encodedData: string) {
+        return encodedData.replace(/-/g, '/').replace(/_/g, '+');
+    }
     useEffect(() => {
         console.log('login - router- Redirect: ', router.query.redirect);
 
-        if (session && address) {
-            const redirect = router.query.redirect || '/';
+        if (session && address && router.query.redirect) {
+            const redirect = encodeURI(router.query.redirect as string) || '/';
             console.log('🚀 ~ useEffect ~ Redirect to:', redirect);
-            router.push(redirect as string);
+            const URI = decodeURIComponent(router.query.redirect as string);
+            router.push(URI);
         }
     }, [session, address, router.query.redirect]);
+
     useEffect(() => {
-        if (session && address) {
-            router.push('/');
+        if (session?.address && address && session?.address === address && router.query.redirect === undefined) {
+            router.replace('/');
         }
-    }, [session, router.pathname, address]);
+    }, [address, session, session?.address, router.query.redirect]);
+
     return (
         <div className="container h-100 d-flex justify-content-center align-items-center">
             <div className="row w-100 justify-content-center">

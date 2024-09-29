@@ -69,7 +69,6 @@ const Subscribe = () => {
 
     useEffect(() => {
         console.log('🚀 ~ useEffect ~  ctx.selectedPackage?.subscriptionType:', ctx.selectedPackage?.subscriptionType);
-
         setIsBestChoice(
             ctx.selectedPackage?.subscriptionType === SubscriptionType.BUSINESS && ctx.selectedPackage?.subscriptionPeriod === SubscriptionPeriod.ANNUAL
         );
@@ -79,12 +78,6 @@ const Subscribe = () => {
             setShouldHydrate(true);
         }
     }, [isLoadingContract, session, ctx.allSubscriptions, address]);
-    // useEffect(() => {
-    //     if (!address) {
-    //         disconnect();
-    //         router.push('/login');
-    //     }
-    // }, [address, session?.address])
 
     useEffect(() => {
         console.log('🚀 ~ file: subscribe.tsx ~ line 116 ~ useEffect ~ ctx.currentSubscription', ctx.currentSubscription);
@@ -118,9 +111,9 @@ const Subscribe = () => {
                                         <table className="table table-striped table-bordered w-100" style={{ maxWidth: '100%' }}>
                                             <thead>
                                                 <tr>
-                                                    <th scope="col">Type</th>
+                                                    <th scope="col">Plan</th>
                                                     <th scope="col">Period</th>
-                                                    <th scope="col">Price</th>
+                                                    {/* <th scope="col">Price</th> */}
                                                     <th scope="col">Tx</th>
                                                     <th scope="col">Started</th>
                                                     <th scope="col">End</th>
@@ -146,7 +139,7 @@ const Subscribe = () => {
                                                             <tr key={index}>
                                                                 <td>{sub.subscriptionModel?.name}</td>
                                                                 <td>{getSubscriptionPeriod(sub?.subscriptionModel?.subscriptionPeriod!)}</td>
-                                                                <td>${sub.subscriptionModel?.price.toFixed(2)}</td>
+                                                                {/* <td>${sub.subscriptionModel?.price.toFixed(2)}</td> */}
                                                                 <td>
                                                                     <Link href={`https://polygonscan.com/tx/${sub.paymentTx}`} target="_blank">
                                                                         {sub.paymentTx?.substring(0, 10)}...
@@ -204,7 +197,7 @@ const Subscribe = () => {
                                                                                             width: '100%',
                                                                                         }}
                                                                                     >
-                                                                                        <b>${ctx.selectedPackage?.promoPrice.toFixed(2)}</b>
+                                                                                        <b>${ctx.selectedPackage?.promoPrice?.toFixed(2)}</b>
                                                                                     </div>
                                                                                     instead
                                                                                     <h4>
@@ -372,29 +365,12 @@ const Subscribe = () => {
         </>
     );
 };
-// export const getServerSideProps: GetServerSideProps = withAuth(async (context) => {
-//     return {
-//         props: {
-//         },
-//     };
-// });
+
 export default Subscribe;
-// export async function getServerSideProps(context: GetSessionParams | undefined ) {
-//     const session :  SessionExt | null  = await getSession(context); // Recupera la sessione come preferisci
-//     console.log("🚀 ~ getServerSideProps ~ session:", session)
-
-//     if (!session || session.email === '' || session.verified === false) {
-//         return {
-//             redirect: {
-//                 destination: '/verify-email',
-//                 permanent: false,
-//             },
-//         };
-//     }
-
-//     return {
-//         props: {
-//             session,
-//         },
-//     };
-// }
+export const getServerSideProps = withAuth(async (context: any, session: any) => {
+    return {
+        props: {
+            session,
+        },
+    };
+});

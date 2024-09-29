@@ -21,7 +21,7 @@ export interface PromoterModelSB {
     referralCode: string;
 }
 
-export interface SubscriptionModelSB {
+export interface SubscriptionPlansSB {
     id: number;
     subscriptionType: SubscriptionType;
     subscriptionPeriod: SubscriptionPeriod;

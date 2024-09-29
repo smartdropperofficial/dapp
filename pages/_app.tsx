@@ -20,8 +20,7 @@ import Head from 'next/head';
 import 'react-loading-skeleton/dist/skeleton.css';
 import 'react-datepicker/dist/react-datepicker.css';
 import SessionGuard from './SessionGuard';
-import { useEffect } from 'react';
-import { useRouter } from 'next/router';
+
 const isDev = process.env.NODE_ENV === 'development';
 
 const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
@@ -86,11 +85,11 @@ export default function App({ Component, pageProps }: AppProps) {
                             <ConfigContextProvider>
                                 <SubscriptionContextProvider>
                                     <OrderContextProvider>
-                                        <Layout>
-                                            <SessionGuard>
+                                        <SessionGuard>
+                                            <Layout>
                                                 <Component {...pageProps} />
-                                            </SessionGuard>
-                                        </Layout>
+                                            </Layout>
+                                        </SessionGuard>
                                     </OrderContextProvider>
                                 </SubscriptionContextProvider>
                             </ConfigContextProvider>

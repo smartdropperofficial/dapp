@@ -23,7 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   // Invia l'email con il link di verifica
-  const verifyUrl = `${process.env.NEXTAUTH_URL}/verify-mail?token=${token}`;
+  const verifyUrl = `${process.env.NEXTAUTH_URL}/link-email?token=${token}`;
 
   try {
     const response = await axios.post(`${process.env.MAILER_WEBHOOK}/send-login-email`, {

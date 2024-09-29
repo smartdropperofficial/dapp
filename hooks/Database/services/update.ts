@@ -46,23 +46,32 @@ export async function createDataOnSB(tableName: string, insertValues: Record<str
 }
 export async function getDataFromSB(tableName: string, filterCriteria: Record<string, any> = {}): Promise<any> {
     if (!tableName) {
-        throw new Error('Il nome della tabella è obbligatorio.')
+        throw new Error('Il nome della tabella è obbligatorio.');
     }
+    
     try {
-        let query = supabase.from(tableName).select('*')
+        // Query dinamica sulla tabella fornita
+        let query = supabase.from(tableName).select('*');
 
+        // Applicazione dei criteri di filtro dinamici
         for (const [key, value] of Object.entries(filterCriteria)) {
-            query = query.eq(key, value)
+            query = query.eq(key, value);
         }
-        const { data, error } = await query
+
+        // Esecuzione della query
+        const { data, error } = await query;
+        console.log("🚀 ~ getDataFromSB ~ data:", data);
 
         if (error) {
-            throw new Error(`Errore nel recupero dei dati: ${error.message}`)
+            throw new Error(`Errore nel recupero dei dati: ${error.message}`);
         }
-        return data[0]
+
+        // Ritorna i dati ottenuti
+        return data;  // Restituisce l'intero set di dati
     } catch (err) {
-        console.error('Errore durante il recupero:', err)
-        throw err
+        console.error('Errore durante il recupero:', err);
+        throw err;
     }
 }
+
 

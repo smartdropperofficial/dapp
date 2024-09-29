@@ -55,7 +55,8 @@ export default async function auth(req: any, res: any) {
         providers.pop();
     }
 
-    return await NextAuth(req, res, {
+    return await NextAuth(req, res, { 
+        debug: true,
         providers,
         session: {
             strategy: 'jwt',
@@ -63,11 +64,8 @@ export default async function auth(req: any, res: any) {
         secret: process.env.NEXTAUTH_SECRET!,
         callbacks: {
             async session({ session, token}: { session: any; token: any }) { 
-             console.log("🚀 ~ session ~ token:", token)
-             console.log("🚀 ~ session ~ session:", session)           
              
                     const userRole = await getUserByWalletAddress(token.sub) as any;
-                    console.log("🚀 ~ session ~ userRole:", userRole)
                      /* eslint-disable */
                     if (userRole && userRole?.email_verified) {        
 
@@ -89,14 +87,14 @@ export default async function auth(req: any, res: any) {
                     }
               
 
-                session.address = token.sub;
+                 session.address = token.sub;
                 session.email = token?.email; // Add user email to session
                 session.verified = token?.verified; // Add user email to session
                 session.isPromoter = token?.isPromoter; // Add user email to session
                 session.is_promoter_active = token?.is_promoter_active;
                 session.isAdmin = token?.isAdmin; // Add user email to session
                 session.config_db = token?.config_db; // Add user email to session
-                console.log("🚀 ~ session ~ session:", session)
+                // console.log("🚀 ~ session ~ session:", session)
 
                 return session;
             },

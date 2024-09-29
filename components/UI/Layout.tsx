@@ -15,52 +15,25 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
     const ctx = useContext(OrderContext);
     const ctxConfig = useContext(ConfigContext);
     const { data: session }: { data: SessionExt | null; status: string } = useSession() as { data: SessionExt | null; status: string };
-    const { address, isConnected } = useAccount();
     const year = new Date().getFullYear();
-    const { disconnect } = useDisconnect();
-    const [newBar, setNewBar] = useState<boolean>(false);
 
     const [isMounted, setIsMounted] = useState(false);
     const router = useRouter();
     const [showMenuResp, setShowMenuResp] = useState<boolean>(false);
     const [windowWidth, setWindowWidth] = useState(0);
 
-    useEffect(() => {
-        if (!address) {
-            router.push('/login');
-        }
-    }, [address]);
+    // useEffect(() => {
+    //     if (!address) {
+    //         disconnect();
+    //         router.push('/login');
+    //     }
+    // }, [address]);
 
-    useEffect(() => {
-        // Funzione di controllo della sessione
-        const checkSession = () => {
-            if (session?.email === '' || session?.verified === false) {
-                router.push('/link-email');
-            }
-        };
-
-        // Controllo iniziale quando si monta il componente
-        checkSession();
-
-        // Aggiungi un listener per intercettare i cambi di pagina
-        router.events.on('routeChangeComplete', checkSession);
-
-        // Cleanup del listener quando il componente viene smontato
-        return () => {
-            router.events.off('routeChangeComplete', checkSession);
-        };
-    }, [router, session]);
-
-    useEffect(() => {
-        if (session?.address && address && session?.address !== address) {
-            disconnect();
-        }
-    }, [address, session, session?.address, disconnect]);
-    useEffect(() => {
-        if (session?.email && ctx.email === '') {
-            ctx.emailHandler(session?.email);
-        }
-    }, [ctx, session, session?.email]);
+    // useEffect(() => {
+    //     if (session?.address && address && session?.address !== address) {
+    //         disconnect();
+    //     }
+    // }, [address, session, session?.address, disconnect]);
 
     useEffect(() => {
         setIsMounted(true);

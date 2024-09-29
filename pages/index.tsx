@@ -13,14 +13,8 @@ import ZonePicker from '../components/steps/ZonePicker';
 import { RETAILERS } from '../utils/constants';
 import EbayImg from '../public/assets/image.png';
 import AmazonImg from '../public/assets/amazon-logo.png';
-import { ConfigContext } from '@/store/config-context';
 import Basket from '@/components/orders/Basket';
-import { useAccount, useDisconnect } from 'wagmi';
-import router from 'next/router';
-import { GetServerSideProps } from 'next';
-import { getSession, GetSessionParams } from 'next-auth/react';
-import { SessionExt } from '@/types/SessionExt';
-// import { withAuth } from '@/withAuth';
+import { withAuth } from '@/withAuth';
 
 export default function Home() {
     const { currentStep: step } = useContext(OrderContext);
@@ -169,22 +163,14 @@ export default function Home() {
         </>
     );
 }
-// export async function getServerSideProps(context: GetSessionParams | undefined ) {
-//     const session :  SessionExt | null  = await getSession(context); // Recupera la sessione come preferisci
-//     console.log("🚀 ~ getServerSideProps ~ session:", session)
+export const getServerSideProps = withAuth(async (context: any, session: any) => {
+    console.log('🚀 ~ / -  getServerSideProps ~ session:', session);
+    console.log('🚀 ~ / -  getServerSideProps ~ context:', context);
 
-//     if (!session || session.email === '' || session.verified === false) {
-//         return {
-//             redirect: {
-//                 destination: '/verify-email',
-//                 permanent: false,
-//             },
-//         };
-//     }
-
-//     return {
-//         props: {
-//             session,
-//         },
-//     };
-// }
+    // Puoi passare la sessione come prop alla pagina
+    return {
+        props: {
+            session,
+        },
+    };
+});

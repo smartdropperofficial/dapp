@@ -1,26 +1,27 @@
 import React, { createContext, useEffect } from 'react';
 import { useState } from 'react';
-import { PromoterModel, SubscriptionManagementModel, SubscriptionModel } from '@/hooks/Contracts/Subscription/types';
+import { PromoterModel, SubscriptionManagementModel, SubscriptionPlans } from '@/hooks/Contracts/Subscription/types';
 import useSubscriptionPlan from '@/hooks/Contracts/Subscription/customHooks/useSubscriptionPlan';
 import useSubscriptionManagement from '@/hooks/Contracts/Subscription/customHooks/useSubscriptionManagement';
 import { useSession } from 'next-auth/react';
 import { SessionExt } from '@/types/SessionExt';
 import { useAccount } from 'wagmi';
 import usePromoterManagement from '@/hooks/Contracts/Subscription/customHooks/usePromoterManagement';
+import useSubscriptionPlansOnDB from '@/hooks/Database/subscription/useSubscriptionPlans';
 
 export const SubscriptionContext = createContext({
     currentSubscription: null as SubscriptionManagementModel | null,
     allSubscriptions: null as SubscriptionManagementModel[] | null,
-    selectedPackage: null as SubscriptionModel | null,
+    selectedPackage: null as SubscriptionPlans | null,
     selectedPackageId: 3 as number,
     promoterReferral: null as string | null | undefined,
     isReferralCodeApplied: false as boolean,
     debouncedReferralCode: '' as string,
     canPay: false as boolean,
-    subscriptionsModels: [] as SubscriptionModel[],
+    subscriptionsModels: [] as SubscriptionPlans[],
     promoter: null as PromoterModel | null,
     setCurrentSubscriptionHandler: async (subscription: SubscriptionManagementModel | null) => {},
-    setSubscriptionModels: (models: SubscriptionModel[]) => {},
+    setSubscriptionModels: (models: SubscriptionPlans[]) => {},
     setSelectedPackageHandler: (subscription: number | null) => {},
     setSubscriptionIdHandler: (id: number) => {},
     setPromoterReferralHandler: (referral: string | null | undefined) => {},
@@ -41,14 +42,15 @@ const SubscriptionContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const [promoter, setPromoter] = useState<PromoterModel | null>(null);
     const [currentSubscription, setCurrentSubscription] = useState<SubscriptionManagementModel | null>(null); // Set initial value to null
     const [allSubscriptions, setAllSubscriptions] = useState<SubscriptionManagementModel[]>([]); // Set initial value to an empty array
-    const [selectedPackage, setSelectedPackage] = useState<SubscriptionModel | null>(null);
+    const [selectedPackage, setSelectedPackage] = useState<SubscriptionPlans | null>(null);
     const [selectedPackageId, setSelectedPackageId] = useState<number>(3);
     const [promoterReferral, setPromoterReferral] = useState<string | null | undefined>('');
     const [isReferralCodeApplied, setIsReferralCodeApplied] = useState<boolean>(false);
     const [debouncedReferralCode, setDebouncedReferralCode] = useState('');
     const [canPay, setCanPay] = useState<boolean>(false);
     const { account, getSubscriptionModels } = useSubscriptionPlan();
-    const [subscriptionsModels, setSubscriptionsModels] = useState<SubscriptionModel[]>([]);
+    const { getPlansOnDB } = useSubscriptionPlansOnDB();
+    const [subscriptionsPlans, setSubscriptionsPlans] = useState<SubscriptionPlans[]>([]);
     const setAllSubscriptionsHandler = (subscriptions: SubscriptionManagementModel[]) => {
         setAllSubscriptions(subscriptions);
     };
@@ -56,7 +58,7 @@ const SubscriptionContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
         setCurrentSubscription(subscription);
     };
     const setSelectedPackageHandler = (subscription: number | null) => {
-        setSelectedPackage(subscriptionsModels[subscription!]);
+        setSelectedPackage(subscriptionsPlans[subscription!]);
         if (subscription === null) {
             setSelectedPackageId(-1);
             return;
@@ -77,8 +79,8 @@ const SubscriptionContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const setCanPayHandler = (canpay: boolean) => {
         setCanPay(canpay);
     };
-    const setSubscriptionModels = (models: SubscriptionModel[]) => {
-        setSubscriptionsModels(models);
+    const setSubscriptionPlans = (models: SubscriptionPlans[]) => {
+        setSubscriptionsPlans(models);
     };
     const setPromoterHandler = (promoter: PromoterModel | null) => {
         setPromoter(promoter);
@@ -93,7 +95,7 @@ const SubscriptionContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
         isReferralCodeApplied: isReferralCodeApplied,
         debouncedReferralCode: debouncedReferralCode,
         canPay: canPay,
-        subscriptionsModels: subscriptionsModels,
+        subscriptionsModels: subscriptionsPlans,
         promoter: promoter,
         setCurrentSubscriptionHandler: setCurrentSubscriptionHandler,
         setSelectedPackageHandler: setSelectedPackageHandler, // Add setSelectedPackage property
@@ -102,7 +104,7 @@ const SubscriptionContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
         setIsReferralCodeAppliedHandler: setIsReferralCodeAppliedHandler, // Add setIsReferralCodeApplied property
         setDebouncedReferralCodeHandler: setDebouncedReferralCodeHandler, // Add setDebouncedReferralCode property
         setCanPayHandler: setCanPayHandler, // Add setCanPay property
-        setSubscriptionModels: setSubscriptionModels, // Add setSubscriptionModels property
+        setSubscriptionModels: setSubscriptionPlans, // Add setSubscriptionModels property
         setAllSubscriptionsHandler: setAllSubscriptionsHandler, // Add setAllSubscriptions property
         setPromoterHandler: setPromoterHandler, // Add setPromoter property
     };
@@ -171,37 +173,37 @@ const SubscriptionContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
         }
     }, [getLastValidSubscription, getSubscriptionById, session?.address, address]);
 
-    useEffect(() => {
-        async function getData() {
-            if (getPromoterOnBC && address) {
-                try {
-                    const data: PromoterModel | null = await getPromoterOnBC(address);
-                    if (data) {
-                        console.log('🚀 ~ data:', data);
-                        if (data.referralCode && data.isActive) {
-                            setPromoterHandler(data);
-                        } else if (!data.isActive) {
-                        }
-                    } else {
-                        setPromoterHandler(null);
-                    }
-                } catch (error) {
-                } finally {
-                }
-            }
-        }
-        if ((session?.address && address, getPromoterOnBC)) {
-            getData();
-        }
-    }, [session?.address, address, getPromoterOnBC]);
+    // useEffect(() => {
+    //     async function getData() {
+    //         if (getPromoterOnBC && address) {
+    //             try {
+    //                 const data: PromoterModel | null = await getPromoterOnBC(address);
+    //                 if (data) {
+    //                     console.log('🚀 ~ data:', data);
+    //                     if (data.referralCode && data.isActive) {
+    //                         setPromoterHandler(data);
+    //                     } else if (!data.isActive) {
+    //                     }
+    //                 } else {
+    //                     setPromoterHandler(null);
+    //                 }
+    //             } catch (error) {
+    //             } finally {
+    //             }
+    //         }
+    //     }
+    //     if ((session?.address && address, getPromoterOnBC)) {
+    //         getData();
+    //     }
+    // }, [session?.address, address, getPromoterOnBC]);
 
     useEffect(() => {
         const fetchSubscriptions = async () => {
-            if (getSubscriptionModels && subscriptionsModels.length === 0) {
+            if (getSubscriptionModels && subscriptionsPlans.length === 0) {
                 try {
                     const result = await getSubscriptionModels();
                     setTimeout(() => {
-                        setSubscriptionModels(result!);
+                        setSubscriptionPlans(result!);
                     }, 3000);
                 } catch (error) {
                     console.error(error);
@@ -209,14 +211,33 @@ const SubscriptionContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
                 }
             }
         };
-        if (subscriptionsModels.length === 0) {
+        if (subscriptionsPlans.length === 0) {
             fetchSubscriptions();
         }
     }, [getSubscriptionModels]);
+    useEffect(() => {
+        const fetchSubscriptions = async () => {
+            if (getPlansOnDB && subscriptionsPlans.length === 0) {
+                try {
+                    const result = await getPlansOnDB();
+                    console.log('🚀 ~ fetchSubscriptions ~ result:', result);
+                    setTimeout(() => {
+                        setSubscriptionPlans(result!);
+                    }, 3000);
+                } catch (error) {
+                    console.error(error);
+                } finally {
+                }
+            }
+        };
+        if (subscriptionsPlans.length === 0) {
+            fetchSubscriptions();
+        }
+    }, [getPlansOnDB]);
 
     useEffect(() => {
-        setSelectedPackage(subscriptionsModels[selectedPackageId!]);
-    }, [subscriptionsModels, selectedPackageId]);
+        setSelectedPackage(subscriptionsPlans[selectedPackageId!]);
+    }, [subscriptionsPlans, selectedPackageId]);
 
     return <SubscriptionContext.Provider value={store}>{children}</SubscriptionContext.Provider>;
 };

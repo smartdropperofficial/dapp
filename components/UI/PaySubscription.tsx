@@ -4,7 +4,7 @@ import { useContractReads, useWaitForTransaction } from 'wagmi';
 import { createSubscription } from '../controllers/SubscriptionController';
 import { SessionExt } from '../../types/SessionExt';
 import { useSession } from 'next-auth/react';
-import { PromoterModel, SubscriptionManagementModel, SubscriptionModel } from '@/hooks/Contracts/Subscription/types';
+import { PromoterModel, SubscriptionManagementModel, SubscriptionPlans } from '@/hooks/Contracts/Subscription/types';
 import useSubscriptionManagement from '@/hooks/Contracts/Subscription/customHooks/useSubscriptionManagement';
 import usePromoterManagement from '@/hooks/Contracts/Subscription/customHooks/usePromoterManagement';
 import { checkErrorMessage, convertToDecimal } from '@/utils/utils';
@@ -14,16 +14,13 @@ import DatePicker from 'react-datepicker';
 import { Form } from 'react-bootstrap';
 
 const PaySubscription: React.FC<{
-    Package: SubscriptionModel;
+    Package: SubscriptionPlans;
     promoterReferralCode?: string | null | undefined;
     setIsReferralCodeApplied?: (value: boolean) => void;
     setLoadingReferral?: (value: boolean) => void;
     loadingReferral?: boolean;
     btnStyle?: React.CSSProperties;
 }> = ({ Package, promoterReferralCode = '', setIsReferralCodeApplied, btnStyle, setLoadingReferral, loadingReferral }) => {
-
-
-
     const configContext = useContext(ConfigContext);
     const { getPromoterByReferralOnBC } = usePromoterManagement();
     const { data: session }: { data: SessionExt | null } = useSession() as { data: SessionExt | null };
@@ -68,32 +65,25 @@ const PaySubscription: React.FC<{
                             setPromoter(convertedPromoter);
                             setIsPromoActive(true);
                             setLoadingReferral(false);
-
                         } else {
                             setPromoter(null);
                             setLoadingReferral(false);
-
                         }
                     });
                 }, 3000);
-
-
             } catch (error) {
-                console.log("🚀 ~ useEffect ~ error:", error)
+                console.log('🚀 ~ useEffect ~ error:', error);
                 setLoadingReferral(false);
-
             } finally {
                 // setLoadingReferral(false);
-
             }
         } else {
         }
     }, [promoterReferralCode]);
 
-
     useEffect(() => {
         console.log('loadingReferral:', loadingReferral);
-    }, [loadingReferral])
+    }, [loadingReferral]);
 
     const getPrice = (): number => {
         if (promoter && promoter?.referralCode === promoterReferralCode) {
@@ -106,31 +96,33 @@ const PaySubscription: React.FC<{
             return Package?.price;
         }
     };
-    const handleCreateSubscription = useCallback(async (subscriptionTypeId: number, subscriber: string, paymentTx: string, promoterAddress: string | null | undefined) => {
-        setIsSubmitting(true);
-        setError(null);
-        let endDate;
-        try {
-            if (Package?.period === 0) {
-                endDate = formatedDate + 30 * 24 * 60 * 60; // 365 giorni * 24 ore * 60 minuti * 60 secondi
-            }
-            else if (Package?.period === 1) {
-                endDate = formatedDate + 365 * 24 * 60 * 60; // 365 giorni * 24 ore * 60 minuti * 60 secondi
-            }
+    const handleCreateSubscription = useCallback(
+        async (subscriptionTypeId: number, subscriber: string, paymentTx: string, promoterAddress: string | null | undefined) => {
+            setIsSubmitting(true);
+            setError(null);
+            let endDate;
+            try {
+                if (Package?.period === 0) {
+                    endDate = formatedDate + 30 * 24 * 60 * 60; // 365 giorni * 24 ore * 60 minuti * 60 secondi
+                } else if (Package?.period === 1) {
+                    endDate = formatedDate + 365 * 24 * 60 * 60; // 365 giorni * 24 ore * 60 minuti * 60 secondi
+                }
 
-            const res = await createSubscription(subscriptionTypeId, subscriber, paymentTx, promoterAddress || undefined, formatedDate, endDate);
-            if (res.tx) {
-            } else if (res.error) {
-                const errorMessage = checkErrorMessage(res.error.reason);
-                console.log("🚀 ~ handleSubmit ~ errorMessage:", errorMessage)
-                setError(errorMessage! ?? res.error.reason);
+                const res = await createSubscription(subscriptionTypeId, subscriber, paymentTx, promoterAddress || undefined, formatedDate, endDate);
+                if (res.tx) {
+                } else if (res.error) {
+                    const errorMessage = checkErrorMessage(res.error.reason);
+                    console.log('🚀 ~ handleSubmit ~ errorMessage:', errorMessage);
+                    setError(errorMessage! ?? res.error.reason);
+                }
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setIsSubmitting(false);
             }
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setIsSubmitting(false);
-        }
-    }, [createSubscription, checkErrorMessage, setIsSubmitting, setError, formatedDate]);
+        },
+        [createSubscription, checkErrorMessage, setIsSubmitting, setError, formatedDate]
+    );
 
     useEffect(() => {
         if (canCreateSubscription) {
@@ -152,7 +144,7 @@ const PaySubscription: React.FC<{
     }, [price]);
 
     useEffect(() => {
-        if (paymentTx && session?.address && Package, promoter?.promoterAddress, formatedDate) {
+        if ((paymentTx && session?.address && Package, promoter?.promoterAddress, formatedDate)) {
             try {
                 setCanCreateSubscription(true);
             } catch (err) {
@@ -227,22 +219,26 @@ const PaySubscription: React.FC<{
             </div>
         );
     };
-    return <div className='d-flex flex-column'>
-        <div className='mb-5 d-flex flex-column'>
-            <RenderButton />
-            {error && <p className='text-danger'>{error}</p>}
+    return (
+        <div className="d-flex flex-column">
+            <div className="mb-5 d-flex flex-column">
+                <RenderButton />
+                {error && <p className="text-danger">{error}</p>}
+            </div>
+            <div className="mb-5 d-flex flex-column">
+                <Form.Label>
+                    {' '}
+                    <b> When should your subscription start ? (optional)</b>
+                </Form.Label>
 
+                <DatePicker selected={startDate} onChange={handleChangeDate} className=" form-control  " minDate={new Date()} />
+                <p className="disclaimer pe-auto">*Leave it as it is, if you want to start immediately</p>
+            </div>
         </div>
-        <div className='mb-5 d-flex flex-column'>
-            <Form.Label> <b> When should your subscription start ? (optional)</b></Form.Label>
-
-            <DatePicker selected={startDate} onChange={handleChangeDate} className=' form-control  ' minDate={new Date()} />
-            <p className='disclaimer pe-auto'>*Leave it as it is, if you want to start immediately</p>
-        </div>
-    </div>;
+    );
 };
 //     return Package && subContext.currentSubscription && Package.id > subContext.currentSubscription?.subscriptionModel.id! ? (
-//         <RenderButton /> 
+//         <RenderButton />
 //     ) : Package && !subContext.currentSubscription ? (
 //         <RenderButton />
 //     ) : null;

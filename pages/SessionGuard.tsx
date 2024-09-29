@@ -71,6 +71,12 @@ const SessionGuard = ({ children }: { children: ReactNode }) => {
         }
     }, [sessionStatus, session, isConnected, address, router.pathname, router.asPath]);
 
+    useEffect(() => {
+        if (session && address && session.address !== address) {
+            disconnect();
+        }
+    }, [session, address]);
+
     if (loading) {
         return (
             <ModalOverlay show={true}>

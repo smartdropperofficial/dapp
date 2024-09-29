@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { Alert, Card } from 'react-bootstrap';
 import useSubscriptionPlan from '../../../hooks/Contracts/Subscription/customHooks/useSubscriptionPlan';
-import { SubscriptionType, SubscriptionPeriod, SubscriptionModel } from '../../../hooks/Contracts/Subscription/types';
+import { SubscriptionType, SubscriptionPeriod, SubscriptionPlans } from '../../../hooks/Contracts/Subscription/types';
 import useSubscriptionManagement from '@/hooks/Contracts/Subscription/customHooks/useSubscriptionManagement';
 import { SubscriptionContext } from '@/store/subscription-context';
 import Skeleton from 'react-loading-skeleton';
@@ -12,33 +12,12 @@ const LoadSubscripionsPackages: React.FC<{}> = () => {
 
     const [isLoading, setIsLoading] = useState(true);
 
-    // useEffect(() => {
-    //     const fetchSubscriptions = async () => {
-    //         if (getSubscriptionModels && isLoading){
-    //             try {
-    //                 const result = await getSubscriptionModels();
-    //                 console.log("🚀 ~ fetchSubscriptions ~ result:", result)
-    //                 setTimeout(() => {
-    //                     ctx.setSubscriptionModels(result!);
-    //                     setIsLoading(false);
-
-    //                 }, 3000);
-    //             } catch (error) {
-    //                 console.error(error);
-    //             } finally {
-    //             }
-    //         }
-
-    //     };
-
-    //     fetchSubscriptions();
-    // }, [getSubscriptionModels, ctx]);
     useEffect(() => {
         if (ctx.subscriptionsModels && ctx.subscriptionsModels.length > 0) {
             setIsLoading(false);
         }
     }, [ctx.subscriptionsModels]);
-    const handlePackageSelect = (subType: SubscriptionModel | null) => {
+    const handlePackageSelect = (subType: SubscriptionPlans | null) => {
         if (subType === null) {
             ctx.setSelectedPackageHandler(null);
             // ctx.setSubscriptionIdHandler(-1);
@@ -52,14 +31,14 @@ const LoadSubscripionsPackages: React.FC<{}> = () => {
         return isActive ? { backgroundColor: '#f7f7f7', border: 'none', color: 'grey' } : {};
     };
 
-    const getSubscriptionPeriod = (sub: SubscriptionModel): string => {
+    const getSubscriptionPeriod = (sub: SubscriptionPlans): string => {
         if ([SubscriptionType.BUSINESS, SubscriptionType.RETAILER].includes(sub.subscriptionType)) {
             return sub.subscriptionPeriod === SubscriptionPeriod.MONTHLY ? 'Month' : 'Annual';
         }
         return '';
     };
 
-    const isBestChoice = (sub: SubscriptionModel): boolean => {
+    const isBestChoice = (sub: SubscriptionPlans): boolean => {
         return sub.subscriptionType === SubscriptionType.BUSINESS && sub.subscriptionPeriod === SubscriptionPeriod.ANNUAL;
     };
     const RenderSkeleton = () => {
@@ -112,8 +91,8 @@ const LoadSubscripionsPackages: React.FC<{}> = () => {
                                             <div key={sub.id} className="col-8 col-xl-6 mb-1 p-2 h-lg-50  ">
                                                 <button
                                                     className={`card align-items-center card-secondary px-5 h-md-100  d-flex justify-content-center justify-content-lg-start py-4  
-                                                  ${sub.id === ctx.selectedPackage?.id ? 'active' : ''}    ${
-                                                        sub.id === ctx.currentSubscription?.subscriptionModel?.id! ? 'current-sub' : ''
+                                                  ${sub?.id === ctx.selectedPackage?.id ? 'active' : ''}    ${
+                                                        sub?.id === ctx.currentSubscription?.subscriptionModel?.id! ? 'current-sub' : ''
                                                     }    ${sub.id === ctx.selectedPackageId ? 'active' : ''}   `}
                                                     onClick={() => handlePackageSelect(sub)}
                                                     style={{

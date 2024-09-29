@@ -279,12 +279,12 @@ main {
     height: 55px;
     border-radius: 0px; 
     border-width: 2px; 
-    border-color: #727272;
+    border-color: #d6d2d2;
     padding: 0px 25px;
 
     &:focus,
     &:active {
-        box-shadow: 0 0 0 0.25rem rgba(163, 163, 163, 0.5);
+        box-shadow: 0 0 0 0.25rem rgba(221, 221, 221, 0.5);
         background-color: #e6f2ff;
     }
 }

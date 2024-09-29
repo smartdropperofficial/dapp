@@ -12,12 +12,11 @@ import Image from 'next/image';
 import OffCanvasResult from '../UI/OffCanvasResult';
 import TicketChat from '../Ticket/TicketChat';
 
-
 function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
     const inputRef = useRef<HTMLInputElement>(null);
     const router = useRouter();
 
-    const [itemsPerPage, setItemsPerPage] = useState(5);
+    const [itemsPerPage, setItemsPerPage] = useState(30);
     const [orders, setOrders] = useState<OrderSB[]>([]);
     const [search, setSearch] = useState('');
     const [sort, setSort] = useState<'asc' | 'desc'>('desc');
@@ -27,7 +26,7 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
     const [orderIdTicket, setOrderIdTicket] = useState('');
 
     useEffect(() => {
-        console.log("🚀 ~ OrderTable ~ ordersProps:", ordersProps)
+        console.log('🚀 ~ OrderTable ~ ordersProps:', ordersProps);
 
         setOrders(ordersProps);
     }, [ordersProps]);
@@ -95,7 +94,7 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
     };
 
     const RenderSearch = () => (
-        <Card className='p-4 mb-4'>
+        <Card className="p-4 mb-4">
             <Form.Control
                 ref={inputRef}
                 type="text"
@@ -110,8 +109,8 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
 
     const RenderItemsPerPage = () => (
         <Form.Group as={Col} controlId="ItemsPerPage" className="my-2">
-            <div className='d-flex col-lg-6 col-8 justify-content-lg-start justify-content-center align-items-center'>
-                <Form.Label className='d-flex col-lg-6 col-12 align-items-lg-start mb-0 text-start'>Rows per page</Form.Label>
+            <div className="d-flex col-lg-6 col-8 justify-content-lg-start justify-content-center align-items-center">
+                <Form.Label className="d-flex col-lg-6 col-12 align-items-lg-start mb-0 text-start">Rows per page</Form.Label>
                 <Form.Select
                     value={itemsPerPage}
                     onChange={handleItemsPerPageChange}
@@ -131,62 +130,88 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
     const RenderAction = (order: OrderSB) => {
         switch (order?.status) {
             case OrderStatus.WAITING_PAYMENT:
-                return <Button className='btn-success col-10' onClick={() => GoToCheckout(order.order_id!)}>Pay </Button>
+                return (
+                    <Button className="btn-success col-10" onClick={() => GoToCheckout(order.order_id!)}>
+                        Pay{' '}
+                    </Button>
+                );
 
             case OrderStatus.WAITING_TAX:
-                return <span className="col-10 col-xl-8  text-center my-1 p-2 rounded-2" style={{ backgroundColor: '#ffeeb1', color: '#a96500' }}><b> in process...</b></span>
+                return (
+                    <span className="col-10 col-xl-8  text-center my-1 p-2 rounded-2" style={{ backgroundColor: '#ffeeb1', color: '#a96500' }}>
+                        <b> in process...</b>
+                    </span>
+                );
             case OrderStatus.ERROR:
-                return <span className="col-10 col-xl-8 text-danger text-center my-1 p-2 rounded-2" style={{ backgroundColor: '#ffc7c7' }}><b> Error </b></span>
+                return (
+                    <span className="col-10 col-xl-8 text-danger text-center my-1 p-2 rounded-2" style={{ backgroundColor: '#ffc7c7' }}>
+                        <b> Error </b>
+                    </span>
+                );
 
             case OrderStatus.PAYMENT_RECEIVED:
-                return <span className="col-10 col-xl-8 text-success text-center my-1 p-2 rounded-2" style={{ backgroundColor: '#d3ffcb' }}><b> Paid</b></span> 
+                return (
+                    <span className="col-10 col-xl-8 text-success text-center my-1 p-2 rounded-2" style={{ backgroundColor: '#d3ffcb' }}>
+                        <b> Paid</b>
+                    </span>
+                );
 
             case OrderStatus.PRODUCT_UNAVAILABLE:
-            return <span className="col-10 col-xl-8 text-success text-center my-1 p-2 rounded-2" style={{ backgroundColor: '#d3ffcb' }}><b> Product Unavailable</b></span> 
+                return (
+                    <span className="col-10 col-xl-8 text-success text-center my-1 p-2 rounded-2" style={{ backgroundColor: '#d3ffcb' }}>
+                        <b> Product Unavailable</b>
+                    </span>
+                );
 
             case OrderStatus.ERROR:
-                return <span className="col-10 col-xl-8 text-success text-center my-1 p-2 rounded-2" style={{ backgroundColor: '#d3ffcb' }}><b> Errro</b></span>
+                return (
+                    <span className="col-10 col-xl-8 text-success text-center my-1 p-2 rounded-2" style={{ backgroundColor: '#d3ffcb' }}>
+                        <b> Errro</b>
+                    </span>
+                );
 
             case OrderStatus.SENT_TO_AMAZON:
-                return <span className="col-10 col-xl-8  text-center my-1 p-2 rounded-2" style={{ backgroundColor: '#a2d1ff', color: '#0c41a5' }}><b> Sent to Retailer</b></span>
-
+                return (
+                    <span className="col-10 col-xl-8  text-center my-1 p-2 rounded-2" style={{ backgroundColor: '#a2d1ff', color: '#0c41a5' }}>
+                        <b> Sent to Retailer</b>
+                    </span>
+                );
         }
-    }
+    };
 
     const GotoOrderDetails = (orderId: string) => {
         const tmpEnc = encryptData(orderId);
         console.log('Order Details', orderId);
         router.push(`/order/${tmpEnc}/order-details`);
-    }
+    };
 
     const GoToCheckout = (orderId: string) => {
         const tmpEnc = encryptData(orderId);
         console.log('Order Details', orderId);
         router.push(`/pay/${tmpEnc}/checkout`);
-    }
+    };
     const openNewRequest = (order_id: string) => {
         // Crea il messaggio con l'order_id
         const message = `order_id=${order_id}`;
 
         // Codifica il messaggio in base64
-        const encodedMessage = Buffer.from(message).toString('base64');  // Corretto: codifica in base64
+        const encodedMessage = Buffer.from(message).toString('base64'); // Corretto: codifica in base64
 
         // Crea l'URL Telegram con il messaggio codificato
         const telegramUrl = `https://t.me/SmartDropperSupport_Bot?start=${encodedMessage}`;
 
         // Apri il link in una nuova scheda
         window.open(telegramUrl, '_blank');
-    }
+    };
 
     const openTicketMessages = (order_id: string) => {
-
-        const message = "order_id=12345";
-        const encodedMessage = Buffer.from(message, 'base64');  // Codifica in base64
-        console.log("🚀 ~ openTicketMessages ~ encodedMessage:", encodedMessage)
+        const message = 'order_id=12345';
+        const encodedMessage = Buffer.from(message, 'base64'); // Codifica in base64
+        console.log('🚀 ~ openTicketMessages ~ encodedMessage:', encodedMessage);
 
         // setShowCanvas(true);
         // setOrderIdTicket(order_id);
-    }
+    };
     const RenderTable = () => (
         <Table responsive striped bordered>
             <thead>
@@ -209,17 +234,22 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
                     {/* <th data-key="details" style={{ cursor: 'pointer' }}>
                         Support request
                     </th> */}
-
                 </tr>
             </thead>
             <tbody>
                 {paginatedOrders.map((order, index) => (
                     <tr key={index}>
-                        <td className='align-middle'><Image src="/icons/amazon-avatar.png" height={40} width={40} alt="avatar" /></td>
-                        <td className='align-middle'>{order.order_id}</td>
-                        <td className='align-middle'>{formatSPDate(order.created_at!)}</td>
-                        <td className='align-middle'>{RenderAction(order)}</td>
-                        <td className='align-middle'><Button onClick={() => GotoOrderDetails(order.order_id!)} style={{ backgroundColor: '#616161' }}>Details</Button></td>
+                        <td className="align-middle">
+                            <Image src="/icons/amazon-avatar.png" height={40} width={40} alt="avatar" />
+                        </td>
+                        <td className="align-middle">{order.order_id}</td>
+                        <td className="align-middle">{formatSPDate(order.created_at!)}</td>
+                        <td className="align-middle">{RenderAction(order)}</td>
+                        <td className="align-middle">
+                            <Button onClick={() => GotoOrderDetails(order.order_id!)} style={{ backgroundColor: '#616161' }}>
+                                Details
+                            </Button>
+                        </td>
                         {/* <td className='align-middle'> <Button onClick={order?.ticket_id ? () => openTicketMessages(order?.order_id!) : () => openNewRequest(order?.order_id!)} style={{ backgroundColor: order?.ticket_id ? '#616161' : '#primary' }}
                         > {order?.ticket_id ? <>See Request</> : <>Open Request</>} </Button></td> */}
                     </tr>
@@ -229,8 +259,8 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
     );
 
     const RenderPagination = () => (
-        <div className='d-flex col-lg-6 col-6 justify-content-lg-end justify-content-center align-items-center'>
-            <Stack spacing={2} className='my-2'>
+        <div className="d-flex col-lg-6 col-6 justify-content-lg-end justify-content-center align-items-center">
+            <Stack spacing={2} className="my-2">
                 <Pagination
                     count={totalPages}
                     page={currentPage}
@@ -250,14 +280,13 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
             <Card>
                 <RenderTable />
             </Card>
-            <Card className='d-flex align-items-center my-2 px-5 py-1'>
-                <div className='d-flex col-12 align-items-center justify-content-center flex-lg-row flex-column'>
+            <Card className="d-flex align-items-center my-2 px-5 py-1">
+                <div className="d-flex col-12 align-items-center justify-content-center flex-lg-row flex-column">
                     <RenderItemsPerPage />
                     <RenderPagination />
                 </div>
             </Card>
-            <OffCanvasResult setShow={setShowCanvas} show={showCanvas} orderId={orderIdTicket} >
-            </OffCanvasResult>
+            <OffCanvasResult setShow={setShowCanvas} show={showCanvas} orderId={orderIdTicket}></OffCanvasResult>
         </div>
     );
 }

@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useContext } from 'react';
 import { ethers } from 'ethers';
 import { useSigner, useAccount } from 'wagmi';
 import subscriptionModelABI from '../abi/subscriptionModelABI.json'; // Sostituisci con il percorso corretto del file ABI
-import { SubscriptionManagementModel, SubscriptionModel } from '../types'; // Assicurati che il percorso del tipo sia corretto
+import { SubscriptionManagementModel, SubscriptionPlans } from '../types'; // Assicurati che il percorso del tipo sia corretto
 import { convertToDecimal, convertToScaled, fetchAbiFromDatabase } from '@/utils/utils';
 import { checkErrorMessage } from '@/errors/checkErrorMessage';
 import { ConfigContext } from '@/store/config-context';
@@ -159,7 +159,7 @@ const useSubscriptionPlan = () => {
         [contract]
     );
 
-    const getSubscriptionModels = useCallback(async (): Promise<SubscriptionModel[]> => {
+    const getSubscriptionPlans = useCallback(async (): Promise<SubscriptionPlans[]> => {
         if (contract) {
             try {
                 const result = await contract.getSubscriptionModels();
@@ -181,10 +181,10 @@ const useSubscriptionPlan = () => {
                 console.log('🚀 ~ getSubscriptionModels ~ error:', error);
                 checkErrorMessage(error.message);
 
-                return [] as SubscriptionModel[];
+                return [] as SubscriptionPlans[];
             }
         } else {
-            return [] as SubscriptionModel[];
+            return [] as SubscriptionPlans[];
         }
     }, [contract]);
 
@@ -196,7 +196,7 @@ const useSubscriptionPlan = () => {
         changeSubscriptionTypeFees: changeSubscriptionTypeFeesOnBC,
         changeSubscriptionPrice: changeSubscriptionPriceOnBC,
         changeSubscriptionTypeShopLimit: changeSubscriptionTypeShopLimitOnBC,
-        getSubscriptionModels,
+        getSubscriptionModels: getSubscriptionPlans,
     };
 };
 

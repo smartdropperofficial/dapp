@@ -120,13 +120,22 @@ const Checkout = () => {
 
     useEffect(() => {
         if (subsContext.currentSubscription) {
+            console.log('🚀 ~ useEffect ~ subsContext.currentSubscription:', subsContext.currentSubscription);
             setSSPCommissions(subsContext.currentSubscription?.subscriptionModel?.fees);
             setWaitForSub(false);
         } else {
+            console.log('🚀 ~ useEffect ~ setSSPCommissions:', 7);
+
             setSSPCommissions(7);
             setWaitForSub(false);
         }
     }, [subsContext.currentSubscription]);
+
+    useEffect(() => {
+        if (!loadingPrices) {
+            console.log('( loadingPrices ) settato a false:', loadingPrices);
+        }
+    }, [loadingPrices]);
 
     useEffect(() => {
         setIsBestChoice(
@@ -139,8 +148,16 @@ const Checkout = () => {
         try {
             const amazonAmountToPay = await getAmountToPay(configContext, order?.tax_request_id!);
             console.log('🚀 ~ fetchOrderPrice ~ amazonAmountToPay:', amazonAmountToPay);
+            if (amazonAmountToPay === null) {
+                Swal.fire({
+                    title: 'Error: Amazon is not responding. Check your connection or try again in an hour.',
+                    icon: 'error',
+                });
+            }
 
-            if (amazonAmountToPay) {
+            if (Object.keys(amazonAmountToPay).length !== 0) {
+                console.log('🚀 ~ fetchOrderPrice ~ amazonAmountToPay:', amazonAmountToPay);
+
                 setAmountToPay(amazonAmountToPay);
             } else {
                 Swal.fire({
@@ -158,10 +175,9 @@ const Checkout = () => {
         }
     };
     useEffect(() => {
-        if (order && order?.wallet_address && session?.address && address && sspCommissions) {
+        if (order && order?.wallet_address && session?.address && address) {
             if (order?.wallet_address === session?.address && session?.address === address) {
                 showCheckout.current.isSameWallet = true;
-                // setCanPay(false);
                 fetchOrderPrice();
             } else {
                 Swal.fire({
@@ -172,10 +188,7 @@ const Checkout = () => {
             }
         } else {
         }
-    }, [order, address, sspCommissions, session]);
-    useEffect(() => {
-        return () => {};
-    }, [subsContext]);
+    }, [order, address, session]);
 
     useEffect(() => {
         let FeeAmountToPay;
@@ -199,14 +212,18 @@ const Checkout = () => {
         let FeeAmountToPay;
         if (amountToPay?.total) {
             FeeAmountToPay = amountToPay?.total;
+        } else {
         }
 
-        if (subsContext.selectedPackage === null || (subsContext.selectedPackage === undefined && subsContext?.currentSubscription! === null)) {
+        if (
+            (FeeAmountToPay && subsContext.selectedPackage === null) ||
+            (subsContext.selectedPackage === undefined && subsContext?.currentSubscription! === null)
+        ) {
             console.log('🚀 ~ useEffect ~ sspCommissions: 7%', sspCommissions);
             console.log('🚀 ~ useEffect ~ FeeAmountToPay:', FeeAmountToPay);
 
             setFees((FeeAmountToPay * 7) / 100);
-        } else if (subsContext.selectedPackage! && subsContext?.currentSubscription! === null) {
+        } else if (FeeAmountToPay && subsContext.selectedPackage! && subsContext?.currentSubscription! === null) {
             console.log('🚀 ~ useEffect ~ sspCommissions:', sspCommissions + '%');
             console.log('🚀 ~ useEffect ~ FeeAmountToPay:', FeeAmountToPay);
 
@@ -275,7 +292,11 @@ const Checkout = () => {
             }
         }
     }, [amountToPay]);
-
+    useEffect(() => {
+        if (order) {
+            console.log('order:', order);
+        }
+    }, [order]);
     useEffect(() => {
         const calculateChangeFees = (total: number, fees: number): number => {
             const result = (total / 100) * fees;
@@ -406,8 +427,25 @@ const Checkout = () => {
             setOrderStep(OrderSteps.WAITING_CONFIRMATION);
         }
     }, [loadingPaymentTx]);
+
     useEffect(() => {
-        if (fees && amountToPay && sspCommissions && exchangeFees && zincFee && shippingFees) {
+        console.log(
+            '🚀 ~ useEffect ~ fees && amountToPay && sspCommissions && exchangeFees && zincFee && shippingFees:',
+            fees,
+            amountToPay,
+            sspCommissions,
+            exchangeFees,
+            zincFee,
+            shippingFees
+        );
+        if (
+            (fees !== null || fees !== undefined) &&
+            amountToPay &&
+            (sspCommissions !== null || sspCommissions !== undefined) &&
+            exchangeFees &&
+            zincFee &&
+            shippingFees
+        ) {
             orderContext.checkoutHandler({
                 items: Number(amountToPay.subtotal),
                 zincFees: Number(zincFee),
@@ -416,6 +454,8 @@ const Checkout = () => {
                 fees: fees,
                 tax: Number(amountToPay.tax),
             });
+            console.log('checkoutHandler -  End');
+
             setLoadingPrices(false);
         }
     }, [fees, amountToPay, exchangeFees, zincFee, shippingFees]);

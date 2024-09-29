@@ -4,62 +4,55 @@ import { convertToDecimal, convertToScaled } from '@/utils/utils';
 import { checkErrorMessage } from '@/errors/checkErrorMessage';
 import { ConfigContext } from '@/store/config-context';
 import { createDataOnSB, getDataFromSB, updateDataOnSB } from '../services/update';
-import { SubscriptionModelSB } from '../types';
+import { SubscriptionPlansSB } from '../types';
 import { SubscriptionManagementSB } from '../types';
 import { id } from 'ethers/lib/utils.js';
 
 const useSubscriptionModel = () => {
     const { config } = useContext(ConfigContext);
-    const TABLE = "subscription_plans"
+    const TABLE = 'subscription_plans';
 
+    const getSubscriptionByPeriod = useCallback(async (subscriptionPeriod: number): Promise<SubscriptionManagementSB[]> => {
+        if (!getDataFromSB) throw new Error('getData is not initialized');
+        try {
+            const result = await getDataFromSB(TABLE, { subscriptionPeriod: subscriptionPeriod });
+            return result.map((sub: any) => ({
+                subscriptionType: sub.subscriptionType,
+                subscriptionPeriod: sub.subscriptionPeriod,
+                name: sub.name,
+                price: convertToDecimal(sub.price),
+                period: sub.period.toNumber(),
+                enabled: sub.enabled,
+                fees: convertToDecimal(sub.fees),
+                shopLimit: sub.shopLimit.toNumber(),
+            }));
+        } catch (error: any) {
+            checkErrorMessage(error.message);
 
-    const getSubscriptionByPeriod = useCallback(
-        async (subscriptionPeriod: number): Promise<SubscriptionManagementSB[]> => {
-            if (!getDataFromSB) throw new Error('getData is not initialized');
-            try {
-                const result = await getDataFromSB(TABLE, { subscriptionPeriod: subscriptionPeriod });
-                return result.map((sub: any) => ({
-                    subscriptionType: sub.subscriptionType,
-                    subscriptionPeriod: sub.subscriptionPeriod,
-                    name: sub.name,
-                    price: convertToDecimal(sub.price),
-                    period: sub.period.toNumber(),
-                    enabled: sub.enabled,
-                    fees: convertToDecimal(sub.fees),
-                    shopLimit: sub.shopLimit.toNumber(),
-                }));
-            } catch (error: any) {
-                checkErrorMessage(error.message);
+            throw error;
+        }
+    }, []);
+    const getSubscriptionByType = useCallback(async (subscriptionType: number): Promise<SubscriptionManagementSB[]> => {
+        if (!getDataFromSB) throw new Error('getData is not initialized');
 
-                throw error;
-            }
-        },
-        []
-    );
-    const getSubscriptionByType = useCallback(
-        async (subscriptionType: number): Promise<SubscriptionManagementSB[]> => {
-            if (!getDataFromSB) throw new Error('getData is not initialized');
-
-            try {
-                const result = await getDataFromSB(TABLE, { subscriptionPeriod: subscriptionType });
-                return result.map((sub: any) => ({
-                    id: sub.id,
-                    subscriptionType: sub.subscriptionType,
-                    subscriptionPeriod: sub.subscriptionPeriod,
-                    name: sub.name,
-                    price: convertToDecimal(sub.price),
-                    period: sub.period.toNumber(),
-                    enabled: sub.enabled,
-                    fees: convertToDecimal(sub.fees),
-                    shopLimit: sub.shopLimit.toNumber(),
-                }));
-            } catch (error: any) {
-                checkErrorMessage(error.message);
-                return [] as SubscriptionManagementSB[];
-            }
-        },
-        []
-    );
+        try {
+            const result = await getDataFromSB(TABLE, { subscriptionPeriod: subscriptionType });
+            return result.map((sub: any) => ({
+                id: sub.id,
+                subscriptionType: sub.subscriptionType,
+                subscriptionPeriod: sub.subscriptionPeriod,
+                name: sub.name,
+                price: convertToDecimal(sub.price),
+                period: sub.period.toNumber(),
+                enabled: sub.enabled,
+                fees: convertToDecimal(sub.fees),
+                shopLimit: sub.shopLimit.toNumber(),
+            }));
+        } catch (error: any) {
+            checkErrorMessage(error.message);
+            return [] as SubscriptionManagementSB[];
+        }
+    }, []);
     const addSubscriptionModelOnSB = useCallback(
         async (
             id: number,
@@ -82,9 +75,8 @@ const useSubscriptionModel = () => {
                     period: period,
                     enabled: enabled,
                     fees: fees,
-                    shopLimit: shopLimit
-                }
-                );
+                    shopLimit: shopLimit,
+                });
                 Swal.fire({ title: 'Subscription added', icon: 'success' });
             } catch (error: any) {
                 checkErrorMessage(error.message);
@@ -92,43 +84,34 @@ const useSubscriptionModel = () => {
         },
         []
     );
-    const changeSubscriptionTypeFees = useCallback(
-        async (subscriptionId: number, newFees: number) => {
-            if (!updateDataOnSB) throw new Error('updateDataOnDb is not initialized');
-            try {
-                const tx = await updateDataOnSB(TABLE, { id: subscriptionId }, { fees: newFees });
-                Swal.fire({ title: 'Subscription fees updated', icon: 'success' });
-            } catch (error: any) {
-                checkErrorMessage(error.message);
-            }
-        },
-        []
-    );
-    const changeSubscriptionPrice = useCallback(
-        async (subscriptionId: number, newPrice: number) => {
-            if (!updateDataOnSB) throw new Error('Contract is not initialized');
-            try {
-                const tx = await updateDataOnSB(TABLE, { id: subscriptionId }, { price: convertToScaled(newPrice) });
-                Swal.fire({ title: 'Subscription price updated', icon: 'success' });
-            } catch (error: any) {
-                checkErrorMessage(error.message);
-            }
-        },
-        []
-    );
-    const changeSubscriptionTypeShopLimit = useCallback(
-        async (subscriptionId: number, newLimit: number) => {
-            if (!updateDataOnSB) throw new Error('Contract is not initialized');
-            try {
-                const tx = await updateDataOnSB(TABLE, { id: subscriptionId }, { shopLimit: newLimit });
-                Swal.fire({ title: 'Shop limit updated', icon: 'success' });
-            } catch (error: any) {
-                checkErrorMessage(error.message);
-            }
-        },
-        []
-    );
-    const getSubscriptionModels = useCallback(async (): Promise<SubscriptionModelSB[]> => {
+    const changeSubscriptionTypeFees = useCallback(async (subscriptionId: number, newFees: number) => {
+        if (!updateDataOnSB) throw new Error('updateDataOnDb is not initialized');
+        try {
+            const tx = await updateDataOnSB(TABLE, { id: subscriptionId }, { fees: newFees });
+            Swal.fire({ title: 'Subscription fees updated', icon: 'success' });
+        } catch (error: any) {
+            checkErrorMessage(error.message);
+        }
+    }, []);
+    const changeSubscriptionPrice = useCallback(async (subscriptionId: number, newPrice: number) => {
+        if (!updateDataOnSB) throw new Error('Contract is not initialized');
+        try {
+            const tx = await updateDataOnSB(TABLE, { id: subscriptionId }, { price: convertToScaled(newPrice) });
+            Swal.fire({ title: 'Subscription price updated', icon: 'success' });
+        } catch (error: any) {
+            checkErrorMessage(error.message);
+        }
+    }, []);
+    const changeSubscriptionTypeShopLimit = useCallback(async (subscriptionId: number, newLimit: number) => {
+        if (!updateDataOnSB) throw new Error('Contract is not initialized');
+        try {
+            const tx = await updateDataOnSB(TABLE, { id: subscriptionId }, { shopLimit: newLimit });
+            Swal.fire({ title: 'Shop limit updated', icon: 'success' });
+        } catch (error: any) {
+            checkErrorMessage(error.message);
+        }
+    }, []);
+    const getSubscriptionModels = useCallback(async (): Promise<SubscriptionPlansSB[]> => {
         if (getDataFromSB) {
             try {
                 const result = await getDataFromSB(TABLE);
@@ -147,15 +130,14 @@ const useSubscriptionModel = () => {
             } catch (error: any) {
                 checkErrorMessage(error.message);
 
-                return [] as SubscriptionModelSB[];
+                return [] as SubscriptionPlansSB[];
             }
         } else {
-            return [] as SubscriptionModelSB[];
+            return [] as SubscriptionPlansSB[];
         }
     }, []);
 
     return {
-
         getSubscriptionByPeriod,
         getSubscriptionByType,
         addSubscriptionContract: addSubscriptionModelOnSB,
@@ -165,4 +147,3 @@ const useSubscriptionModel = () => {
         getSubscriptionModels,
     };
 };
-
