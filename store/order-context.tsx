@@ -462,8 +462,20 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     const modifyBasketOnDB = async (wallet: string, items: any) => {
         try {
+            // Calcola total_items e basket_price
+            const total_items = items.reduce((acc: number, item: any) => acc + item.quantity, 0); // Somma delle quantità
+            const basket_price = items.reduce((acc: number, item: any) => acc + parseFloat(item.price) * item.quantity, 0); // Somma del prezzo totale (price * quantity)
+
             // Prova ad aggiornare il record
-            const { data: editData, error: editError } = await supabase.from('basket').update({ products: items }).eq('wallet_address', wallet).select();
+            const { data: editData, error: editError } = await supabase
+                .from('basket')
+                .update({
+                    products: items,
+                    total_items,
+                    basket_price,
+                })
+                .eq('wallet_address', wallet)
+                .select();
 
             if (editError) {
                 console.log('🚀 ~ modifyBasketOnDB ~ editError:', editError);
@@ -476,7 +488,14 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
                 const { data: addData, error: addError } = await supabase
                     .from('basket')
-                    .insert([{ wallet_address: wallet, products: items }])
+                    .insert([
+                        {
+                            wallet_address: wallet,
+                            products: items,
+                            total_items,
+                            basket_price,
+                        },
+                    ])
                     .select();
 
                 if (addError) {
