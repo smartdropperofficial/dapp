@@ -5,7 +5,9 @@ const Loading: React.FC<{ loadingText?: string; dark?: boolean }> = ({ loadingTe
                 <div></div>
                 <div></div>
             </div>
-            <p className="mt-3 text-center">{loadingText}</p>
+            <p className="mt-3 text-center fw-5 fw-5" style={{ color: '#fff' }}>
+                {loadingText}
+            </p>
         </div>
     );
 };

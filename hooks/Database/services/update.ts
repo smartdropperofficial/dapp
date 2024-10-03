@@ -60,7 +60,6 @@ export async function getDataFromSB(tableName: string, filterCriteria: Record<st
 
         // Esecuzione della query
         const { data, error } = await query;
-        console.log("🚀 ~ getDataFromSB ~ data:", data);
 
         if (error) {
             throw new Error(`Errore nel recupero dei dati: ${error.message}`);

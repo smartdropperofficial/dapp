@@ -1,11 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
-import {
-    messageInputBoxStyle,
-    inputStyle,
-    buttonStyle,
-    messageInputContainerStyle,
-} from './messageInputBoxStyles';
+import { messageInputBoxStyle, inputStyle, buttonStyle, messageInputContainerStyle } from './messageInputBoxStyles';
 
 interface MessageInputBoxProps {
     onSendMessage: (content: string) => void;
@@ -23,15 +18,14 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = ({ onSendMessage }) => {
 
     return (
         <div style={messageInputContainerStyle}>
-            <div style={messageInputBoxStyle} className='d-flex flex-column '>
+            <div style={messageInputBoxStyle} className="d-flex flex-column ">
                 <Form.Control
                     type="text"
-                    className='my-1'
-
+                    className="my-1"
                     placeholder="Write a message..."
                     value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    onKeyPress={(e) => {
+                    onChange={e => setMessage(e.target.value)}
+                    onKeyPress={e => {
                         if (e.key === 'Enter') {
                             e.preventDefault();
                             handleSendMessage();
@@ -39,7 +33,7 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = ({ onSendMessage }) => {
                     }}
                     style={inputStyle}
                 />
-                <Button variant="primary" className='my-1 col-12 rounded-5' onClick={handleSendMessage} style={buttonStyle}>
+                <Button variant="primary" className="my-1 col-12 rounded-2" onClick={handleSendMessage} style={buttonStyle} disabled={message === ''}>
                     Send
                 </Button>
             </div>

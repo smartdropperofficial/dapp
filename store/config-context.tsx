@@ -94,18 +94,15 @@ const ConfigContextProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             if (!storedConfig || storedConfig === 'null' || storedConfig === 'undefined' || storedConfig === '') {
                 const userConfig = await getUserConfig(session?.config_db);
                 if (userConfig) {
-                    console.log('🚀 ~ fetchConfig ~ userConfig:', userConfig);
                     setConfig(userConfig as ConfigType);
                     return;
                 }
             } else {
-                // console.log('🚀 ~ fetchConfig ~ storedConfig:', storedConfig);
                 const parsedConfig = JSON.parse(storedConfig);
                 setConfig(parsedConfig);
             }
 
             if (storedConfig) {
-                // console.log('🚀 ~ fetchConfig ~ storedConfig:', storedConfig);
             }
         };
 

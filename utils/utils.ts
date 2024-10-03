@@ -14,10 +14,15 @@ export const encryptData = (data: string) => {
     return encodeURIComponent(ciphertext.toString());
 };
 export const decryptData = (data: string) => {
+    console.log("🚀 ~ decryptData ~ data:", data)
     try {
         const decodedStr = decodeURIComponent(data);
-        return AES.decrypt(decodedStr, process.env.NEXT_PUBLIC_API_ENCRYPTER!).toString(enc.Utf8);
-    } catch {
+        console.log("🚀 ~ decryptData ~ decodedStr:", decodedStr)
+         const res=  AES.decrypt(decodedStr, process.env.NEXT_PUBLIC_API_ENCRYPTER!).toString(enc.Utf8); 
+         console.log("🚀 ~ decryptData ~ res:", res)
+         return res; 
+    } catch (error) {
+        console.log("🚀 ~ decryptData ~ error:", error)
         return '';
     }
 };
