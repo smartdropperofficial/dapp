@@ -9,6 +9,9 @@ import { ShippingInfo } from '../types/Order';
 import { RETAILERS, ZONE } from '../utils/constants';
 import { SubscriptionManagementModel } from '@/hooks/Contracts/Subscription/types';
 import { SubscriptionContext } from './subscription-context';
+import { supabase } from '@/utils/supabaseClient';
+import { SessionExt } from '@/types/SessionExt';
+import { useSession } from 'next-auth/react';
 
 type ShippingInfoType = {
     firstName: string;
@@ -68,58 +71,11 @@ interface OrderContextProps {
     basketTotal: () => number;
 }
 
-// export const OrderContext = createContext(
-//     {
-//     items: [] as ContextProductInfo[],
-//     checkout: {} as CheckoutType,
-//     retailer: '',
-//     zone: '',
-//     email: '',
-//     isLoading: false,
-//     currentStep: 1,
-//     shippingInfo: {
-//         firstName: '',
-//         lastName: '',
-//         email: '',
-//         addressLine1: '',
-//         addressLine2: '',
-//         zipCode: '',
-//         city: '',
-//         state: '',
-//         phoneNumber: '',
-//     },
-//     scraper: '',
-//     showErrors: false,
-//     infoHandler: (payload: ShippingInfoType) => {},
-//     itemsHandler: (
-//         id: number,
-//         scraper: string,
-//         action: string,
-//         productInfo?: BuddyProductInfo | ProductInfo | RainforestProduct | RainforestData | Content
-//     ) => {},
-//     changeAddressHandler: (
-//         id: number,
-//         scraper: string,
-//         quantity: number,
-//         productInfo?: BuddyProductInfo | ProductInfo | RainforestProduct | RainforestData | Content
-//     ) => {},
-//     cleanItems: () => {} ,
-//     incrementHandler: (id: number, action: string, productInfo?: BuddyProductInfo | ProductInfo) => {},
-//     stepsHandler: (action: string) => {},
-//     retailerHandler: (retailer: string) => {},
-//     zoneHandler: (retailer: string) => {},
-//     showErrorsToggle: () => {},
-//     updateScraper: (scraper: string) => {},
-//     isLoadingHandler: (loading: boolean) => {},
-//     emailHandler: (payload: string) => {},
-//     checkoutHander: (payload: CheckoutType) => {},
-//     basketTotal: () => {} ,
-// }
-
-// );
 export const OrderContext = createContext<OrderContextProps>(null as unknown as OrderContextProps);
 
 export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const { data: session }: { data: SessionExt | null } = useSession() as { data: SessionExt | null };
+
     const subContext = useContext(SubscriptionContext);
     const [items, setItems] = useState<ContextProductInfo[]>([]);
     const [shippingInfo, setShippingInfo] = useState<ShippingInfoType>({
@@ -244,66 +200,80 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
                 }
 
                 if (currentItem) {
-                    const newItems = [...items];
-                    const index = items.indexOf(currentItem);
-                    const quantity = newItems[index].quantity + 1;
-                    newItems[index] = { ...newItems[index], quantity: quantity };
-                    setItems(newItems);
+                    // Se l'elemento esiste già, aggiorna la quantità
+                    setItems(prevItems => {
+                        const newItems = [...prevItems];
+                        const index = prevItems.indexOf(currentItem);
+                        const quantity = newItems[index].quantity + 1;
+
+                        // Aggiorna l'elemento con la nuova quantità
+                        newItems[index] = { ...newItems[index], quantity: quantity };
+
+                        // Esegui modifyBasketOnDB con il nuovo array
+                        modifyBasketOnDB(session?.address!, newItems);
+
+                        return newItems; // Ritorna il nuovo array per aggiornare lo stato
+                    });
                 } else {
-                    let newItems: any;
-                    switch (scraper) {
-                        case 'RAINFOREST':
-                            newItems = [
-                                items,
-                                {
-                                    id: id,
-                                    quantity: 1,
-                                    price: (productInfo as RainforestData).product.buybox_winner.price?.value,
-                                    symbol: (productInfo as RainforestData).product.buybox_winner.price?.symbol,
-                                    image: (productInfo as RainforestData).product.main_image?.link,
-                                    title: (productInfo as RainforestData).product?.title,
-                                    url: (productInfo as RainforestData).request_metadata?.amazon_url,
-                                    asin: (productInfo as RainforestData).product?.asin,
-                                },
-                            ].flat();
-                            break;
-                        case 'LIBRARY':
-                            newItems = [
-                                items,
-                                {
-                                    id: id,
-                                    quantity: 1,
-                                    price: (productInfo as BuddyProductInfo)?.price?.current_price,
-                                    symbol: (productInfo as BuddyProductInfo)?.price?.symbol,
-                                    image: (productInfo as BuddyProductInfo)?.main_image,
-                                    title: (productInfo as BuddyProductInfo)?.title,
-                                    url: (productInfo as BuddyProductInfo)?.url,
-                                    asin: (productInfo as BuddyProductInfo)?.asin,
-                                },
-                            ].flat();
-                            break;
-                        case 'OXYLABS':
-                            newItems = [
-                                items,
-                                {
-                                    id: id,
-                                    quantity: 1,
-                                    price: (productInfo as Content)?.price,
-                                    symbol: (productInfo as Content)?.currency,
-                                    image: (productInfo as Content)?.images[0],
-                                    title: (productInfo as Content)?.title,
-                                    url: (productInfo as Content)?.url,
-                                    asin: (productInfo as Content)?.asin,
-                                },
-                            ].flat();
-                            break;
+                    // Se l'elemento non esiste, crea un nuovo oggetto in base allo scraper
+                    setItems(prevItems => {
+                        let newItems: any;
 
-                        default:
-                            break;
-                    }
-                    //console.log("🚀 ~ file: order-context.tsx:104 ~ itemsHandler ~ newItems:", newItems)
+                        switch (scraper) {
+                            case 'RAINFOREST':
+                                newItems = [
+                                    ...prevItems,
+                                    {
+                                        id: id,
+                                        quantity: 1,
+                                        price: (productInfo as RainforestData).product.buybox_winner.price?.value,
+                                        symbol: (productInfo as RainforestData).product.buybox_winner.price?.symbol,
+                                        image: (productInfo as RainforestData).product.main_image?.link,
+                                        title: (productInfo as RainforestData).product?.title,
+                                        url: (productInfo as RainforestData).request_metadata?.amazon_url,
+                                        asin: (productInfo as RainforestData).product?.asin,
+                                    },
+                                ];
+                                break;
+                            case 'LIBRARY':
+                                newItems = [
+                                    ...prevItems,
+                                    {
+                                        id: id,
+                                        quantity: 1,
+                                        price: (productInfo as BuddyProductInfo)?.price?.current_price,
+                                        symbol: (productInfo as BuddyProductInfo)?.price?.symbol,
+                                        image: (productInfo as BuddyProductInfo)?.main_image,
+                                        title: (productInfo as BuddyProductInfo)?.title,
+                                        url: (productInfo as BuddyProductInfo)?.url,
+                                        asin: (productInfo as BuddyProductInfo)?.asin,
+                                    },
+                                ];
+                                break;
+                            case 'OXYLABS':
+                                newItems = [
+                                    ...prevItems,
+                                    {
+                                        id: id,
+                                        quantity: 1,
+                                        price: (productInfo as Content)?.price,
+                                        symbol: (productInfo as Content)?.currency,
+                                        image: (productInfo as Content)?.images[0],
+                                        title: (productInfo as Content)?.title,
+                                        url: (productInfo as Content)?.url,
+                                        asin: (productInfo as Content)?.asin,
+                                    },
+                                ];
+                                break;
+                            default:
+                                return prevItems; // Se lo scraper non è riconosciuto, ritorna lo stato precedente
+                        }
 
-                    setItems(newItems);
+                        // Esegui modifyBasketOnDB con il nuovo array
+                        modifyBasketOnDB(session?.address!, newItems);
+
+                        return newItems; // Ritorna il nuovo array per aggiornare lo stato
+                    });
                 }
             }
         } else if (action === 'remove') {
@@ -340,14 +310,36 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
             var newtotalAmount;
             switch (action) {
                 case 'add':
-                    quantity = newItems[index].quantity + 1;
-                    newtotalAmount = price * quantity;
-                    newItems[index] = {
-                        ...newItems[index],
-                        quantity: quantity,
-                        // totalAmount: newtotalAmount,
-                    }; //  Sovrascrivi l'item selezionato con i nuovi dati
-                    setItems(newItems);
+                // quantity = newItems[index].quantity + 1;
+                // newtotalAmount = price * quantity;
+                // newItems[index] = {
+                //     ...newItems[index],
+                //     quantity: quantity,
+                // };
+                // setItems(newItems);
+                case 'add':
+                    setItems(prevItems => {
+                        // Crea una copia dello stato precedente
+                        const newItems = [...prevItems];
+
+                        // Calcola la nuova quantità
+                        const quantity = newItems[index].quantity + 1;
+
+                        // Calcola il nuovo totalAmount
+
+                        // Aggiorna l'elemento all'indice specificato con i nuovi dati
+                        newItems[index] = {
+                            ...newItems[index],
+                            quantity: quantity,
+                        };
+
+                        // Esegui modifyBasketOnDB con il nuovo array
+                        modifyBasketOnDB(session?.address!, newItems);
+
+                        // Ritorna il nuovo array per aggiornare lo stato
+                        return newItems;
+                    });
+
                     return;
                     break;
                 case 'decrement':
@@ -364,25 +356,53 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
                             return;
                         } else {
                             newtotalAmount = price * quantity;
-                            newItems[index] = {
-                                ...newItems[index],
-                                quantity: quantity,
-                                // totalAmount: newtotalAmount,
-                            }; //  Sovrascrivi l'item selezionato con i nuovi dati
-                            setItems(newItems);
+                            // newItems[index] = {
+                            //     ...newItems[index],
+                            //     quantity: quantity,
+
+                            // };
+                            // setItems(newItems);
+                            setItems(prevItems => {
+                                // Crea una copia dello stato precedente
+                                const newItems = [...prevItems];
+
+                                // Calcola il nuovo totalAmount
+
+                                // Sovrascrivi l'item selezionato con i nuovi dati
+                                newItems[index] = {
+                                    ...newItems[index],
+                                    quantity: quantity,
+                                };
+
+                                // Esegui modifyBasketOnDB con il nuovo array
+                                modifyBasketOnDB(session?.address!, newItems);
+
+                                // Ritorna il nuovo array per aggiornare lo stato
+                                return newItems;
+                            });
                         }
                     }
                     break;
                 case 'delete':
-                    const filtered = items.filter(items => items.id !== id);
-                    const newArray = [...filtered];
-                    setItems(newArray);
+                    // const filtered = items.filter(items => items.id !== id);
+                    // const newArray = [...filtered];
+                    // setItems(newArray);
+                    // modifyBasketOnDB(session?.address!, newArray);
+
+                    setItems(prevItems => {
+                        const filtered = prevItems.filter(item => item.id !== id);
+                        const newArray = [...filtered];
+
+                        // Esegui modifyBasketOnDB con il nuovo array
+                        modifyBasketOnDB(session?.address!, newArray);
+
+                        return newArray; // Questo aggiorna lo stato con il nuovo array
+                    });
                     break;
 
                 default:
                     break;
             }
-            // const quantity = newItems[index].quantity + 1;
         }
     };
     const stepsHandler = (action: string) => {
@@ -427,20 +447,70 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
         });
     };
     useEffect(() => {
+        const fetchBasketItems = async (wallet: string) => {
+            try {
+                const items: ContextProductInfo[] = await getBasketOnDB(wallet);
+                if (items?.length > 0) {
+                    setItems(items);
+                }
+            } catch (error) {
+                console.log('🚀 ~ useEffect ~ error:', error);
+            }
+        };
+        if (session?.address) fetchBasketItems(session?.address);
+    }, [session]);
+
+    const modifyBasketOnDB = async (wallet: string, items: any) => {
         try {
-            const cartItemsData = JSON.parse(localStorage.getItem('basket') ?? '[]') as ContextProductInfo[];
-            if (cartItemsData?.length > 0) {
-                setItems(cartItemsData);
+            // Prova ad aggiornare il record
+            const { data: editData, error: editError } = await supabase.from('basket').update({ products: items }).eq('wallet_address', wallet).select();
+
+            if (editError) {
+                console.log('🚀 ~ modifyBasketOnDB ~ editError:', editError);
+                return;
+            }
+
+            // Se nessun record è stato aggiornato (editData è vuoto), inserisci un nuovo record
+            if (editData.length === 0) {
+                console.log('Nessun record trovato, creando un nuovo record nel database.');
+
+                const { data: addData, error: addError } = await supabase
+                    .from('basket')
+                    .insert([{ wallet_address: wallet, products: items }])
+                    .select();
+
+                if (addError) {
+                    console.log('🚀 ~ modifyBasketOnDB ~ addError:', addError);
+                } else {
+                    console.log('Record aggiunto con successo:', addData);
+                }
+            } else {
+                console.log('Record aggiornato con successo:', editData);
             }
         } catch (error) {
-            console.log('🚀 ~ useEffect ~ error:', error);
+            console.log('🚀 ~ modifyBasketOnDB ~ error:', error);
         }
-    }, []);
+    };
+
+    const getBasketOnDB = async (wallet: string): Promise<ContextProductInfo[]> => {
+        try {
+            let { data: basket, error } = await supabase.from('basket').select('*').eq('wallet_address', wallet);
+            if (error || !basket || basket.length === 0) {
+                return [];
+            }
+            const products = typeof basket[0]?.products === 'string' ? JSON.parse(basket[0]?.products) : basket[0]?.products;
+
+            return products as ContextProductInfo[];
+        } catch (error) {
+            console.log('🚀 ~ getBasketOnDB ~ error:', error);
+            return [];
+        }
+    };
 
     useEffect(() => {
         try {
             const info = JSON.parse(localStorage.getItem('shippingInfo') ?? '{}') as ShippingInfoType;
-            if (info?.firstName !== '') {
+            if (info?.firstName) {
                 setShippingInfo(info);
             }
         } catch (error) {
@@ -448,15 +518,21 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
         }
     }, []);
 
-    useEffect(() => {
-        try {
-            if (items.length > 0) {
-                localStorage.setItem('basket', JSON.stringify(items));
-            }
-        } catch (error) {
-            console.log('🚀 ~ useEffect ~ error:', error);
-        }
-    }, [items]);
+    // useEffect(() => {
+    //     const syncBasketWithDB = async () => {
+    //         if (process.env.NODE_ENV === 'development') {
+    //             try {
+    //                 if (items.length > 0 && session?.address) {
+    //                     const updatedItems = await modifyBasketOnDB(session.address, items);
+    //                 }
+    //             } catch (error) {
+    //                 console.log('🚀 ~ useEffect ~ error:', error);
+    //             }
+    //         }
+    //     };
+    //     syncBasketWithDB();
+    // }, [items, session]);
+
     useEffect(() => {
         if (process.env.NODE_ENV === 'development') {
             try {
@@ -499,6 +575,7 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
         </OrderContext.Provider>
     );
 };
+
 // const store = {
 //     items: items,
 //     retailer: retailer,

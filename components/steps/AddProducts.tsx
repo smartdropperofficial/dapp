@@ -279,7 +279,7 @@ const AddProducts = () => {
                             <div className="d-flex flex-column ">
                                 <div className="d-flex align-items-center justify-content-end ">
                                     <div className="mx-2 fs-5  m-0">
-                                        <b> Monthly Shop budget left0:</b>
+                                        <b> Monthly Shop budget left:</b>
                                     </div>
                                     <div className="d-flex align-items-center  justify-content-end" style={{ width: '30%' }}>
                                         <label className="text-danger h4 " htmlFor="spent-limit"></label>

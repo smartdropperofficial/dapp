@@ -220,7 +220,6 @@ const SubscriptionContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
             if (getPlansOnDB && subscriptionsPlans.length === 0) {
                 try {
                     const result = await getPlansOnDB();
-                    console.log('🚀 ~ fetchSubscriptions ~ result:', result);
                     setTimeout(() => {
                         setSubscriptionPlans(result!);
                     }, 3000);

@@ -18,7 +18,8 @@ export interface ShippingInfo {
      phoneNumber: string;
 }
 
-export enum OrderStatus {
+export enum OrderStatus { 
+     BASKET = "BASKET",
      CREATED = "CREATED",
      WAITING_TAX = "WAITING_TAX",
      WAITING_PAYMENT = "WAITING_PAYMENT",

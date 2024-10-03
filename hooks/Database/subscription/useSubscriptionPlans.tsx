@@ -15,7 +15,6 @@ const useSubscriptionPlansOnDB = () => {
         if (getDataFromSB) {
             try {
                 const result = await getDataFromSB(TABLE);
-                console.log('🚀 ~ getPlansOnDB ~ result:', result);
                 const data = result.map((sub: any) => ({
                     id: sub.plan_id,
                     subscriptionType: Number(sub?.subscription_type),
@@ -30,7 +29,6 @@ const useSubscriptionPlansOnDB = () => {
                     isPromoActive: sub.is_promo_active,
                     shopLimit: sub.shop_limit * 100,
                 }));
-                console.log('🚀 ~ getPlansOnDB ~ data:', data);
 
                 return data;
             } catch (error) {
