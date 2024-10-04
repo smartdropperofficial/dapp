@@ -9,6 +9,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           try {
                const orderEncrypted = req.body;
                const order: OrderSB = JSON.parse(decryptData(orderEncrypted as string));
+               console.log("🚀 ~ handler ~ order:", order)
                const total = order.products?.reduce((acc, product) => acc + product.quantity * product.price, 0);
                console.log("🚀 ~ handler ~ total:", total);
                if (total! > 25.0) {
@@ -17,8 +18,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                          const { data: supabaseOrderCreationResponse, error } = await supabase.from("orders").insert(order).select();
 
                          if (supabaseOrderCreationResponse) {
-                              //  console.log("🚀 ~ file: createOrder.ts:16 ~ handler ~ res.status(201");
-                              //  console.log("🚀 ~ file: createOrder.ts:17 ~ handler ~ supabaseOrderCreationResponse.data:", supabaseOrderCreationResponse);
+                               console.log("🚀 ~ file: createOrder.ts:16 ~ handler ~ res.status(201");
+                               console.log("🚀 ~ file: createOrder.ts:17 ~ handler ~ supabaseOrderCreationResponse.data:", supabaseOrderCreationResponse);
 
                               res.status(201).json(supabaseOrderCreationResponse[0]);
                          } else {

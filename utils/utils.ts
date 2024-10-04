@@ -16,7 +16,11 @@ export const encryptData = (data: string) => {
 export const decryptData = (data: string) => {
     try {
         const decodedStr = decodeURIComponent(data);
-        return AES.decrypt(decodedStr, process.env.NEXT_PUBLIC_API_ENCRYPTER!).toString(enc.Utf8);
+        console.log("🚀 ~ decryptData ~ decodedStr:", decodedStr)
+        const res=  AES.decrypt(decodedStr, process.env.NEXT_PUBLIC_API_ENCRYPTER!).toString(enc.Utf8);
+        console.log("🚀 ~ decryptData ~ process.env.NEXT_PUBLIC_API_ENCRYPTER!:", process.env.NEXT_PUBLIC_API_ENCRYPTER!)
+        console.log("🚀 ~ decryptData ~ res:", res); 
+        return res;
     } catch {
         return '';
     }

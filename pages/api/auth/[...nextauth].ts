@@ -24,7 +24,6 @@ export default async function auth(req: any, res: any) {
                 try {
                     const siwe = new SiweMessage(JSON.parse(credentials?.message || '{}'));
                     const nextAuthUrl = new URL(process.env.NEXTAUTH_URL!);
-                    console.log('🚀 ~ authorize ~ nextAuthUrl:', nextAuthUrl);
 
                     const result = await siwe.verify({
                         signature: credentials?.signature || '',
@@ -41,7 +40,6 @@ export default async function auth(req: any, res: any) {
                     }
                     return null;
                 } catch (error) {
-                    console.error('Error in authorization:', error);
                     return null;
                 }
             },

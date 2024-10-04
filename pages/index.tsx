@@ -164,9 +164,6 @@ export default function Home() {
     );
 }
 export const getServerSideProps = withAuth(async (context: any, session: any) => {
-    console.log('🚀 ~ / -  getServerSideProps ~ session:', session);
-    console.log('🚀 ~ / -  getServerSideProps ~ context:', context);
-
     // Puoi passare la sessione come prop alla pagina
     return {
         props: {
