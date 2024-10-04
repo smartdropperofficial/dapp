@@ -16,11 +16,12 @@ import { useSession } from 'next-auth/react';
 import { SessionExt } from '../../types/SessionExt';
 import { SendEmailOrderReceived } from '../controllers/EmailController';
 import { ConfigContext } from '@/store/config-context';
-
+import { useOrder } from '@/components/controllers/useOrder';
 const NextStep: React.FC = () => {
     const orderCtx = useContext(OrderContext);
     const configCtx = useContext(ConfigContext);
     const router = useRouter();
+    const { createOrder } = useOrder();
     const { data: session } = useSession() as { data: SessionExt | null };
 
     const signerAddress = useRef<string>('');
@@ -46,7 +47,7 @@ const NextStep: React.FC = () => {
         //  const { data: requestId, error } = await createOrderOnAmazon(ctx, currentOrderId.current);
         // console.log("🚀 ~ placeOrderOnAmazon ~ requestId:", requestId);
         try {
-            const hasCreated = await createOrder(orderCtx, currentOrderId.current, signerAddress.current);
+            const hasCreated = await createOrder(currentOrderId.current);
             console.log('🚀 ~ placeOrderOnAmazon ~ hasCreated:', hasCreated);
             if (hasCreated.created) {
                 const { data: requestId, error } = await createOrderOnAmazon(orderCtx, configCtx, currentOrderId.current);
