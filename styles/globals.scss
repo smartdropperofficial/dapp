@@ -382,7 +382,11 @@ main {
     }
 
     &.btn-success {
-        background-color: #31bf3b;
+        background-color: #31bf3b; 
+        &:hover {
+        background-color: #13991c; 
+
+        }
     }
 
     &.btn-disabled {

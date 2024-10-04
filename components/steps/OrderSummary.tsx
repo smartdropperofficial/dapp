@@ -3,7 +3,8 @@ import Link from 'next/link';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { OrderContext } from '../../store/order-context';
 import ItemCard from '../UI/ItemCard';
-import { Alert, AlertTitle, Fab } from '@mui/material';
+// import { Alert, AlertTitle, Fab } from '@mui/material';
+import Alert from 'react-bootstrap/Alert';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
@@ -14,13 +15,17 @@ import { getBasketOnDB } from '@/utils/utils';
 import { useAccount } from 'wagmi';
 import Swal from 'sweetalert2';
 import { ConfigContext } from '@/store/config-context';
+import useOrderManagement from '@/hooks/Contracts/Order/customHooks/useOrder';
 
 const OrderSummary: React.FC = () => {
     const { address } = useAccount();
     const configContext = useContext(ConfigContext);
+    const { getExchangeTax } = useOrderManagement();
+    const [slippage, setSlippage] = useState<number>();
+    const [exchangeFees, setExchangesFees] = useState<number>();
+    const [totalToPay, setTotalToPay] = useState<number>();
 
     const { data: session }: { data: SessionExt | null } = useSession() as { data: SessionExt | null };
-    const [amountToPay, setAmountToPay] = useState<number>();
     const basketTotalFromDb = useCallback(async (): Promise<number> => {
         if (session?.address) {
             const basket = await getBasketOnDB(session?.address);
@@ -40,7 +45,7 @@ const OrderSummary: React.FC = () => {
         } else {
             const acceptobj = {
                 blockchain: 'polygon',
-                amount: ctx.basketTotal().toFixed(2),
+                amount: totalToPay?.toFixed(2),
                 token: configContext.config?.coin_contract as `0x${string}`,
                 receiver: configContext.config?.order_owner as `0x${string}`,
                 //    fee: {
@@ -113,6 +118,28 @@ const OrderSummary: React.FC = () => {
             // });
         }
     };
+    const SendOrderConfirmedPreOrder = () => {
+        //  Scrivi sul  DB con  lo status di Pre-order
+        // Reindirizza utente alla pagina del bicchiere
+    };
+    useEffect(() => {
+        if (getExchangeTax) {
+            getExchangeTax().then(data => {
+                console.log('🚀 ~ getExchangeTax ~ data:', data);
+                setSlippage(data);
+            });
+        }
+    }, [getExchangeTax]);
+    useEffect(() => {
+        if (ctx && slippage) {
+            setExchangesFees((ctx.basketTotal() / 100) * slippage);
+        }
+    }, [slippage, ctx]);
+    useEffect(() => {
+        if (ctx && slippage) {
+            setTotalToPay(ctx.basketTotal() + exchangeFees!);
+        }
+    }, [exchangeFees, ctx]);
 
     return (
         <div>
@@ -194,16 +221,14 @@ const OrderSummary: React.FC = () => {
                         );
                     })}
                 </div>
-                <div className="my-4 mx-3 text-end">
-                    <h3>
-                        {' '}
+                <div className="my-4 mx-3 text-end ">
+                    <div className="d-flex justify-content-between col-12">
+                        <b>Crypto/Fiat exchange fees: </b>
+                        <p>${exchangeFees?.toFixed(2)}</p>
+                    </div>
+                    <h3 className="d-flex justify-content-between col-12">
+                        <b>Total Basket: </b>
                         <b>{'$' + ctx.basketTotal().toFixed(2)}</b>
-                        {/* <b>
-                            {'$' +
-                                ctx.basketTotalFromDb().then(total => {
-                                    return total;
-                                })}
-                        </b>{' '} */}
                     </h3>{' '}
                 </div>
                 {/* <div className="subtotal d-flex justify-content-between mt-3">
@@ -219,38 +244,74 @@ const OrderSummary: React.FC = () => {
             </section>
             <section id="pre-order-checkout">
                 <div className="">
-                    <Alert severity="warning" className="col-12 d-flex flex-column justify-content-center rounded-3 mt-5">
+                    {/* <Alert severity="warning" className="col-12 d-flex flex-column justify-content-center rounded-3 mt-5">
                         <AlertTitle>
                             **Pre-order Payment Notice**: This is a <b>pre-order payment</b>, where you will only be charged for the price of the merchandise,
                             excluding <b>shipping</b> and <b>state taxes</b> . Once the payment is completed,{' '}
                             <u>we will send you an email with the details of the taxes required to finalize the shipment</u> .
                             <div className="mt-5">
                                 <p className="disclaimer">
-                                    Note that in the United States, purchases on Amazon are subject to state and local taxes in most states. The amount of tax
-                                    varies depending on the state, city, and sometimes the county where the buyer is located.
+                                    "Note that in the United States, purchases on Amazon are subject to state and local taxes in most states. The amount of tax
+                                    varies depending on the state, city, and sometimes the county where the buyer is located. Additionally, it should be noted
+                                    that only the shipping costs are typically waived for orders over $25, while the taxes still apply."
                                 </p>
                                 <p className="disclaimer text-start" style={{ backgroundColor: '' }}>
                                     (To learn more about US State Sales Tax, please check &nbsp;
                                     <a className="" href="https://www.amazon.com/gp/help/customer/display.html?nodeId=202036190" target="_black">
                                         Amazon page
                                     </a>
-                                    ){/* <InfoIcon style={{ fontSize: '14px' }} className="mx-2"></InfoIcon> */}
+                                    )
                                 </p>
                             </div>
                         </AlertTitle>
+                    </Alert> */}
+                    <Alert variant="danger" onClose={() => setShow(false)}>
+                        <Alert.Heading> Pre-order Payment Notice</Alert.Heading>
+                        <p>
+                            This is a <u>pre-order payment</u>, where you will only be charged for the <b>price of the merchandise</b>, excluding{' '}
+                            <b>Shipping*</b> and <b>Local taxes**</b> . Once the payment is completed,{' '}
+                            <u>we will send you an email with the details of the taxes required to finalize the shipment</u>
+                        </p>
+                    </Alert>
+                    <Alert variant="warning" onClose={() => setShow(false)}>
+                        <Alert.Heading> *Shipping Fees</Alert.Heading>
+                        <p>
+                            On Amazon US, shipping is often free for orders over $25, but there are some conditions. This offer applies{' '}
+                            <u>only to products sold by Amazon</u> and not by third-party sellers. Additionally, the free shipping option is usually available
+                            with standard shipping, which may take longer compared to faster shipping options. Some items, such as bulky or very heavy ones, may
+                            be excluded from the offer
+                        </p>
+                    </Alert>
+                    <Alert variant="warning" onClose={() => setShow(false)}>
+                        <Alert.Heading> **Local Taxes</Alert.Heading>
+                        <p>
+                            "Note that in the United States, purchases on Amazon are subject to state and local taxes in most states. The amount of tax varies
+                            depending on the state, city, and sometimes the county where the buyer is located. Additionally, it should be noted that only the
+                            shipping costs are typically waived for orders over $25, while the taxes still apply."
+                        </p>
+                        <p className="disclaimer text-start" style={{ backgroundColor: '' }}>
+                            (To learn more about US State Sales Tax, please check &nbsp;
+                            <a className="" href="https://www.amazon.com/gp/help/customer/display.html?nodeId=202036190" target="_black">
+                                Amazon page
+                            </a>
+                            )
+                        </p>
                     </Alert>
                 </div>
+
                 <div id="pre-order-payment-button" className="mt-5 d-flex flex-column align-items-center">
                     <h4>
                         {' '}
                         <b> Pay pre-order</b>
+                        <br />
                     </h4>
+
                     <button
                         disabled={ctx.basketTotal() === 0}
                         className={`btn form-control  mt-2 col-12 col-xl-10 ${ctx.basketTotal() === 0 ? 'btn-disabled' : 'btn-success'}`}
                         onClick={openPaymentDepayWidgetHandler}
                     >
-                        ${Number(ctx.basketTotal().toFixed(2))}
+                        ${Number(totalToPay?.toFixed(2))}
                     </button>
                 </div>
             </section>

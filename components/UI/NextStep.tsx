@@ -215,8 +215,8 @@ const NextStep: React.FC = () => {
                     <strong className="ms-3">BACK</strong>
                 </button>
                 <button
-                    className={`btn text-black ${orderCtx.currentStep === 6 && 'invisible'} d-flex align-items-center px-0`}
-                    disabled={orderCtx.currentStep === 6 || !go}
+                    className={`btn text-black ${orderCtx.currentStep === 5 && 'invisible'} d-flex align-items-center px-0`}
+                    disabled={orderCtx.currentStep === 5 || !go}
                     onClick={nextStepHandler}
                 >
                     <strong className="me-3">NEXT </strong>{' '}
