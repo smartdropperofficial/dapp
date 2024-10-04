@@ -3,10 +3,12 @@ import Link from 'next/link';
 import { useContext, useEffect } from 'react';
 import { OrderContext } from '../../store/order-context';
 import ItemCard from '../UI/ItemCard';
-import { Fab } from '@mui/material';
+import { Alert, AlertTitle, Fab } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import InfoIcon from '@mui/icons-material/Info';
+
 const OrderSummary: React.FC = () => {
     const ctx = useContext(OrderContext);
 
@@ -107,7 +109,32 @@ const OrderSummary: React.FC = () => {
           
            */}
             </section>
-            <section id="pre-order-checkout"></section>
+            <section id="pre-order-checkout">
+                <div className="">
+                    <Alert severity="warning" className="col-12 d-flex flex-column justify-content-center rounded-3 mt-5">
+                        <AlertTitle>
+                            **Pre-order Payment Notice**: This is a <b>pre-order payment</b>, where you will only be charged for the price of the merchandise,
+                            excluding <b>shipping</b> and <b>state taxes</b> . Once the payment is completed,{' '}
+                            <u>we will send you an email with the details of the taxes required to finalize the shipment</u> .
+                        </AlertTitle>
+                    </Alert>
+                </div>
+                <div className="">
+                    <Alert severity="success" className="col-12 d-flex flex-column justify-content-center rounded-3 mt-2">
+                        <AlertTitle>
+                            Note that in the United States, purchases on Amazon are subject to state and local taxes in most states. The amount of tax varies
+                            depending on the state, city, and sometimes the county where the buyer is located.
+                            <p className="disclaimer text-start" style={{ backgroundColor: '' }}>
+                                (To learn more about US State Sales Tax, please check &nbsp;
+                                <a className="" href="https://www.amazon.com/gp/help/customer/display.html?nodeId=202036190" target="_black">
+                                    Amazon page
+                                </a>
+                                ){/* <InfoIcon style={{ fontSize: '14px' }} className="mx-2"></InfoIcon> */}
+                            </p>
+                        </AlertTitle>
+                    </Alert>
+                </div>
+            </section>
         </div>
     );
 };
