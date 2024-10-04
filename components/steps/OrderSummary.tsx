@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { useContext, useEffect } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { OrderContext } from '../../store/order-context';
 import ItemCard from '../UI/ItemCard';
 import { Alert, AlertTitle, Fab } from '@mui/material';
@@ -8,9 +8,111 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import InfoIcon from '@mui/icons-material/Info';
+import { SessionExt } from '@/types/SessionExt';
+import { useSession } from 'next-auth/react';
+import { getBasketOnDB } from '@/utils/utils';
+import { useAccount } from 'wagmi';
+import Swal from 'sweetalert2';
+import { ConfigContext } from '@/store/config-context';
 
 const OrderSummary: React.FC = () => {
+    const { address } = useAccount();
+    const configContext = useContext(ConfigContext);
+
+    const { data: session }: { data: SessionExt | null } = useSession() as { data: SessionExt | null };
+    const [amountToPay, setAmountToPay] = useState<number>();
+    const basketTotalFromDb = useCallback(async (): Promise<number> => {
+        if (session?.address) {
+            const basket = await getBasketOnDB(session?.address);
+            return basket.reduce((acc, item) => acc + item.price! * item.quantity, 0);
+        }
+        return 0;
+    }, [session?.address]);
     const ctx = useContext(OrderContext);
+    const openPaymentDepayWidgetHandler = async () => {
+        const DePayWidgets = (await import('@depay/widgets')).default;
+        if (!address) {
+            Swal.fire({
+                title: 'Please connect your wallet to proceed',
+                icon: 'error',
+            });
+            return;
+        } else {
+            const acceptobj = {
+                blockchain: 'polygon',
+                amount: ctx.basketTotal().toFixed(2),
+                token: configContext.config?.coin_contract as `0x${string}`,
+                receiver: configContext.config?.order_owner as `0x${string}`,
+                //    fee: {
+                //        amount: fees!.toFixed(2),
+                //        receiver: process.env.NEXT_PUBLIC_SMART_CONTRACT_COIN as `0x${string}`,
+                //    },
+            };
+            console.log(acceptobj);
+
+            await DePayWidgets.Payment({
+                accept: [acceptobj],
+                currency: 'USD',
+
+                style: {
+                    colors: {
+                        primary: '#ff9900',
+                        text: '#000',
+                        buttonText: '#fff',
+                        icons: '#ff9900',
+                    },
+                    fontFamily: '"Montserrat", sans-serif!important',
+                    css: `
+                       @import url("https://fonts.googleapis.com/css2?family=Cardo:wght@400;700&display=swap");
+
+                       .ReactDialogBackground {
+                          background: rgba(0,0,0,0.8);
+                       }
+                     `,
+                },
+                before: async () => {
+                    const amountFromDb = await basketTotalFromDb();
+
+                    if (amountFromDb.toFixed(2) !== ctx.basketTotal().toFixed(2)) {
+                        console.error(
+                            `Depay - Pre-Order Payment - before : Amount expected:(${amountFromDb.toFixed(
+                                2
+                            )}) but the amount into the Widget has a different amount. acceptobj is (${acceptobj.amount}) `
+                        );
+                        Swal.fire({
+                            title: 'Error during the payment.',
+                            icon: 'error',
+                            text: 'Amount expected is different from the amount into the widget.',
+                        });
+                        return false;
+                    }
+                },
+                succeeded: (transaction: any) => {
+                    // setPaymentTx(transaction.id);
+                },
+                failed: (transaction: any) => {
+                    Swal.fire({
+                        title: 'Error during the payment, please try again or contact the support.',
+                        icon: 'error',
+                    });
+                    console.error('Payment failed:', transaction);
+                },
+                error: (error: any) => {
+                    Swal.fire({
+                        title: 'Error during the payment, please try again or contact the support.',
+                        icon: 'error',
+                    });
+                    console.error('Payment error:', error);
+                },
+            });
+            // DePayWidgets.Payment({
+            //      integration: "f3bf2aa3-5731-484e-9bb3-5ede215f3fe0",
+            //      payload: {
+            //           orderid: orderId,
+            //      },
+            // });
+        }
+    };
 
     return (
         <div>
@@ -95,7 +197,13 @@ const OrderSummary: React.FC = () => {
                 <div className="my-4 mx-3 text-end">
                     <h3>
                         {' '}
-                        <b>{'$' + ctx.basketTotal().toFixed(2)}</b>{' '}
+                        <b>{'$' + ctx.basketTotal().toFixed(2)}</b>
+                        {/* <b>
+                            {'$' +
+                                ctx.basketTotalFromDb().then(total => {
+                                    return total;
+                                })}
+                        </b>{' '} */}
                     </h3>{' '}
                 </div>
                 {/* <div className="subtotal d-flex justify-content-between mt-3">
@@ -116,23 +224,34 @@ const OrderSummary: React.FC = () => {
                             **Pre-order Payment Notice**: This is a <b>pre-order payment</b>, where you will only be charged for the price of the merchandise,
                             excluding <b>shipping</b> and <b>state taxes</b> . Once the payment is completed,{' '}
                             <u>we will send you an email with the details of the taxes required to finalize the shipment</u> .
+                            <div className="mt-5">
+                                <p className="disclaimer">
+                                    Note that in the United States, purchases on Amazon are subject to state and local taxes in most states. The amount of tax
+                                    varies depending on the state, city, and sometimes the county where the buyer is located.
+                                </p>
+                                <p className="disclaimer text-start" style={{ backgroundColor: '' }}>
+                                    (To learn more about US State Sales Tax, please check &nbsp;
+                                    <a className="" href="https://www.amazon.com/gp/help/customer/display.html?nodeId=202036190" target="_black">
+                                        Amazon page
+                                    </a>
+                                    ){/* <InfoIcon style={{ fontSize: '14px' }} className="mx-2"></InfoIcon> */}
+                                </p>
+                            </div>
                         </AlertTitle>
                     </Alert>
                 </div>
-                <div className="">
-                    <Alert severity="success" className="col-12 d-flex flex-column justify-content-center rounded-3 mt-2">
-                        <AlertTitle>
-                            Note that in the United States, purchases on Amazon are subject to state and local taxes in most states. The amount of tax varies
-                            depending on the state, city, and sometimes the county where the buyer is located.
-                            <p className="disclaimer text-start" style={{ backgroundColor: '' }}>
-                                (To learn more about US State Sales Tax, please check &nbsp;
-                                <a className="" href="https://www.amazon.com/gp/help/customer/display.html?nodeId=202036190" target="_black">
-                                    Amazon page
-                                </a>
-                                ){/* <InfoIcon style={{ fontSize: '14px' }} className="mx-2"></InfoIcon> */}
-                            </p>
-                        </AlertTitle>
-                    </Alert>
+                <div id="pre-order-payment-button" className="mt-5 d-flex flex-column align-items-center">
+                    <h4>
+                        {' '}
+                        <b> Pay pre-order</b>
+                    </h4>
+                    <button
+                        disabled={ctx.basketTotal() === 0}
+                        className={`btn form-control  mt-2 col-12 col-xl-10 ${ctx.basketTotal() === 0 ? 'btn-disabled' : 'btn-success'}`}
+                        onClick={openPaymentDepayWidgetHandler}
+                    >
+                        ${Number(ctx.basketTotal().toFixed(2))}
+                    </button>
                 </div>
             </section>
         </div>

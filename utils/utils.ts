@@ -8,6 +8,7 @@ import { formatUnits } from 'ethers/lib/utils.js';
 import { parse, isValid, format } from 'date-fns';
 import { SubscriptionManagementModel } from '@/hooks/Contracts/Subscription/types';
 import { Abi, AbiFunction, AbiEvent } from 'viem';
+import { ContextProductInfo } from '@/types/Product';
 
 export const encryptData = (data: string) => {
     const ciphertext = AES.encrypt(data, process.env.NEXT_PUBLIC_API_ENCRYPTER!);
@@ -242,5 +243,71 @@ export async function getUserByWalletAddress(walletAddress: string) {
       console.error('Errore in getUserByWalletAddress:', error);
       return null;
     }
-  }
+  } 
+export const modifyBasketOnDB = async (wallet: string, items: any) => {
+    try {
+        // Calcola total_items e basket_price
+        const total_items = items.reduce((acc: number, item: any) => acc + item.quantity, 0); // Somma delle quantità
+        const basket_price = items.reduce((acc: number, item: any) => acc + parseFloat(item.price) * item.quantity, 0); // Somma del prezzo totale (price * quantity)
+
+        // Prova ad aggiornare il record
+        const { data: editData, error: editError } = await supabase
+            .from('basket')
+            .update({
+                products: items,
+                total_items,
+                basket_price,
+            })
+            .eq('wallet_address', wallet)
+            .select();
+
+        if (editError) {
+            console.log('🚀 ~ modifyBasketOnDB ~ editError:', editError);
+            return;
+        }
+
+        // Se nessun record è stato aggiornato (editData è vuoto), inserisci un nuovo record
+        if (editData.length === 0) {
+            console.log('Nessun record trovato, creando un nuovo record nel database.');
+
+            const { data: addData, error: addError } = await supabase
+                .from('basket')
+                .insert([
+                    {
+                        wallet_address: wallet,
+                        products: items,
+                        total_items,
+                        basket_price,
+                    },
+                ])
+                .select();
+
+            if (addError) {
+                console.log('🚀 ~ modifyBasketOnDB ~ addError:', addError);
+            } else {
+                console.log('Record aggiunto con successo:', addData);
+            }
+        } else {
+            console.log('Record aggiornato con successo:', editData);
+        }
+    } catch (error) {
+        console.log('🚀 ~ modifyBasketOnDB ~ error:', error);
+    }
+};
+
+export const getBasketOnDB = async (wallet: string): Promise<ContextProductInfo[]> => {
+    try {
+        let { data: basket, error } = await supabase.from('basket').select('*').eq('wallet_address', wallet);
+        if (error || !basket || basket.length === 0) {
+            return [];
+        }
+        const products = typeof basket[0]?.products === 'string' ? JSON.parse(basket[0]?.products) : basket[0]?.products;
+
+        return products as ContextProductInfo[];
+    } catch (error) {
+        console.log('🚀 ~ getBasketOnDB ~ error:', error);
+        return [];
+    }
+};
+
   
