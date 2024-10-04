@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect } from 'react';
+import React, { createContext, useCallback, useContext, useEffect } from 'react';
 import { useState } from 'react';
 import { BuddyProductInfo, Price } from '../types/BuddyProduct';
 import { RainforestData, RainforestProduct } from '../types/scraperTypes/Rainforest';
@@ -12,6 +12,7 @@ import { SubscriptionContext } from './subscription-context';
 import { supabase } from '@/utils/supabaseClient';
 import { SessionExt } from '@/types/SessionExt';
 import { useSession } from 'next-auth/react';
+import { getBasketOnDB, modifyBasketOnDB } from '@/utils/utils';
 
 type ShippingInfoType = {
     firstName: string;
@@ -69,6 +70,7 @@ interface OrderContextProps {
     emailHandler: (payload: string) => void;
     checkoutHandler: (payload: CheckoutType) => void;
     basketTotal: () => number;
+    basketTotalFromDb: () => Promise<number>;
 }
 
 export const OrderContext = createContext<OrderContextProps>(null as unknown as OrderContextProps);
@@ -178,6 +180,8 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
         action: string,
         productInfo?: BuddyProductInfo | ProductInfo | RainforestProduct | RainforestData | Content
     ) => {
+        setIsLoading(true);
+
         //console.log("🚀 ~ file: order-context.tsx:101 ~ itemsHandler ~ scraper:", scraper)
         // console.log("🚀 ~ file: order-context.tsx:100 ~ itemsHandler ~ productInfo:", productInfo)
         console.log(productInfo);
@@ -269,8 +273,10 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
                                 return prevItems; // Se lo scraper non è riconosciuto, ritorna lo stato precedente
                         }
 
-                        // Esegui modifyBasketOnDB con il nuovo array
-                        modifyBasketOnDB(session?.address!, newItems);
+                        setTimeout(() => {
+                            modifyBasketOnDB(session?.address!, newItems);
+                            setIsLoading(false);
+                        }, 1500);
 
                         return newItems; // Ritorna il nuovo array per aggiornare lo stato
                     });
@@ -319,24 +325,17 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
                 // setItems(newItems);
                 case 'add':
                     setItems(prevItems => {
-                        // Crea una copia dello stato precedente
+                        setIsLoading(true);
                         const newItems = [...prevItems];
-
-                        // Calcola la nuova quantità
                         const quantity = newItems[index].quantity + 1;
-
-                        // Calcola il nuovo totalAmount
-
-                        // Aggiorna l'elemento all'indice specificato con i nuovi dati
                         newItems[index] = {
                             ...newItems[index],
                             quantity: quantity,
                         };
-
-                        // Esegui modifyBasketOnDB con il nuovo array
-                        modifyBasketOnDB(session?.address!, newItems);
-
-                        // Ritorna il nuovo array per aggiornare lo stato
+                        setTimeout(() => {
+                            modifyBasketOnDB(session?.address!, newItems);
+                            setIsLoading(false);
+                        }, 1500);
                         return newItems;
                     });
 
@@ -363,21 +362,18 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
                             // };
                             // setItems(newItems);
                             setItems(prevItems => {
-                                // Crea una copia dello stato precedente
+                                setIsLoading(true);
+
                                 const newItems = [...prevItems];
-
-                                // Calcola il nuovo totalAmount
-
-                                // Sovrascrivi l'item selezionato con i nuovi dati
                                 newItems[index] = {
                                     ...newItems[index],
                                     quantity: quantity,
                                 };
+                                setTimeout(() => {
+                                    modifyBasketOnDB(session?.address!, newItems);
+                                    setIsLoading(false);
+                                }, 1500);
 
-                                // Esegui modifyBasketOnDB con il nuovo array
-                                modifyBasketOnDB(session?.address!, newItems);
-
-                                // Ritorna il nuovo array per aggiornare lo stato
                                 return newItems;
                             });
                         }
@@ -390,11 +386,14 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
                     // modifyBasketOnDB(session?.address!, newArray);
 
                     setItems(prevItems => {
+                        setIsLoading(true);
+
                         const filtered = prevItems.filter(item => item.id !== id);
                         const newArray = [...filtered];
-
-                        // Esegui modifyBasketOnDB con il nuovo array
-                        modifyBasketOnDB(session?.address!, newArray);
+                        setTimeout(() => {
+                            modifyBasketOnDB(session?.address!, newItems);
+                            setIsLoading(false);
+                        }, 1500);
 
                         return newArray; // Questo aggiorna lo stato con il nuovo array
                     });
@@ -435,6 +434,15 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const basketTotal = (): number => {
         return items.reduce((acc, item) => acc + item.price! * item.quantity, 0);
     };
+
+    const basketTotalFromDb = useCallback(async (): Promise<number> => {
+        if (session?.address) {
+            const basket = await getBasketOnDB(session?.address);
+            return basket.reduce((acc, item) => acc + item.price! * item.quantity, 0);
+        }
+        return 0;
+    }, [session?.address]);
+
     const emailHandler = (payload: string) => {
         setEmail(payload);
     };
@@ -459,72 +467,6 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
         };
         if (session?.address) fetchBasketItems(session?.address);
     }, [session]);
-
-    const modifyBasketOnDB = async (wallet: string, items: any) => {
-        try {
-            // Calcola total_items e basket_price
-            const total_items = items.reduce((acc: number, item: any) => acc + item.quantity, 0); // Somma delle quantità
-            const basket_price = items.reduce((acc: number, item: any) => acc + parseFloat(item.price) * item.quantity, 0); // Somma del prezzo totale (price * quantity)
-
-            // Prova ad aggiornare il record
-            const { data: editData, error: editError } = await supabase
-                .from('basket')
-                .update({
-                    products: items,
-                    total_items,
-                    basket_price,
-                })
-                .eq('wallet_address', wallet)
-                .select();
-
-            if (editError) {
-                console.log('🚀 ~ modifyBasketOnDB ~ editError:', editError);
-                return;
-            }
-
-            // Se nessun record è stato aggiornato (editData è vuoto), inserisci un nuovo record
-            if (editData.length === 0) {
-                console.log('Nessun record trovato, creando un nuovo record nel database.');
-
-                const { data: addData, error: addError } = await supabase
-                    .from('basket')
-                    .insert([
-                        {
-                            wallet_address: wallet,
-                            products: items,
-                            total_items,
-                            basket_price,
-                        },
-                    ])
-                    .select();
-
-                if (addError) {
-                    console.log('🚀 ~ modifyBasketOnDB ~ addError:', addError);
-                } else {
-                    console.log('Record aggiunto con successo:', addData);
-                }
-            } else {
-                console.log('Record aggiornato con successo:', editData);
-            }
-        } catch (error) {
-            console.log('🚀 ~ modifyBasketOnDB ~ error:', error);
-        }
-    };
-
-    const getBasketOnDB = async (wallet: string): Promise<ContextProductInfo[]> => {
-        try {
-            let { data: basket, error } = await supabase.from('basket').select('*').eq('wallet_address', wallet);
-            if (error || !basket || basket.length === 0) {
-                return [];
-            }
-            const products = typeof basket[0]?.products === 'string' ? JSON.parse(basket[0]?.products) : basket[0]?.products;
-
-            return products as ContextProductInfo[];
-        } catch (error) {
-            console.log('🚀 ~ getBasketOnDB ~ error:', error);
-            return [];
-        }
-    };
 
     useEffect(() => {
         try {
@@ -588,6 +530,7 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
                 emailHandler,
                 checkoutHandler,
                 basketTotal,
+                basketTotalFromDb,
             }}
         >
             {children}

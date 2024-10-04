@@ -10,10 +10,11 @@ import { useAccount, useDisconnect } from 'wagmi';
 import Swal from 'sweetalert2';
 import { ConfigContext } from '@/store/config-context';
 import Messages from './Messages';
+import ModalOverlay from './ModalOverlay';
+import Loading from './Loading';
 
 const Layout: React.FC<{ children: React.ReactNode }> = props => {
-    const ctx = useContext(OrderContext);
-    const ctxConfig = useContext(ConfigContext);
+    const orderCtx = useContext(OrderContext);
     const { data: session }: { data: SessionExt | null; status: string } = useSession() as { data: SessionExt | null; status: string };
     const year = new Date().getFullYear();
 
@@ -55,10 +56,6 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
         }
     }, [windowWidth]);
     // Assicurati di includere isChrome nell'array delle dipendenze
-    useEffect(() => {
-        if (ctxConfig) {
-        }
-    }, [ctxConfig]);
 
     return (
         <>
@@ -76,7 +73,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                                                     className={`d-flex align-items-center ${isMounted && router.asPath !== '/' && 'text-black'}`}
                                                     onClick={() => {
                                                         setShowMenuResp(false);
-                                                        ctx.stepsHandler('1');
+                                                        orderCtx.stepsHandler('1');
                                                     }}
                                                 >
                                                     <i className="fa-solid fa-cart-shopping me-3"></i>Order now
@@ -180,7 +177,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                                                 <a
                                                     className={`${isMounted && router.asPath !== '/' && 'text-black  text-center  '}`}
                                                     onClick={() => {
-                                                        ctx.stepsHandler('1');
+                                                        orderCtx.stepsHandler('1');
                                                     }}
                                                 >
                                                     {' '}
@@ -277,9 +274,9 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                         </div>
                     </div>
                 </footer>
-                {/* <ModalOverlay show={configCtx.isLoading}>
-                        <Loading dark={true} />
-                    </ModalOverlay> */}
+                <ModalOverlay show={orderCtx.isLoading}>
+                    <Loading dark={true} />
+                </ModalOverlay>
             </div>
         </>
     );
