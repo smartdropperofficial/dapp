@@ -22,7 +22,7 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = ({ onSendMessage }) => {
                 <Form.Control
                     type="text"
                     className="my-1"
-                    placeholder="Write a message..."
+                    placeholder="Write a message... We will back to as soon as possibile."
                     value={message}
                     onChange={e => setMessage(e.target.value)}
                     onKeyPress={e => {

@@ -16,12 +16,11 @@ import { useSession } from 'next-auth/react';
 import { SessionExt } from '../../types/SessionExt';
 import { SendEmailOrderReceived } from '../controllers/EmailController';
 import { ConfigContext } from '@/store/config-context';
-import { useOrder } from '@/components/controllers/useOrder';
+
 const NextStep: React.FC = () => {
     const orderCtx = useContext(OrderContext);
     const configCtx = useContext(ConfigContext);
     const router = useRouter();
-    const { createOrder } = useOrder();
     const { data: session } = useSession() as { data: SessionExt | null };
 
     const signerAddress = useRef<string>('');
@@ -47,9 +46,11 @@ const NextStep: React.FC = () => {
         //  const { data: requestId, error } = await createOrderOnAmazon(ctx, currentOrderId.current);
         // console.log("🚀 ~ placeOrderOnAmazon ~ requestId:", requestId);
         try {
-            const hasCreated = await createOrder(currentOrderId.current);
+            const hasCreated = await createOrder(orderCtx, currentOrderId.current, signerAddress.current);
             console.log('🚀 ~ placeOrderOnAmazon ~ hasCreated:', hasCreated);
             if (hasCreated.created) {
+                console.log('🚀 ~ placeOrderOnAmazon ~ hasCreated.created:', hasCreated.created);
+
                 const { data: requestId, error } = await createOrderOnAmazon(orderCtx, configCtx, currentOrderId.current);
                 console.log('🚀 ~ placeOrderOnAmazon ~ requestId:', requestId);
 
@@ -96,6 +97,7 @@ const NextStep: React.FC = () => {
                 }
             } else {
                 setIsLoading(false);
+                console.log('🚀 ~ placeOrderOnAmazon ~ hasCreated.created:', hasCreated.created);
 
                 Swal.fire({
                     title: hasCreated.data,
@@ -196,7 +198,7 @@ const NextStep: React.FC = () => {
     };
     useEffect(() => {
         if (session) {
-            setGo(!session?.verified === false || session?.email === null || session?.address === null);
+            setGo(!session?.verified === false || session?.email === null || session?.address === null || session?.plan === null);
         }
     }, [session]);
 
@@ -219,9 +221,10 @@ const NextStep: React.FC = () => {
                     disabled={orderCtx.currentStep === 6 || !go}
                     onClick={nextStepHandler}
                 >
-                    <strong className="me-3">NEXT </strong>{' '}
+                    <strong className="me-3">NEXT</strong>{' '}
                     <Image src={'/assets/back.png'} className="btn-next" height={50} width={50} alt="SmartShopper Next Icon" />
                 </button>
+
                 <ModalOverlay show={isLoading}>
                     <Loading loadingText={'Loading'} />
                 </ModalOverlay>
