@@ -70,12 +70,35 @@ export const useOrder = () => {
         console.log('🚀 ~ createOrder ~ orderId:', orderId);
         console.log('🚀 ~ createOrder ~ orderCtx:', orderCtx);
         try {
-            const order = generateOrderObject(orderId);
+            const order = generateOrderObject();
             console.log('🚀 ~ createOrder ~ order:', order);
             const encryptedOrder = encryptData(JSON.stringify(order));
             console.log('🚀 ~ createOrder ~ encryptedOrder:', encryptedOrder);
 
             const createOrderResponse = await fetch('/api/createOrder', {
+                method: 'POST',
+                body: encryptedOrder,
+                headers: { 'Content-Type': 'plain/text' },
+            });
+
+            switch (createOrderResponse.status) {
+                case 201:
+                    return { data: await createOrderResponse.json(), created: true };
+                default:
+                    return { data: await createOrderResponse.json(), created: false };
+            }
+        } catch {
+            return null;
+        }
+    };
+    const createPreOrder = async (): Promise<any> => {
+        try {
+            const order = generatePreOrderObject();
+            console.log('🚀 ~ createOrder ~ order:', order);
+            const encryptedOrder = encryptData(JSON.stringify(order));
+            console.log('🚀 ~ createOrder ~ encryptedOrder:', encryptedOrder);
+
+            const createOrderResponse = await fetch('/api/createPreOrder', {
                 method: 'POST',
                 body: encryptedOrder,
                 headers: { 'Content-Type': 'plain/text' },
@@ -170,7 +193,7 @@ export const useOrder = () => {
         }
     };
 
-    const generateOrderObject = (orderId: string): OrderSB | null => {
+    const generateOrderObject = (): OrderSB | null => {
         console.log('🚀 ~ generateOrderObject ~ ctx.items:', orderCtx.items);
         try {
             return {
@@ -178,6 +201,44 @@ export const useOrder = () => {
                 country: 'US',
                 status: OrderStatus.CREATED,
                 order_id: orderId,
+                email: session?.email!,
+                currency: 'USD',
+                retailer: orderCtx.retailer,
+                shipping_info: {
+                    first_name: orderCtx.shippingInfo.firstName,
+                    last_name: orderCtx.shippingInfo.lastName,
+                    address_line1: orderCtx.shippingInfo.addressLine1,
+                    address_line2: orderCtx.shippingInfo.addressLine2,
+                    zip_code: orderCtx.shippingInfo.zipCode,
+                    city: orderCtx.shippingInfo.city,
+                    state: orderCtx.shippingInfo.state,
+                    phone_number: orderCtx.shippingInfo.phoneNumber,
+                    email: orderCtx.shippingInfo.email,
+                },
+                products: orderCtx?.items?.map((product: any) => {
+                    return {
+                        asin: product.asin,
+                        image: product.image,
+                        symbol: product.symbol,
+                        title: product.title,
+                        url: product.url,
+                        price: Number(product.price),
+                        quantity: product.quantity,
+                    };
+                }),
+            };
+        } catch (error) {
+            console.log('🚀 ~ generateOrderObject ~ error:', error);
+            return null;
+        }
+    };
+    const generatePreOrderObject = (): OrderSB | null => {
+        console.log('🚀 ~ generateOrderObject ~ ctx.items:', orderCtx.items);
+        try {
+            return {
+                wallet_address: session?.address!,
+                country: 'US',
+                status: OrderStatus.WAITING_TAX,
                 email: session?.email!,
                 currency: 'USD',
                 retailer: orderCtx.retailer,
@@ -251,6 +312,7 @@ export const useOrder = () => {
         getOrderStatusFromAmazon,
         updateOrder,
         createOrder,
+        createPreOrder,
         createOrderOnAmazon,
         createOrderOnWeb3,
         generateOrderObject,

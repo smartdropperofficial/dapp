@@ -171,8 +171,8 @@ const OrderCompleted = () => {
                         <div className="card-title text-center mt-5">
                             <h5>Order N°{orderId}</h5>
                             <p className="text-center font-weight-light mt-3 px-4">
-                                After a few minutes you will be automatically redirected to <strong>complete the payment</strong>. If the countdown is set to
-                                zero and the page {"doesn't"} change go to <Link href="/my-orders">My Orders</Link> section.
+                                After a few hours you will be automatically redirected to <strong>complete the payment</strong>. If the countdown is set to zero
+                                and the page {"doesn't"} change go to <Link href="/my-orders">My Orders</Link> section.
                                 <br />
                                 <br />
                                 You can close this page at anytime.

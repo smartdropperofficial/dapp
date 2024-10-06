@@ -1,9 +1,7 @@
 import { SessionExt } from '@/types/SessionExt';
 import { getUserConfig } from '@/utils/utils';
 import { useSession } from 'next-auth/react';
-import React, { createContext, useEffect } from 'react';
-import { useState } from 'react';
-
+import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 type ConfigType = {
     id: number;
     name: string;
@@ -29,12 +27,22 @@ type AbiConfig = {
     subscriptionPlanAbi: string;
     subscriptionManagementAbi: string;
 };
+interface ConfigContextProps {
+    isLoading: boolean;
+    config: ConfigType | null;
+    abiConfig: Partial<AbiConfig> | null;
+    setConfigHandler: (config: ConfigType | null) => void;
+    setAbiConfigHandler: (abiConfig: Partial<AbiConfig> | null) => void;
+    setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-export const ConfigContext = createContext({
+export const ConfigContext = createContext<ConfigContextProps>({
+    isLoading: false,
     config: null as ConfigType | null,
     abiConfig: null as Partial<AbiConfig> | null,
     setConfigHandler: (config: ConfigType | null) => {},
     setAbiConfigHandler: (abiConfig: Partial<AbiConfig> | null) => {},
+    setIsLoading: () => {},
 });
 
 const ConfigContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -60,7 +68,7 @@ const ConfigContextProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         subscriptionPlanAbi: '',
         subscriptionManagementAbi: '',
     });
-
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [configAbi, setConfigAbi] = useState<Partial<AbiConfig> | null>({
         orderAbi: '',
         promoterAbi: '',
@@ -81,10 +89,11 @@ const ConfigContextProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
     const store = {
         config: config,
-        // isLoading: isLoading,
+        isLoading,
         abiConfig: configAbi,
         setConfigHandler,
         setAbiConfigHandler,
+        setIsLoading,
     };
 
     useEffect(() => {
@@ -116,8 +125,6 @@ const ConfigContextProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
     useEffect(() => {
         if (config) {
-            // localStorage.setItem('config', JSON.stringify(null));
-            // localStorage.setItem('config', JSON.stringify(''));
         }
     }, [config]);
 

@@ -1,4 +1,4 @@
-import { useContext, useRef, useState, useEffect } from 'react';
+import React, { useContext, useRef, useState, useEffect } from 'react';
 import { OrderContext } from '../../store/order-context';
 import Swal from 'sweetalert2';
 import Loading from './Loading';
@@ -16,95 +16,126 @@ import { useSession } from 'next-auth/react';
 import { SessionExt } from '../../types/SessionExt';
 import { SendEmailOrderReceived } from '../controllers/EmailController';
 import { ConfigContext } from '@/store/config-context';
-import { useOrder } from '@/components/controllers/useOrder';
+import { useOrder } from '../controllers/useOrder';
+// import { useOrder } from '@/components/controllers/useOrder';
 const NextStep: React.FC = () => {
     const orderCtx = useContext(OrderContext);
     const configCtx = useContext(ConfigContext);
     const router = useRouter();
-    const { createOrder } = useOrder();
     const { data: session } = useSession() as { data: SessionExt | null };
+    const config_context = useContext(ConfigContext);
 
     const signerAddress = useRef<string>('');
     const currentOrderId = useRef<string>('');
+    const { createPreOrder } = useOrder();
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [go, setGo] = useState<boolean>(true);
 
-    const { signMessageAsync } = useSignMessage({
-        onSuccess(data, variables) {
-            const address = verifyMessage(variables.message, data);
-            signerAddress.current = address;
-            currentOrderId.current = orderId(process.env.NEXT_PUBLIC_ORDER_ID_KEY!).generate().toString();
+    // const { signMessageAsync } = useSignMessage({
+    //     onSuccess(data, variables) {
+    //         const address = verifyMessage(variables.message, data);
+    //         signerAddress.current = address;
+    //         currentOrderId.current = orderId(process.env.NEXT_PUBLIC_ORDER_ID_KEY!).generate().toString();
 
-            performOrderCreation();
-        },
-        onError() {
-            setIsLoading(false);
-        },
-    });
+    //         performOrderCreation();
+    //     },
+    //     onError() {
+    //         setIsLoading(false);
+    //     },
+    // });
 
-    const performOrderCreation = async () => {
-        //  const { data: requestId, error } = await createOrderOnAmazon(ctx, currentOrderId.current);
-        // console.log("🚀 ~ placeOrderOnAmazon ~ requestId:", requestId);
+    // const performOrderCreation = async () => {
+    //     //  const { data: requestId, error } = await createOrderOnAmazon(ctx, currentOrderId.current);
+    //     // console.log("🚀 ~ placeOrderOnAmazon ~ requestId:", requestId);
+    //     try {
+    //         const hasCreated = await createOrder(currentOrderId.current);
+    //         console.log('🚀 ~ placeOrderOnAmazon ~ hasCreated:', hasCreated);
+    //         if (hasCreated.created) {
+    //             const { data: requestId, error } = await createOrderOnAmazon(orderCtx, configCtx, currentOrderId.current);
+    //             console.log('🚀 ~ placeOrderOnAmazon ~ requestId:', requestId);
+
+    //             if (requestId) {
+    //                 const updateDb: OrderSB = {
+    //                     status: OrderStatus.WAITING_TAX,
+    //                     tax_request_id: requestId,
+    //                     user_id: session?.userid,
+    //                 };
+
+    //                 const hasUpdated = await updateOrder(currentOrderId.current, updateDb);
+    //                 console.log('🚀 ~ placeOrderOnAmazon ~ hasUpdated:', hasUpdated);
+    //                 if (hasUpdated) {
+    //                     const encryptedOrderId = encryptData(currentOrderId.current);
+    //                     SendEmailOrderReceived(currentOrderId.current);
+    //                     router.push(`/order/${encryptedOrderId}/thankYou`);
+
+    //                     return true;
+    //                 } else {
+    //                     setIsLoading(false);
+
+    //                     Swal.fire({
+    //                         title: 'Error during the update of the order on Database. Please try again or contact the support.',
+    //                         icon: 'error',
+    //                     });
+    //                     return false;
+    //                 }
+    //             } else if (error) {
+    //                 setIsLoading(false);
+
+    //                 Swal.fire({
+    //                     title: 'Error during the creation of the order on DB. Please try again or contact the support.',
+    //                     icon: 'error',
+    //                 });
+    //                 return false;
+    //             } else {
+    //                 setIsLoading(false);
+
+    //                 Swal.fire({
+    //                     title: 'Error during the creation of the order on Amazon. Please try again or contact the support.',
+    //                     icon: 'error',
+    //                 });
+    //                 return false;
+    //             }
+    //         } else {
+    //             setIsLoading(false);
+
+    //             Swal.fire({
+    //                 title: hasCreated.data,
+    //                 icon: 'error',
+    //             });
+    //             return false;
+    //         }
+    //     } catch (error) {
+    //         setIsLoading(false);
+    //     }
+    // };
+    const performPreOrderCreation = async (payment_tx?: string) => {
         try {
-            const hasCreated = await createOrder(currentOrderId.current);
+            const hasCreated = await createPreOrder();
+            console.log('🚀 ~ performPreOrderCreation ~ hasCreated.data.order_id:', hasCreated.data.order_id);
             console.log('🚀 ~ placeOrderOnAmazon ~ hasCreated:', hasCreated);
             if (hasCreated.created) {
-                const { data: requestId, error } = await createOrderOnAmazon(orderCtx, configCtx, currentOrderId.current);
-                console.log('🚀 ~ placeOrderOnAmazon ~ requestId:', requestId);
-
-                if (requestId) {
-                    const updateDb: OrderSB = {
-                        status: OrderStatus.WAITING_TAX,
-                        tax_request_id: requestId,
-                        user_id: session?.userid,
-                    };
-
-                    const hasUpdated = await updateOrder(currentOrderId.current, updateDb);
-                    console.log('🚀 ~ placeOrderOnAmazon ~ hasUpdated:', hasUpdated);
-                    if (hasUpdated) {
-                        const encryptedOrderId = encryptData(currentOrderId.current);
-                        SendEmailOrderReceived(currentOrderId.current);
-                        router.push(`/order/${encryptedOrderId}/thankYou`);
-
-                        return true;
-                    } else {
-                        setIsLoading(false);
-
-                        Swal.fire({
-                            title: 'Error during the update of the order on Database. Please try again or contact the support.',
-                            icon: 'error',
-                        });
-                        return false;
-                    }
-                } else if (error) {
-                    setIsLoading(false);
-
-                    Swal.fire({
-                        title: 'Error during the creation of the order on DB. Please try again or contact the support.',
-                        icon: 'error',
-                    });
-                    return false;
-                } else {
-                    setIsLoading(false);
-
-                    Swal.fire({
-                        title: 'Error during the creation of the order on Amazon. Please try again or contact the support.',
-                        icon: 'error',
-                    });
-                    return false;
+                const updateDb: OrderSB = {
+                    payment_tx: payment_tx,
+                };
+                const hasUpdated = await updateOrder(currentOrderId.current, updateDb);
+                if (hasUpdated) {
+                    // orderCtx.deleteAllItems();
+                    const encryptedOrderId = encryptData(hasCreated.data.order_id);
+                    router.push(`/order/${encryptedOrderId}/preorder-thank-you`);
                 }
             } else {
-                setIsLoading(false);
+                config_context.setIsLoading(false);
 
                 Swal.fire({
-                    title: hasCreated.data,
+                    title: 'Order creation failed! Please, Contact support on Telegram Channel',
+                    text: 'We recevied your payment but there were some issues creatin oreder on blockchain.',
                     icon: 'error',
                 });
                 return false;
             }
         } catch (error) {
-            setIsLoading(false);
+            config_context.setIsLoading(false);
         }
     };
 
@@ -135,7 +166,7 @@ const NextStep: React.FC = () => {
             case 3:
                 if (orderCtx.items.length < 1 || orderCtx.items[0].url === '') {
                     return Swal.fire({
-                        title: 'Insert at least 1 item to continue.',
+                        title: 'Insert at least 1 item from Amazon to continue.',
                         icon: 'error',
                     });
                 } else if (orderCtx.basketTotal() < 25.01) {
@@ -170,10 +201,11 @@ const NextStep: React.FC = () => {
                     return;
                 }
                 try {
-                    await signMessageAsync({
-                        message:
-                            'Signing this message you will accept Terms and Conditions.\nPlease wait around 10 minutes so we can calculate the best shipping offer and the correct amount of TAX.',
-                    });
+                    await performPreOrderCreation();
+                    // await signMessageAsync({
+                    //     message:
+                    //         'Signing this message you will accept Terms and Conditions.\nPlease wait around 10 minutes so we can calculate the best shipping offer and the correct amount of TAX.',
+                    // });
                 } catch {
                     setIsLoading(false);
 
@@ -215,8 +247,8 @@ const NextStep: React.FC = () => {
                     <strong className="ms-3">BACK</strong>
                 </button>
                 <button
-                    className={`btn text-black ${orderCtx.currentStep === 5 && 'invisible'} d-flex align-items-center px-0`}
-                    disabled={orderCtx.currentStep === 5 || !go}
+                    className={`btn text-black ${orderCtx.currentStep === 6 && 'invisible'} d-flex align-items-center px-0`}
+                    disabled={orderCtx.currentStep === 6 || !go}
                     onClick={nextStepHandler}
                 >
                     <strong className="me-3">NEXT </strong>{' '}

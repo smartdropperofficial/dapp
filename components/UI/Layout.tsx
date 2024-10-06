@@ -1,7 +1,7 @@
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { OrderContext } from '../../store/order-context';
 import { useRouter } from 'next/router';
 import { SessionExt } from '../../types/SessionExt';

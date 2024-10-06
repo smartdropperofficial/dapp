@@ -12,7 +12,9 @@ import { SubscriptionContext } from './subscription-context';
 import { supabase } from '@/utils/supabaseClient';
 import { SessionExt } from '@/types/SessionExt';
 import { useSession } from 'next-auth/react';
-import { getBasketOnDB, modifyBasketOnDB } from '@/utils/utils';
+import { deleteBasketOnDB, getBasketOnDB, modifyBasketOnDB } from '@/utils/utils';
+import { error } from 'console';
+import Swal from 'sweetalert2';
 
 type ShippingInfoType = {
     firstName: string;
@@ -71,6 +73,7 @@ interface OrderContextProps {
     checkoutHandler: (payload: CheckoutType) => void;
     basketTotal: () => number;
     basketTotalFromDb: () => Promise<number>;
+    deleteAllItems: () => boolean;
 }
 
 export const OrderContext = createContext<OrderContextProps>(null as unknown as OrderContextProps);
@@ -304,6 +307,17 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
             setItems([]);
         }
     };
+    const deleteAllItems = (): boolean => {
+        deleteBasketOnDB(session?.address!)
+            .then(res => {
+                setItems([]);
+            })
+            .catch(error => {
+                console.log('🚀 ~ deleteBasketOnDB ~ error:', error);
+                return false;
+            });
+        return true;
+    };
     const incrementHandler = (id: number, action: string) => {
         const currentItem = items.find(item => item.id === id)!;
         var quantity = 0;
@@ -531,6 +545,7 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
                 checkoutHandler,
                 basketTotal,
                 basketTotalFromDb,
+                deleteAllItems,
             }}
         >
             {children}

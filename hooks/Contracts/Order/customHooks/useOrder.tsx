@@ -8,7 +8,7 @@ import { ConfigContext } from '@/store/config-context';
 import { convertToDecimal, fetchAbiFromDatabase } from '@/utils/utils';
 
 const useOrderManagement = () => {
-    const { config,setAbiConfigHandler } = useContext(ConfigContext);
+    const { config, setAbiConfigHandler } = useContext(ConfigContext);
 
     const contractAddress = config?.order_contract as `0x${string}`;
     const { data: signer } = useSigner();
@@ -25,17 +25,12 @@ const useOrderManagement = () => {
                 try {
                     const abi = await fetchAbiFromDatabase('order');
                     if (abi) {
-                        const contract = new ethers.Contract(
-                            config.order_contract as `0x${string}`,
-                            abi,
-                            signer
-                        );
-                        setContract(contract); 
-                       setAbiConfigHandler({ orderAbi: abi });
-
+                        const contract = new ethers.Contract(config.order_contract as `0x${string}`, abi, signer);
+                        setContract(contract);
+                        setAbiConfigHandler({ orderAbi: abi });
                     }
                 } catch (error) {
-                    console.error('Errore nel caricamento dell\'ABI o nella creazione del contratto:', error);
+                    console.error("Errore nel caricamento dell'ABI o nella creazione del contratto:", error);
                 }
             }
         };
@@ -43,19 +38,18 @@ const useOrderManagement = () => {
         loadContract();
     }, [signer, config?.subscription_management_contract]);
 
-
     const createOrderOnBC = useCallback(
         async (orderId: string, subscriptionTypeId: number, orderAmount: number, commission: number, shippingFee: number, buyer: string): Promise<boolean> => {
-            console.log("🚀 ~ orderAmount:", orderAmount)
+            console.log('🚀 ~ orderAmount:', orderAmount);
             if (contract) {
                 try {
                     const tx = await contract.createOrder(orderId, subscriptionTypeId, orderAmount, commission, shippingFee, buyer);
                     await tx.wait();
-                    console.log("🚀 createOrderOnBC ~ tx:", tx.hash)
+                    console.log('🚀 createOrderOnBC ~ tx:', tx.hash);
 
                     return true;
                 } catch (error: any) {
-                    console.log("🚀 ~ error:", error)
+                    console.log('🚀 ~ error:', error);
                     return false;
                 }
             }

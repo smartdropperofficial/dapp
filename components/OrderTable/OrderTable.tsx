@@ -139,7 +139,7 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
             case OrderStatus.WAITING_TAX:
                 return (
                     <span className="col-10 col-xl-8  text-center my-1 p-2 rounded-2" style={{ backgroundColor: '#ffeeb1', color: '#a96500' }}>
-                        <b> in process...</b>
+                        <b> Waiting for taxes</b>
                     </span>
                 );
             case OrderStatus.ERROR:
@@ -204,14 +204,6 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
         window.open(telegramUrl, '_blank');
     };
 
-    const openTicketMessages = (order_id: string) => {
-        const message = 'order_id=12345';
-        const encodedMessage = Buffer.from(message, 'base64'); // Codifica in base64
-        console.log('🚀 ~ openTicketMessages ~ encodedMessage:', encodedMessage);
-
-        // setShowCanvas(true);
-        // setOrderIdTicket(order_id);
-    };
     const RenderTable = () => (
         <Table responsive striped bordered>
             <thead>

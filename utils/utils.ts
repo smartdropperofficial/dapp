@@ -293,7 +293,30 @@ export const modifyBasketOnDB = async (wallet: string, items: any) => {
     } catch (error) {
         console.log('🚀 ~ modifyBasketOnDB ~ error:', error);
     }
-};
+};  
+export const deleteBasketOnDB = async (wallet: string) : Promise<boolean> => {
+    try {
+       
+        // Prova ad aggiornare il record
+        const { data: editData, error: editError } = await supabase
+            .from('basket')
+            .delete()
+            .eq('wallet_address', wallet)
+            .select();
+
+        if (editError) {
+              console.log('🚀 ~ deleteBasketOnDB ~ editError:', editError);
+            return false;
+        }
+
+        return true;
+        
+    } catch (error) {
+        console.log('🚀 ~ modifyBasketOnDB ~ error:', error); 
+        return true;
+
+    }
+}; 
 
 export const getBasketOnDB = async (wallet: string): Promise<ContextProductInfo[]> => {
     try {
