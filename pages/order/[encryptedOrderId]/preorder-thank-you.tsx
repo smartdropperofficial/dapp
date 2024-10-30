@@ -19,133 +19,16 @@ const OrderCompleted = () => {
     const { encryptedOrderId } = router.query;
     const orderId = decryptData(encryptedOrderId as string);
     const [OrderId, setOrderId] = useState('');
+    const config_context = useContext(ConfigContext);
 
-    // const isFetching = useRef<boolean>(false);
-    // const delay = useRef<number | null>(10000);
-
-    // const [order, setOrder] = useState<OrderSB | null>(null);
-
-    // const processError = async (status: OrderStatus, errorText: string) => {
-    //     const updateDb: OrderSB = {
-    //         status: status,
-    //     };
-
-    //     await updateOrder(order!.order_id!, updateDb);
-
-    //     delay.current = null;
-    //     return Swal.fire({
-    //         title: errorText,
-    //         icon: 'error',
-    //     }).then(result => {
-    //         if (result.isConfirmed) {
-    //             router.push('/my-orders');
-    //         }
-    //     });
-    // };
-
-    // const fetchStatus = async () => {
-    //     if (order) {
-    //         const amountToPay = await getAmountToPay(configCtx, order?.tax_request_id!);
-
-    //         if (amountToPay && amountToPay.error) {
-    //             if (amountToPay.error !== 'request_processing') {
-    //                 console.log(amountToPay.error);
-    //                 switch (amountToPay.error) {
-    //                     case 'product_unavailable':
-    //                         processError(OrderStatus.PRODUCT_UNAVAILABLE, 'Product unavailable, please try again or contact the support.');
-    //                         break;
-    //                     case 'shipping_address_refused':
-    //                         processError(OrderStatus.SHIPPING_ADDRESS_REFUSED, 'Shipping address refused, please try again or contact the support.');
-    //                         break;
-    //                     case 'cannot_schedule_delivery':
-    //                         processError(OrderStatus.SHIPPING_ADDRESS_REFUSED, 'Shipping address refused, please try again or contact the support.');
-    //                         break;
-    //                     case 'invalid_client_token':
-    //                         processError(OrderStatus.ERROR, 'Error during the request, please try again or contact the support.');
-    //                         break;
-    //                     default:
-    //                         processError(OrderStatus.ERROR, 'Error during the request, please try again or contact the support.');
-    //                         break;
-    //                 }
-    //             } else {
-    //                 isFetching.current = false;
-    //             }
-    //         } else if (amountToPay && !amountToPay.error) {
-    //             const newProducts = order.products?.map(product => {
-    //                 try {
-    //                     const price = amountToPay.products.filter((p: AmazonProduct) => p.product_id === product.asin)[0].price;
-    //                     return {
-    //                         ...product,
-    //                         price: price / 100,
-    //                     };
-    //                 } catch {
-    //                     return {
-    //                         ...product,
-    //                     };
-    //                 }
-    //             });
-
-    //             const updateDb: OrderSB = {
-    //                 status: OrderStatus.WAITING_PAYMENT,
-    //                 products: newProducts,
-    //                 tax_amount: amountToPay.tax,
-    //                 subtotal_amount: amountToPay.subtotal,
-    //                 total_amount: amountToPay.total,
-    //                 shipping_amount: amountToPay.shipping,
-    //             };
-
-    //             const hasUpdated = await updateOrder(order.order_id!, updateDb);
-
-    //             if (hasUpdated) {
-    //                 console.log('🚀 ~ file: thankYou.tsx:111 ~ fetchStatus ~ hasUpdated:', hasUpdated);
-    //                 const encryptedOrderId = encryptData(order.order_id!);
-    //                 router.push(`/pay/${encryptedOrderId}/checkout`);
-    //             } else {
-    //                 console.log('🚀 ~ file: thankYou.tsx:114 ~ fetchStatus ~ hasUpdated:', hasUpdated);
-
-    //                 delay.current = null;
-    //                 return Swal.fire({
-    //                     title: 'Error during the request, please try again or contact the support.',
-    //                     icon: 'error',
-    //                 }).then(result => {
-    //                     if (result.isConfirmed) {
-    //                         router.push('/my-orders');
-    //                     }
-    //                 });
-    //             }
-    //         }
-    //     } else {
-    //         console.log(' isFetching.current = false;');
-    //         isFetching.current = false;
-    //     }
-    // };
-
-    // useInterval(async () => {
-    //     if (!isFetching.current) {
-    //         // isFetching.current = true;
-    //         await fetchStatus();
-    //     }
-    // }, delay.current);
-
-    // useEffect(() => {
-    //     const fetchOrderDetails = async () => {
-    //         const currentOrder = await getOrder(orderId);
-
-    //         if (currentOrder?.status === OrderStatus.WAITING_TAX) {
-    //             setOrder(currentOrder);
-    //         } else {
-    //             router.push('/my-orders');
-    //         }
-    //     };
-    //     if (orderId) {
-    //         fetchOrderDetails();
-    //     }
-    // }, [orderId]);
     useEffect(() => {
         if (orderId !== undefined) {
             setOrderId(orderId!);
         }
     }, [orderId]);
+    useEffect(() => {
+        config_context.setIsLoading(false);
+    }, []);
 
     return (
         OrderId && (
@@ -176,10 +59,15 @@ const OrderCompleted = () => {
                             <div className="card-title text-center mt-5">
                                 <h5>Order N°{orderId}</h5>
                                 <p className="text-center font-weight-light mt-3 px-4">
-                                    We are working to make our service faster.
+                                    You will receive a email with <b>Shipping</b> and <b>Tax price</b> to <strong>complete the order</strong>. You can also
+                                    monitor the status of your on the page <Link href="/my-orders">My Orders</Link> section.
                                     <br />
                                     <br />
                                     You can close this page at anytime.
+                                </p>
+                                <p className="text-center font-weight-light mt-3 px-4">
+                                    <br />
+                                    <br />
                                 </p>
                             </div>
                         </Card>

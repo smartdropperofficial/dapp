@@ -15,6 +15,7 @@ import EbayImg from '../public/assets/image.png';
 import AmazonImg from '../public/assets/amazon-logo.png';
 import Basket from '@/components/orders/Basket';
 import { withAuth } from '@/withAuth';
+import AmazonConditions from '@/components/steps/AmazonConditions';
 
 export default function Home() {
     const { currentStep: step } = useContext(OrderContext);
@@ -34,6 +35,8 @@ export default function Home() {
             case 4:
                 return <ShippingInfo />;
             case 5:
+                return <AmazonConditions />;
+            case 6:
                 return <OrderSummary />;
             default:
                 console.log(step);

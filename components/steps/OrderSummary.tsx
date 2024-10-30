@@ -1,21 +1,33 @@
-import Image from 'next/image';
+import Image from 'react-bootstrap/Image';
+
 import Link from 'next/link';
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { OrderContext } from '../../store/order-context';
 import ItemCard from '../UI/ItemCard';
 import Alert from 'react-bootstrap/Alert';
 
 import { SessionExt } from '@/types/SessionExt';
 import { useSession } from 'next-auth/react';
-import { getBasketOnDB } from '@/utils/utils';
-import { useAccount } from 'wagmi';
+import { encryptData, getBasketOnDB } from '@/utils/utils';
+import { useAccount, useWaitForTransaction } from 'wagmi';
 import Swal from 'sweetalert2';
 import { ConfigContext } from '@/store/config-context';
 import useOrderManagement from '@/hooks/Contracts/Order/customHooks/useOrder';
 import Skeleton from 'react-loading-skeleton';
 import { useOrder } from '../controllers/useOrder';
+import { updateOrder } from '../controllers/OrderController';
+import { OrderSB } from '@/types/OrderSB';
+import { useRouter } from 'next/router';
+import ModalOverlay from '../UI/ModalOverlay';
+import Loading from '../UI/Loading';
 
 const OrderSummary: React.FC = () => {
+    const router = useRouter();
+    const succeededCalled = useRef(false);
+    const isCreatingOrder = useRef(false);
+    const [paymentTx, setPaymentTx] = useState<`0x${string}`>();
+    const [orderIsProcessing, setOrderIsProcessing] = useState(false);
+    const [orderHasBeenProcessed, setOrderHasBeenProcessed] = useState(false);
     const { address } = useAccount();
     const config_context = useContext(ConfigContext);
     const order_context = useContext(OrderContext);
@@ -34,6 +46,30 @@ const OrderSummary: React.FC = () => {
         return 0;
     }, [session?.address]);
     const ctx = useContext(OrderContext);
+    const { isLoading: loadingPaymentTx } = useWaitForTransaction({
+        chainId: 137,
+        confirmations: 5,
+        hash: paymentTx,
+        enabled: !!paymentTx && !isCreatingOrder.current,
+        onSuccess() {
+            logWithMilliseconds('loadingPaymentTx onSuccess ');
+            if (!isCreatingOrder.current) {
+                isCreatingOrder.current = true;
+                performPreOrderCreation();
+            }
+        },
+    });
+    function logWithMilliseconds(message: string) {
+        const now = new Date();
+        const formattedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(
+            now.getHours()
+        ).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}.${String(now.getMilliseconds()).padStart(
+            3,
+            '0'
+        )}`;
+        console.log(`[${formattedDate}] ${message}`);
+    }
+
     const openPaymentDepayWidgetHandler = async () => {
         const DePayWidgets = (await import('@depay/widgets')).default;
         if (!address) {
@@ -46,8 +82,9 @@ const OrderSummary: React.FC = () => {
             const acceptobj = {
                 blockchain: 'polygon',
                 amount: totalToPay?.toFixed(2),
-                token: config_context.config?.coin_contract as `0x${string}`,
-                receiver: config_context.config?.order_owner as `0x${string}`,
+                //  token: config_context.config?.coin_contract as `0x${string}`,
+                token: '0xc2132d05d31c914a87c6611c10748aeb04b58e8f' as `0x${string}`,
+                receiver: '0x4790a1d817999dD302F4E58fe4663e7ee8934F90' as `0x${string}`,
                 //    fee: {
                 //        amount: fees!.toFixed(2),
                 //        receiver: process.env.NEXT_PUBLIC_SMART_CONTRACT_COIN as `0x${string}`,
@@ -93,7 +130,16 @@ const OrderSummary: React.FC = () => {
                     }
                 },
                 succeeded: (transaction: any) => {
-                    // setPaymentTx(transaction.id);
+                    if (!succeededCalled.current) {
+                        config_context.setIsLoading(true);
+
+                        succeededCalled.current = true;
+                        console.log('succeeded called with transaction.id:', transaction.id);
+                        setPaymentTx(transaction.id);
+                        logWithMilliseconds('succeeded setPaymentTx ');
+                    } else {
+                        console.warn('succeeded callback called multiple times. Ignoring subsequent calls.');
+                    }
                 },
                 failed: (transaction: any) => {
                     Swal.fire({
@@ -118,33 +164,51 @@ const OrderSummary: React.FC = () => {
             // });
         }
     };
-    const SendOrderConfirmedPreOrder = () => {
-        //Scrivi sul  DB con  lo status CREATED (chiama il controller)
-        //cancella il basket dal e dal context
-        //Manca un mail di conferma
-        //Reindirizza utente alla pagina del bicchiere
-    };
-    const performOrderCreation = async () => {
-        //  const { data: requestId, error } = await createOrderOnAmazon(ctx, currentOrderId.current);
-        // console.log("🚀 ~ placeOrderOnAmazon ~ requestId:", requestId);
-        try {
-            const hasCreated = await createPreOrder();
-            console.log('🚀 ~ placeOrderOnAmazon ~ hasCreated:', hasCreated);
-            if (hasCreated.created) {
-            } else {
-                config_context.setIsLoading(false);
 
-                Swal.fire({
-                    title: 'Order creation failed! Please, Contact support on Telegram Channel',
-                    text: 'We recevied your payment but there were some issues creatin oreder on blockchain.',
-                    icon: 'error',
-                });
-                return false;
+    const performPreOrderCreation = async () => {
+        if (!orderIsProcessing && !orderHasBeenProcessed) {
+            if (paymentTx && /^0x[a-fA-F0-9]{64}$/.test(paymentTx)) {
+                setOrderIsProcessing(true);
+                try {
+                    const hasCreated = await createPreOrder();
+                    console.log('🚀 ~ performPreOrderCreation ~ hasCreated.data.order_id:', hasCreated.data.order_id);
+                    console.log('🚀 ~ placeOrderOnAmazon ~ hasCreated:', hasCreated);
+
+                    if (hasCreated.created) {
+                        const updateDb: OrderSB = {
+                            payment_tx: paymentTx,
+                            pre_order_amount: Number(ctx.basketTotal().toFixed(2)),
+                        };
+                        const hasUpdated = await updateOrder(hasCreated.data.order_id, updateDb);
+
+                        if (hasUpdated) {
+                            if (process.env.NODE_ENV === 'production') {
+                                order_context.deleteAllItems();
+                            }
+                            const encryptedOrderId = encryptData(hasCreated.data.order_id);
+                            setOrderIsProcessing(false);
+                            setOrderHasBeenProcessed(true);
+
+                            router.push(`/order/${encryptedOrderId}/preorder-thank-you`);
+                        }
+                    } else {
+                        config_context.setIsLoading(false);
+
+                        Swal.fire({
+                            title: 'Order creation failed! Please, contact support on Telegram Channel',
+                            text: 'We received your payment but there were some issues creating the order on the blockchain.',
+                            icon: 'error',
+                        });
+
+                        return false;
+                    }
+                } catch (error) {
+                    config_context.setIsLoading(false);
+                }
             }
-        } catch (error) {
-            config_context.setIsLoading(false);
         }
     };
+
     useEffect(() => {
         if (getExchangeTax) {
             getExchangeTax().then(data => {
@@ -246,8 +310,11 @@ const OrderSummary: React.FC = () => {
                 </div>
                 <div className="my-4 mx-3 text-end ">
                     <div className="d-flex justify-content-between col-12">
-                        <b>Crypto/Fiat exchange fees: </b>
-                        <p>${exchangeFees?.toFixed(2)}</p>
+                        <div>
+                            <b>Crypto/Fiat exchange fees: </b>
+                            {/* <Image src="/icons/1inch.png" alt="" height={20} style={{ aspectRatio: 'auto' }} /> */}
+                        </div>
+                        <p className="col-2 ">${exchangeFees ? exchangeFees?.toFixed(2) : <Skeleton height={20} count={1} style={{ width: '50px' }} />}</p>
                     </div>
                     <h3 className="d-flex justify-content-between col-12">
                         <b>Total Basket: </b>
@@ -267,50 +334,15 @@ const OrderSummary: React.FC = () => {
             </section>
             <section id="pre-order-checkout">
                 <div className="mt-5">
-                    <Alert variant="danger">
+                    <Alert variant="warning">
                         <Alert.Heading> Pre-order Payment Notice</Alert.Heading>
                         <p>
-                            This is a <u>pre-order payment</u>, where you will only be charged for the <b>price of the merchandise</b>, excluding
-                            <b> Shipping*</b> and <b>Local taxes**</b>.&nbsp; Once the payment is confirmed on Blockchain , our system will start the process of
-                            tax calculation <br />
+                            Smart Dropper will start the <u>pre-order process. </u> &nbsp; It means that you will only be charged for the{' '}
+                            <b>price of the merchandise</b>, excluding
+                            <b> Shipping*</b> and <b>Local taxes**</b>.&nbsp; Once the payment is confirmed on Blockchain, our system will start the process of
+                            tax calculation. <br />
                             <span>We will send you an email with the details of the taxes required to finalize the shipment</span>
-                            <u> (it can take few hours!)</u>
-                        </p>
-                    </Alert>
-                    <Alert variant="warning">
-                        <Alert.Heading> *Shipping Fees</Alert.Heading>
-                        <p>
-                            {' '}
-                            Since we operate through blockchain oracle networks, <b>we can't use any Amazon Prime Account</b> . Anyway, on Amazon US, shipping
-                            is often free for orders over $25, but there are some conditions. This offer applies <u>only to products sold by Amazon</u> and not
-                            by third-party sellers. Additionally, the free shipping option is usually available with standard shipping, which may take longer
-                            compared to Prime shipping. Some items, such as bulky or very heavy ones, may be excluded from the offer
-                        </p>
-                        <p className="disclaimer text-start" style={{ backgroundColor: '' }}>
-                            (To learn more about Amazon US State Shipping and Delivery, please check &nbsp;
-                            <a
-                                className=""
-                                href="https://www.amazon.com/gp/help/customer/display.html/ref=chk_help_shipcosts_pri?nodeId=GGE5X8EV7VNVTK6R&ie=UTF8&ref_=chk_help_shipcosts_pri"
-                                target="_black"
-                            >
-                                Amazon page
-                            </a>
-                            )
-                        </p>
-                    </Alert>
-                    <Alert variant="warning">
-                        <Alert.Heading> ** US Local Taxes</Alert.Heading>
-                        <p>
-                            "Note that in the United States, purchases on Amazon are always subject to State and local taxes in most States. The amount of tax
-                            varies depending on the state, city, and sometimes the county where the buyer is located. Additionally, it should be noted{' '}
-                            <u>that only the shipping costs are typically waived for orders over $25</u>, while the taxes still apply."
-                        </p>
-                        <p className="disclaimer text-start" style={{ backgroundColor: '' }}>
-                            (To learn more about US State Sales Tax, please check &nbsp;
-                            <a className="" href="https://www.amazon.com/gp/help/customer/display.html?nodeId=202036190" target="_black">
-                                Amazon page
-                            </a>
-                            )
+                            <u> (it could take few hours)</u>
                         </p>
                     </Alert>
                 </div>
@@ -338,6 +370,9 @@ const OrderSummary: React.FC = () => {
                     <div className="col-6"></div>
                 </div>
             </section>
+            <ModalOverlay show={config_context.isLoading}>
+                <Loading />
+            </ModalOverlay>
         </div>
     );
 };

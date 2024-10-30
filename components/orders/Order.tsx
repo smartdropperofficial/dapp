@@ -369,7 +369,7 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
                             }}
                             style={{ backgroundColor: '#83ce89' }}
                         >
-                            Click to pay complete order
+                            Click to complete order
                         </button>
                         <div className="d-flex col-10 col-xl-8">
                             {/* <span className="disclaimer alert alert-warning my-1 text-center">
@@ -388,7 +388,7 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
                 {order.status === OrderStatus.WAITING_PAYMENT && (
                     <div className="order-buttons text-center text-lg-end mt-3 mt-md-0 d-flex justify-content-center">
                         <button className="btn btn-success col-10 col-xl-8" disabled={taxRequestId === undefined} onClick={proceedToPayment}>
-                            Click to pay complete order
+                            Complete order
                         </button>
                     </div>
                 )}

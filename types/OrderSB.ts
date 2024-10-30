@@ -17,7 +17,7 @@ export interface OrderSB {
      tax_amount?: number;
      subtotal_amount?: number;
      total_amount?: number;
-     amount_paid?: number;
+     total_amount_paid?: number;
      previous_status?: string[];
      shipping_amount?: number;
      refund?: RefundSB[];
@@ -26,7 +26,8 @@ export interface OrderSB {
      email?: string;
      currency?: string;
      retailer?: string;
-     ticket_id?: string;  // Aggiunta dei ticket di supporto
+     ticket_id?: string;  // Aggiunta dei ticket di supporto 
+     pre_order_amount?:number
 }
 
 export interface TicketSB {

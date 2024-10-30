@@ -48,6 +48,7 @@ interface OrderContextProps {
     shippingInfo: ShippingInfoType;
     scraper: string;
     showErrors: boolean;
+    termsConditions: boolean;
     shippingInfoHandler: (payload: ShippingInfoType) => void;
     itemsHandler: (
         id: number,
@@ -74,6 +75,7 @@ interface OrderContextProps {
     basketTotal: () => number;
     basketTotalFromDb: () => Promise<number>;
     deleteAllItems: () => boolean;
+    setTermsAndConditions: () => void;
 }
 
 export const OrderContext = createContext<OrderContextProps>(null as unknown as OrderContextProps);
@@ -104,6 +106,7 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
         total: 0,
         canpay: true,
     });
+    const [termsConditions, setTermsConditions] = useState(false);
     const [currentStep, setCurrentStep] = useState(1);
     const [showErrors, setShowErrors] = useState(false);
     const [scraper, setScraper] = useState('');
@@ -468,6 +471,10 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
             total: payload.items + payload.zincFees + payload.shippingFees + payload.exchangeFees + payload.fees + payload.tax,
         });
     };
+    const setTermsAndConditions = () => {
+        setTermsConditions(prev => !prev);
+    };
+
     useEffect(() => {
         const fetchBasketItems = async (wallet: string) => {
             try {
@@ -530,6 +537,7 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
                 shippingInfo,
                 scraper,
                 showErrors,
+                termsConditions: termsConditions,
                 shippingInfoHandler,
                 itemsHandler,
                 changeAddressHandler,
@@ -546,6 +554,7 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
                 basketTotal,
                 basketTotalFromDb,
                 deleteAllItems,
+                setTermsAndConditions: setTermsAndConditions,
             }}
         >
             {children}

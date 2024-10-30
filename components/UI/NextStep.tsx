@@ -32,113 +32,6 @@ const NextStep: React.FC = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [go, setGo] = useState<boolean>(true);
 
-    // const { signMessageAsync } = useSignMessage({
-    //     onSuccess(data, variables) {
-    //         const address = verifyMessage(variables.message, data);
-    //         signerAddress.current = address;
-    //         currentOrderId.current = orderId(process.env.NEXT_PUBLIC_ORDER_ID_KEY!).generate().toString();
-
-    //         performOrderCreation();
-    //     },
-    //     onError() {
-    //         setIsLoading(false);
-    //     },
-    // });
-
-    // const performOrderCreation = async () => {
-    //     //  const { data: requestId, error } = await createOrderOnAmazon(ctx, currentOrderId.current);
-    //     // console.log("🚀 ~ placeOrderOnAmazon ~ requestId:", requestId);
-    //     try {
-    //         const hasCreated = await createOrder(currentOrderId.current);
-    //         console.log('🚀 ~ placeOrderOnAmazon ~ hasCreated:', hasCreated);
-    //         if (hasCreated.created) {
-    //             const { data: requestId, error } = await createOrderOnAmazon(orderCtx, configCtx, currentOrderId.current);
-    //             console.log('🚀 ~ placeOrderOnAmazon ~ requestId:', requestId);
-
-    //             if (requestId) {
-    //                 const updateDb: OrderSB = {
-    //                     status: OrderStatus.WAITING_TAX,
-    //                     tax_request_id: requestId,
-    //                     user_id: session?.userid,
-    //                 };
-
-    //                 const hasUpdated = await updateOrder(currentOrderId.current, updateDb);
-    //                 console.log('🚀 ~ placeOrderOnAmazon ~ hasUpdated:', hasUpdated);
-    //                 if (hasUpdated) {
-    //                     const encryptedOrderId = encryptData(currentOrderId.current);
-    //                     SendEmailOrderReceived(currentOrderId.current);
-    //                     router.push(`/order/${encryptedOrderId}/thankYou`);
-
-    //                     return true;
-    //                 } else {
-    //                     setIsLoading(false);
-
-    //                     Swal.fire({
-    //                         title: 'Error during the update of the order on Database. Please try again or contact the support.',
-    //                         icon: 'error',
-    //                     });
-    //                     return false;
-    //                 }
-    //             } else if (error) {
-    //                 setIsLoading(false);
-
-    //                 Swal.fire({
-    //                     title: 'Error during the creation of the order on DB. Please try again or contact the support.',
-    //                     icon: 'error',
-    //                 });
-    //                 return false;
-    //             } else {
-    //                 setIsLoading(false);
-
-    //                 Swal.fire({
-    //                     title: 'Error during the creation of the order on Amazon. Please try again or contact the support.',
-    //                     icon: 'error',
-    //                 });
-    //                 return false;
-    //             }
-    //         } else {
-    //             setIsLoading(false);
-
-    //             Swal.fire({
-    //                 title: hasCreated.data,
-    //                 icon: 'error',
-    //             });
-    //             return false;
-    //         }
-    //     } catch (error) {
-    //         setIsLoading(false);
-    //     }
-    // };
-    const performPreOrderCreation = async (payment_tx?: string) => {
-        try {
-            const hasCreated = await createPreOrder();
-            console.log('🚀 ~ performPreOrderCreation ~ hasCreated.data.order_id:', hasCreated.data.order_id);
-            console.log('🚀 ~ placeOrderOnAmazon ~ hasCreated:', hasCreated);
-            if (hasCreated.created) {
-                const updateDb: OrderSB = {
-                    payment_tx: payment_tx,
-                };
-                const hasUpdated = await updateOrder(currentOrderId.current, updateDb);
-                if (hasUpdated) {
-                    // orderCtx.deleteAllItems();
-                    const encryptedOrderId = encryptData(hasCreated.data.order_id);
-                    router.push(`/order/${encryptedOrderId}/preorder-thank-you`);
-                }
-            } else {
-                config_context.setIsLoading(false);
-
-                Swal.fire({
-                    title: 'Order creation failed! Please, Contact support on Telegram Channel',
-                    text: 'We recevied your payment but there were some issues creatin oreder on blockchain.',
-                    icon: 'error',
-                });
-                return false;
-            }
-        } catch (error) {
-            config_context.setIsLoading(false);
-        }
-    };
-
     const nextStepHandler = async () => {
         switch (orderCtx.currentStep) {
             case 1:
@@ -184,8 +77,6 @@ const NextStep: React.FC = () => {
                     orderCtx.stepsHandler('increase');
                     window.scrollTo(0, 0);
                 } else {
-                    console.log(orderCtx.shippingInfo);
-
                     if (!orderCtx.showErrors) {
                         orderCtx.showErrorsToggle();
                         window.scrollTo(0, 0);
@@ -193,28 +84,41 @@ const NextStep: React.FC = () => {
                 }
                 break;
             case 5:
-                setIsLoading(true);
-                if (orderCtx.items.length < 1) {
-                    orderCtx.stepsHandler('decrease');
+                if (orderCtx.termsConditions) {
+                    orderCtx.stepsHandler('increase');
+                    window.scrollTo(0, 0);
+                } else {
+                    Swal.fire({ icon: 'warning', title: 'You must accept all the terms to continue.' });
 
-                    setIsLoading(false);
-                    return;
-                }
-                try {
-                    await performPreOrderCreation();
-                    // await signMessageAsync({
-                    //     message:
-                    //         'Signing this message you will accept Terms and Conditions.\nPlease wait around 10 minutes so we can calculate the best shipping offer and the correct amount of TAX.',
-                    // });
-                } catch {
-                    setIsLoading(false);
-
-                    Swal.fire({
-                        title: 'Please connect your wallet before continue with the next step.',
-                        icon: 'info',
-                    });
+                    if (!orderCtx.showErrors) {
+                        orderCtx.showErrorsToggle();
+                        window.scrollTo(0, 0);
+                    }
                 }
                 break;
+            // case 6:
+            //     setIsLoading(true);
+            //     if (orderCtx.items.length < 1) {
+            //         orderCtx.stepsHandler('decrease');
+
+            //         setIsLoading(false);
+            //         return;
+            //     }
+            //     try {
+            //         await performPreOrderCreation();
+            //         // await signMessageAsync({
+            //         //     message:
+            //         //         'Signing this message you will accept Terms and Conditions.\nPlease wait around 10 minutes so we can calculate the best shipping offer and the correct amount of TAX.',
+            //         // });
+            //     } catch {
+            //         setIsLoading(false);
+
+            //         Swal.fire({
+            //             title: 'Please connect your wallet before continue with the next step.',
+            //             icon: 'info',
+            //         });
+            //     }
+            //     break;
             default:
                 break;
         }

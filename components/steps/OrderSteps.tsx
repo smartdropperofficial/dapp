@@ -9,7 +9,8 @@ const OrderSteps: React.FC<{ currentStep: number }> = ({ currentStep }) => {
                 <Step number={2} text="Shop" active={currentStep > 1} />
                 <Step number={3} text="Items" active={currentStep > 2} />
                 <Step number={4} text="Shipping" active={currentStep > 3} />
-                <Step number={5} text="Order" active={currentStep > 4} />
+                <Step number={5} text="Terms" active={currentStep > 4} />
+                <Step number={6} text="Order" active={currentStep > 5} />
             </div>
         </div>
     );

@@ -132,7 +132,7 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
             case OrderStatus.WAITING_PAYMENT:
                 return (
                     <Button className="btn-success col-10" onClick={() => GoToCheckout(order.order_id!)}>
-                        Pay{' '}
+                        Confirm Order{' '}
                     </Button>
                 );
 
