@@ -20,12 +20,12 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ sender: senderAddress, co
             </div>
             <div className="message-bubble col-12 d-flex ">
                 <div>
-                    <strong className="disclaimer">From:</strong>
-                    <span className="disclaimer">{isSentByLoggedInUser ? 'You' : 'Smart Dropper'}</span>
+                    <strong className="">From: </strong>
+                    <span className="disclaimer">{isSentByLoggedInUser ? 'Me' : 'Smart Dropper'}</span>
                 </div>
                 <br />
                 <div>
-                    <strong>Message:</strong> <span>{content}</span>
+                    <strong>Message: </strong> <span>{content}</span>
                 </div>
                 <br />
                 {/* <strong>Status:</strong> {status} */}
