@@ -18,22 +18,29 @@ const BasketItem = ({ id, el }: { id: string; el: any }) => {
             setInputValue(value); // Aggiorna solo il valore di input temporaneo
 
             if (timeoutRef.current) clearTimeout(timeoutRef.current);
+            console.log("🚀 ~ timeoutRef.current=setTimeout ~ subContext?.currentSubscription?.subscriptionModel?.shopLimit:", subContext?.currentSubscription?.subscriptionModel?.shopLimit)
 
             timeoutRef.current = setTimeout(() => {
-                // Calcola se si può aggiungere più elementi dopo il debounce
-                if (
-                    CanAddMoreItems(value) <
-                    subContext?.currentSubscription?.subscriptionModel?.shopLimit! - subContext?.currentSubscription?.totShopAmountPaid!
-                ) {
-                    setQuantity(value); // Imposta il valore finale
-                } else {
-                    Swal.fire({
-                        title: 'Exceeded Monthly Amount Limit',
-                        text: 'This amount exceed maximum limit for this subscription level.',
-                        icon: 'error',
-                    });
-                    setInputValue(quantity); // Reimposta l'input a `quantity` corrente se il limite è superato
+                if(subContext?.currentSubscription?.subscriptionModel?.shopLimit! > 0 )  {
+                    if ( 
+                        CanAddMoreItems(value) <
+                        subContext?.currentSubscription?.subscriptionModel?.shopLimit! - subContext?.currentSubscription?.totShopAmountPaid!
+                    ) {
+                        setQuantity(value); // Imposta il valore finale
+                    } else {
+                        Swal.fire({
+                            title: 'Exceeded Monthly Amount Limit',
+                            text: 'This amount exceed maximum limit for this subscription level.',
+                            icon: 'error',
+                        });
+                        setInputValue(quantity); // Reimposta l'input a `quantity` corrente se il limite è superato
+                    }
+                } else{
+                    setQuantity(value); return;
+                   
                 }
+
+               
             }, 1500);
         }
     };
