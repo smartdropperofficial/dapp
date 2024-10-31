@@ -1,17 +1,20 @@
+// Layout.tsx
+
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import Image from 'next/image';
 import Link from 'next/link';
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react'; // Aggiunto useRef qui
 import { OrderContext } from '../../store/order-context';
 import { useRouter } from 'next/router';
 import { SessionExt } from '../../types/SessionExt';
 import { getSession, signOut, useSession } from 'next-auth/react';
-import { useAccount, useDisconnect } from 'wagmi';
+import { useAccount, useDisconnect } from 'wagmi'; // Assicurati di avere useAccount
 import Swal from 'sweetalert2';
 import { ConfigContext } from '@/store/config-context';
 import Messages from './Messages';
 import ModalOverlay from './ModalOverlay';
 import Loading from './Loading';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 const Layout: React.FC<{ children: React.ReactNode }> = props => {
     const orderCtx = useContext(OrderContext);
@@ -23,18 +26,12 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
     const [showMenuResp, setShowMenuResp] = useState<boolean>(false);
     const [windowWidth, setWindowWidth] = useState(0);
 
-    // useEffect(() => {
-    //     if (!address) {
-    //         disconnect();
-    //         router.push('/login');
-    //     }
-    // }, [address]);
+    // ** Stato per la verifica reCAPTCHA **
+    const [isHuman, setIsHuman] = useState(false);
+    const recaptchaRef = useRef<ReCAPTCHA>(null);
 
-    // useEffect(() => {
-    //     if (session?.address && address && session?.address !== address) {
-    //         disconnect();
-    //     }
-    // }, [address, session, session?.address, disconnect]);
+    // ** Ottieni lo stato di connessione del wallet **
+    const { address, isConnected } = useAccount();
 
     useEffect(() => {
         setIsMounted(true);
@@ -56,6 +53,15 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
         }
     }, [windowWidth]);
     // Assicurati di includere isChrome nell'array delle dipendenze
+
+    // ** Gestisce la verifica reCAPTCHA **
+    const handleCaptchaVerification = (token: string | null) => {
+        if (token) {
+            setIsHuman(true);
+        } else {
+            setIsHuman(false);
+        }
+    };
 
     return (
         <>
@@ -131,7 +137,6 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                                         </li>
 
                                         <li className=" d-xl-none d-flex justify-content-center align-items-center">
-                                            {/* <a href="https://t.me/SmartDropperSupport_Bot?start" target="_blank"> */}
                                             <a href="https://t.me/SmartDropperOfficial" target="_blank">
                                                 <div className="d-flex justify-content-center align-items-center text-black">
                                                     <Image src="/icons/discord.png" alt="discord" width={50} height={50} />
@@ -144,7 +149,6 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                                             </a>
                                         </li>
 
-                                        {/* <PromoterWrapper> */}
                                         <li className="d-none d-xl-inline-block fw-bold">
                                             <Link href="/referral" legacyBehavior>
                                                 <a className={`${isMounted}`} style={{ borderStyle: 'dotted' }}>
@@ -152,7 +156,6 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                                                 </a>
                                             </Link>
                                         </li>
-                                        {/* </PromoterWrapper> */}
                                     </ul>
                                 </nav>
                             </div>
@@ -160,12 +163,12 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                     </div>
                 </div>
                 <header className="nav">
-                    <div className=" col-12">
+                    <div className="col-12">
                         <div className="d-flex align-items-center">
                             <div className="col-12 col-xl-12 d-flex justify-content-center justify-content-xl-center">
                                 <nav className="nav-menu">
                                     <ul className="d-flex w-100 justify-content-between justify-content-xl-center">
-                                        <li className=" d-none d-xl-flex justify-content-between align-items-center mx-0">
+                                        <li className="d-none d-xl-flex justify-content-between align-items-center mx-0">
                                             <Link href="/" legacyBehavior>
                                                 <div className="logo-header position-relative w-100">
                                                     <Image src="/icons/SD_icon_orange.svg" width={50} height={50} alt="SmartShopper Logo" />
@@ -209,8 +212,18 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                                         </li>
 
                                         <li>
-                                            <ConnectButton showBalance={{ smallScreen: false, largeScreen: false }} />
+                                            {/* ** Integrazione di reCAPTCHA e ConnectButton ** */}
+                                            {!isConnected && !isHuman ? (
+                                                <ReCAPTCHA
+                                                    ref={recaptchaRef}
+                                                    sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
+                                                    onChange={handleCaptchaVerification}
+                                                />
+                                            ) : (
+                                                <ConnectButton showBalance={{ smallScreen: false, largeScreen: false }} />
+                                            )}
                                         </li>
+
                                         <li className="d-none d-xl-inline-block">
                                             <Link href="/settings" legacyBehavior>
                                                 <a className={`${isMounted && router.asPath !== '/Settings' && 'text-black  text-center'}`} onClick={() => {}}>
@@ -230,13 +243,9 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                                                 <Image src="/assets/menu.png" alt="SmartShopper Menu Icon" width={40} height={40} />
                                             </button>
                                         </li>
-                                        <li>{/* <Messages /> */}</li>
-                                        {/* <PromoterWrapper> */}
-                                        {/* </PromoterWrapper> */}
                                     </ul>
                                 </nav>
                                 <div className="telegram ms-5 d-none d-xl-flex d-flex justify-content-center align-items-center">
-                                    {/* <a href="https://t.me/SmartDropperSupport_Bot?start" target="_blank"> */}
                                     <a href="https://t.me/SmartDropperOfficial" target="_blank">
                                         <div className="d-flex justify-content-center align-items-center text-black">
                                             <Image src="/icons/telegram.png" alt="discord" width={50} height={50} />
@@ -264,11 +273,12 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                                 </Link>
                             </div>
                             <div className="col-lg-6 d-flex align-items-center justify-content-center my-4 my-md-0 flex-column">
-                                <p className="mb-0">© Smart Dropper LLP </p> <p className="disclaimer"> {year} - All rights Reserved</p>
+                                <p className="mb-0">© Smart Dropper LLP </p>
+                                <p className="disclaimer"> {year} - All rights Reserved</p>
                                 <p className="mb-0 ">124 City Road, EC1V 2NX </p>
                                 <p className="mb-0">London, UK </p>
                             </div>
-                            <div className="col-lg-3 d-flex align-items-center justify-content-center ju    stify-content-lg-end text-black">
+                            <div className="col-lg-3 d-flex align-items-center justify-content-center justify-content-lg-end text-black">
                                 <ul className="smartshopper-social list-unstyled text-black d-flex mb-0"></ul>
                             </div>
                         </div>

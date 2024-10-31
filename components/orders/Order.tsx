@@ -388,7 +388,7 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
                 {order.status === OrderStatus.WAITING_PAYMENT && (
                     <div className="order-buttons text-center text-lg-end mt-3 mt-md-0 d-flex justify-content-center">
                         <button className="btn btn-success col-10 col-xl-8" disabled={taxRequestId === undefined} onClick={proceedToPayment}>
-                            Complete order
+                            Confirm order
                         </button>
                     </div>
                 )}
