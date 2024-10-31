@@ -76,6 +76,7 @@ interface OrderContextProps {
     basketTotalFromDb: () => Promise<number>;
     deleteAllItems: () => boolean;
     setTermsAndConditions: () => void;
+    editBasketQtyHandler: (id: number, qty: number) => void;
 }
 
 export const OrderContext = createContext<OrderContextProps>(null as unknown as OrderContextProps);
@@ -333,14 +334,6 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
             var newtotalAmount;
             switch (action) {
                 case 'add':
-                // quantity = newItems[index].quantity + 1;
-                // newtotalAmount = price * quantity;
-                // newItems[index] = {
-                //     ...newItems[index],
-                //     quantity: quantity,
-                // };
-                // setItems(newItems);
-                case 'add':
                     setItems(prevItems => {
                         setIsLoading(true);
                         const newItems = [...prevItems];
@@ -415,11 +408,30 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
                         return newArray; // Questo aggiorna lo stato con il nuovo array
                     });
                     break;
-
                 default:
                     break;
             }
         }
+    };
+    const editBasketQtyHandler = (id: number, qty: number) => {
+        const currentItem = items.find(item => item.id === id)!;
+        const index = items.indexOf(currentItem);
+
+        setItems(prevItems => {
+            const newItems = [...prevItems];
+            const quantity = qty;
+            newItems[index] = {
+                ...newItems[index],
+                quantity: quantity,
+            };
+            setIsLoading(true);
+
+            setTimeout(() => {
+                modifyBasketOnDB(session?.address!, newItems);
+                setIsLoading(false);
+            }, 1500);
+            return newItems;
+        });
     };
     const stepsHandler = (action: string) => {
         if (action === 'increase') {
@@ -555,6 +567,7 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
                 basketTotalFromDb,
                 deleteAllItems,
                 setTermsAndConditions: setTermsAndConditions,
+                editBasketQtyHandler: editBasketQtyHandler,
             }}
         >
             {children}
