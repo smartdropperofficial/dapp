@@ -34,7 +34,11 @@ function Login() {
             <div className="row w-100 justify-content-center">
                 <div className="col-lg-6 px-0 px-lg-3">
                     <Card>
-                        <span className="d-flex justify-content-center align-items-center p-4 p-lg-0">Connect your wallet</span>
+                        <h4 className="d-flex justify-content-center align-items-center p-4 p-lg-0">Connect your wallet</h4>
+                        <br />
+                        <span className=" disclaimer d-flex justify-content-center align-items-center p-4 p-lg-0 text-bg-danger">
+                            **( Solve reCAPTCHA above to see the Login Button )
+                        </span>
                     </Card>
                 </div>
             </div>
