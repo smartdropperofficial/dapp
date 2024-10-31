@@ -4,12 +4,13 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import { OrderContext } from '../../store/order-context';
 import ItemCard from '../UI/ItemCard';
-
+import '@/utils/utils/';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import Link from 'next/link';
 import { Fab } from '@mui/material';
 import { SubscriptionContext } from '@/store/subscription-context';
 import Swal from 'sweetalert2';
+import BasketItem from './BasketItem';
 function Basket() {
     const subContext = useContext(SubscriptionContext);
     const orderContext = useContext(OrderContext);
@@ -76,58 +77,17 @@ function Basket() {
                                             </div>
                                             {/* <b> Price: ${el.price!.toFixed(2)}  </b> */}
                                         </div>
-                                        <div className="row d-flex mt-3 col-12 flex-column ">
-                                            <div className="col-12   d-flex my-lg-0 my-3 align-items-center mb-5 ">
-                                                Total: <span className="font-weight-bold bg-white py-2 px-4  flex-column m-2 ">{el.quantity}</span>
-                                                {el.symbol} {(el.price! * el.quantity).toFixed(2)}
-                                            </div>
-                                            <div className="col-12  position-relative d-flex p-0 justify-content-end align-items-center">
-                                                <div className="d-flex">
-                                                    <Fab aria-label="add" className="mx-2" onClick={e => incrementButtonHandler(el.id, el.price!)}>
-                                                        <AddIcon />
-                                                    </Fab>
-                                                    <Fab
-                                                        aria-label="add"
-                                                        sx={{ color: 'black' }}
-                                                        className="mx-2"
-                                                        onClick={e => orderContext.incrementHandler(el.id, 'decrement')}
-                                                    >
-                                                        <RemoveIcon />
-                                                    </Fab>
-                                                </div>
-                                                <div className=" d-flex ">
-                                                    <Fab
-                                                        sx={{ color: 'red' }}
-                                                        aria-label="add"
-                                                        className="mx-2"
-                                                        onClick={e => orderContext.incrementHandler(el.id, 'delete')}
-                                                    >
-                                                        <DeleteForeverIcon />
-                                                    </Fab>
-                                                </div>
-                                                {/* <div className="col-12  position-relative d-flex justify-content-end mt-5"> */}
-                                                {/* <div className="col-6">
-                                        {' '}
-                                        <div className="col-lg-2 d-flex p-0"  >
-                                            <span className=" fw-bold "> Total:</span>{' '} 
-                                            { el.quantity}
-                                        </div>
-                                        {el.quantity === 0 ? (
-                                            <span className="text-danger fs-6">Possibly unavailable</span>
-                                        ) : (
-                                            <div className="fs-5 fw-semibold">
-                                                {el.price === 0.0 ? (
-                                                    <span className="text-danger">Product not available</span>
-                                                ) : (
-                                                    <span>
-                                                        {el.symbol} {(el.price! * el.quantity).toFixed(2)}
-                                                    </span>
-                                                )}
-                                            </div>
-                                        )}
-                                    </div> */}
-
-                                                {/* </div> */}
+                                        <BasketItem id={el.id} el={el} />
+                                        <div className="col-12  position-relative d-flex p-0 justify-content-end align-items-center">
+                                            <div className=" d-flex ">
+                                                <Fab
+                                                    sx={{ color: 'red' }}
+                                                    aria-label="add"
+                                                    className="mx-2"
+                                                    onClick={e => orderContext.incrementHandler(el.id, 'delete')}
+                                                >
+                                                    <DeleteForeverIcon />
+                                                </Fab>
                                             </div>
                                         </div>
                                     </div>
