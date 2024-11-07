@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Spinner } from 'react-bootstrap';
-import Offcanvas from 'react-bootstrap/Offcanvas';
 import { useSession } from 'next-auth/react';
 import MessageBubble from '@/components/orders/Messages/MessageBubble';
 import MessageInputBox from '@/components/orders/Messages/MessageInputBox';
@@ -9,19 +8,16 @@ import { supabase } from '@/utils/supabaseClient';
 import { MessageSB } from '@/types/OrderSB';
 import { SessionExt } from '@/types/SessionExt';
 import Swal from 'sweetalert2';
-import MessageResult from './MessageResult';
+import styles from '@/styles/spinner.module.scss';
 
-interface OffCanvasResultProps {
-    show: boolean;
-    setShow: (value: boolean) => void;
+interface MessageResultProps {
     orderId: string;
     ticket: any;
 }
 
-function OffCanvasResult({ show, setShow, orderId, ticket }: OffCanvasResultProps) {
+function MessageResult({ orderId, ticket }: MessageResultProps) {
     const { data: session }: { data: SessionExt | null } = useSession() as { data: SessionExt | null };
 
-    const handleClose = () => setShow(false);
     const [messages, setMessages] = useState<MessageSB[]>([]);
     const [newMessage, setNewMessage] = useState<MessageSB | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -29,7 +25,7 @@ function OffCanvasResult({ show, setShow, orderId, ticket }: OffCanvasResultProp
     useEffect(() => {
         async function fetchMessages(ticketId: string) {
             setIsLoading(true);
-            let { data: msgs, error } = await supabase.rpc('get_ticket_messages', { p_ticket_id: ticketId });
+            let { data: msgs, error } = await supabase.rpc('get_support_ticket_messages', { p_ticket_id: ticketId });
             if (error) {
                 console.error('Error fetching messages:', error);
             } else {
@@ -50,18 +46,19 @@ function OffCanvasResult({ show, setShow, orderId, ticket }: OffCanvasResultProp
         const newMsg: MessageSB = {
             sender: session?.address || '',
             content: content,
-            email: session?.email,
+            customer_email: session?.email,
             msg_timestamp: new Date().toISOString(),
             status: 'sent',
-            ticket_id: ticket?.id || '', // Usa il ticketId appena creato
+            ticket_id: ticket?.id || '',
             read: false,
+            order_id: orderId,
         };
         setNewMessage(newMsg);
     };
 
     useEffect(() => {
         const AddMessageToDB = async (newMsg: MessageSB) => {
-            const { data, error } = await supabase.from('messages').insert([newMsg]).select();
+            const { data, error } = await supabase.from('support_tickets_messages').insert([newMsg]).select();
             if (error) {
                 Swal.fire({ icon: 'error', title: 'Message not delivered! ', text: error.message });
                 return;
@@ -72,19 +69,38 @@ function OffCanvasResult({ show, setShow, orderId, ticket }: OffCanvasResultProp
         if (newMessage && ticket) {
             AddMessageToDB(newMessage);
         }
-    }, [newMessage, ticket]);
+    }, [newMessage]);
 
+    if (isLoading)
+        return (
+            <div className="d-flex justify-content-center align-items-center h-100 w-100 d-flex flex-column w-75">
+                {/* <Spinner animation="grow" variant="warning" /> */}
+                <div className={`${styles.loader} `}></div>
+                <span className="ms-2">Loading messages...</span>
+            </div>
+        );
     return (
-        <Offcanvas show={show} onHide={handleClose} placement="end">
-            <Offcanvas.Header closeButton>{ticket && <Offcanvas.Title>Order: #{ticket?.order_id}</Offcanvas.Title>}</Offcanvas.Header>
-            <Offcanvas.Body className="col-12 d-flex flex-column h-100 overflow-y-hidden" style={{ maxHeight: '100%' }}>
-                <MessageResult orderId={orderId} ticket={ticket} />
-            </Offcanvas.Body>
-            {/* <div style={messageInputContainerStyle}>
+        <div className="h-100 w-100 ">
+            <div className="h-100 col-12 d-flex flex-column h-100  overflow-y-auto  overflow-x-hidden" style={{ maxHeight: '75%' }}>
+                {/* {ticket && <h4>Order: #{ticket?.order_id}</h4>} */}
+                {messages?.map((msg: MessageSB) => (
+                    <MessageBubble
+                        key={msg?.id}
+                        sender={msg?.sender}
+                        content={msg?.content}
+                        timestamp={msg?.msg_timestamp}
+                        status={msg?.status}
+                        read={msg?.read}
+                        isSentByLoggedInUser={msg.sender === session?.address}
+                        order_id={msg.order_id}
+                    />
+                ))}
+            </div>
+            <div style={messageInputContainerStyle}>
                 <MessageInputBox onSendMessage={handleSendMessage} />
-            </div> */}
-        </Offcanvas>
+            </div>
+        </div>
     );
 }
 
-export default OffCanvasResult;
+export default MessageResult;

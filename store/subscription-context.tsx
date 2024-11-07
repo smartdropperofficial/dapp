@@ -139,10 +139,9 @@ const SubscriptionContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
                 setCanPay(true);
             }
         } else if (currentSubscription === null) {
-            // se non c'è un abbonamento attivo
             console.log(' se non cè un abbonamento attivo ');
+
             if (selectedPackageId > -1) {
-                // se c'è un pacchetto selezionato
                 setCanPay(false);
             } else {
                 setCanPay(true);
@@ -215,24 +214,25 @@ const SubscriptionContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
             fetchSubscriptions();
         }
     }, [getSubscriptionModels]);
-    useEffect(() => {
-        const fetchSubscriptions = async () => {
-            if (getPlansOnDB && subscriptionsPlans.length === 0) {
-                try {
-                    const result = await getPlansOnDB();
-                    setTimeout(() => {
-                        setSubscriptionPlans(result!);
-                    }, 3000);
-                } catch (error) {
-                    console.error(error);
-                } finally {
-                }
-            }
-        };
-        if (subscriptionsPlans.length === 0) {
-            fetchSubscriptions();
-        }
-    }, [getPlansOnDB]);
+    // useEffect(() => {
+    //     const fetchSubscriptions = async () => {
+    //         if (getPlansOnDB && subscriptionsPlans.length === 0) {
+    //             try {
+    //                 const result = await getPlansOnDB();
+    //                 console.log('🚀 ~ fetchSubscriptions ~ result:', result);
+    //                 setTimeout(() => {
+    //                     setSubscriptionPlans(result!);
+    //                 }, 3000);
+    //             } catch (error) {
+    //                 console.error(error);
+    //             } finally {
+    //             }
+    //         }
+    //     };
+    //     if (subscriptionsPlans.length === 0) {
+    //         fetchSubscriptions();
+    //     }
+    // }, [getPlansOnDB]);
 
     useEffect(() => {
         setSelectedPackage(subscriptionsPlans[selectedPackageId!]);

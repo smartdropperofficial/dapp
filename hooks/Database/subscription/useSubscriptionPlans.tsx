@@ -32,7 +32,6 @@ const useSubscriptionPlansOnDB = () => {
 
                 return data;
             } catch (error) {
-                console.error('Error fetching plans from DB :', error);
                 return [] as SubscriptionPlans[];
             }
         } else {

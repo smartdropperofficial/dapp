@@ -5,7 +5,6 @@ export const messageInputBoxStyle: CSSProperties = {
     display: 'flex',
     alignItems: 'center',
     backgroundColor: '#f8f9fa',
-    borderTop: '1px solid #ddd',
     // position: 'fixed' as 'fixed', // Cast di tipo
     bottom: 0,
     width: '100%',
@@ -18,9 +17,9 @@ export const inputStyle: CSSProperties = {
     border: 'none',
     padding: '10px',
     marginRight: '10px',
-    borderRadius: '20px',
+    borderRadius: '5px',
     backgroundColor: '#e9ecef',
-    height: '50px'
+    height: '5em'
 
 };
 

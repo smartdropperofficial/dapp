@@ -126,57 +126,43 @@ const ShippingInfo: React.FC = () => {
                                     <label>Address Line 2</label>
                                     {/* <span className="disclaimer">(whatever you wish)</span> */}
 
-                                    <input
-                                        type="text"
-                                        onChange={e => inputHandler(e, 'addressLine2')}
-                                        value={ctx.shippingInfo?.addressLine2}
-                                        className="form-control mt-2"
-                                    />
-                                </div>
-                            </div>
-                            <div className="col-xl-2 mb-4">
-                                <div className="form-group">
-                                    <label>Zip Code*</label>
-                                    <input
-                                        type="text"
-                                        onChange={e => inputHandler(e, 'zipCode')}
-                                        value={ctx?.shippingInfo?.zipCode}
-                                        className="form-control mt-2"
-                                    />
-                                    {ctx.showErrors && !ctx.shippingInfo?.zipCode && <small className="d-block text-danger mt-2">Field Required.</small>}
-                                </div>
-                            </div>
-                            <div className="col-xl-6 mb-4">
-                                <div className="form-group">
-                                    <label>City*</label>
-                                    <input type="text" onChange={e => inputHandler(e, 'city')} value={ctx?.shippingInfo?.city} className="form-control mt-2" />
-                                    {ctx.showErrors && !ctx.shippingInfo?.city && <small className="d-block text-danger mt-2">Field Required.</small>}
-                                </div>
-                            </div>
-                            <div className="col-xl-4 mb-4">
-                                <div className="form-group">
-                                    <label>State*</label>
-                                    <select onChange={e => inputHandler(e, 'state')} value={ctx?.shippingInfo?.state} className="py-0 form-control mt-2">
-                                        <option value="">--- Select State ---</option>
-                                        {USA_COUNTRIES.map((el, i) => (
-                                            <option key={i} value={el?.abbreviation}>
-                                                {el?.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    {ctx.showErrors && !ctx.shippingInfo?.state && <small className="d-block text-danger mt-2">Field Required.</small>}
-                                </div>
-                            </div>
-                            <div className="col-lg-12 mb-4">
-                                <div className="form-group">
-                                    <div className="d-flex align-items-center">
-                                        <label>
-                                            {' '}
-                                            <b>(Receiver)</b> Phone Number*
-                                        </label>{' '}
-                                        &nbsp; &nbsp;
-                                        <span className="disclaimer m-0">( mandatory in order to be contacted by the courier if necessary.)</span>
-                                    </div>
+                                             <input type="text" onChange={(e) => inputHandler(e, "addressLine2")} value={ctx.shippingInfo?.addressLine2} className="form-control mt-2" />
+                                        </div>
+                                   </div>
+                                   <div className="col-xl-2 mb-4">
+                                        <div className="form-group">
+                                             <label>Zip Code*</label>
+                                             <input type="text" onChange={(e) => inputHandler(e, "zipCode")} value={ctx?.shippingInfo?.zipCode} className="form-control mt-2" />
+                                             {ctx.showErrors && !ctx.shippingInfo?.zipCode && <small className="d-block text-danger mt-2">Field Required.</small>}
+                                        </div>
+                                   </div>
+                                   <div className="col-xl-6 mb-4">
+                                        <div className="form-group">
+                                             <label>City*</label>
+                                             <input type="text" onChange={(e) => inputHandler(e, "city")} value={ctx?.shippingInfo?.city} className="form-control mt-2" />
+                                             {ctx.showErrors && !ctx.shippingInfo?.city && <small className="d-block text-danger mt-2">Field Required.</small>}
+                                        </div>
+                                   </div>
+                                   <div className="col-xl-4 mb-4">
+                                        <div className="form-group">
+                                             <label>State*</label>
+                                             <select onChange={(e) => inputHandler(e, "state")} value={ctx?.shippingInfo?.state} className="py-0 form-control mt-2">
+                                                  <option value="">--- Select State ---</option>
+                                                  {USA_COUNTRIES.map((el, i) => (
+                                                       <option key={i} value={el?.abbreviation}>
+                                                            {el?.name}
+                                                       </option>
+                                                  ))}
+                                             </select>
+                                             {ctx.showErrors && !ctx.shippingInfo?.state && <small className="d-block text-danger mt-2">Field Required.</small>}
+                                        </div>
+                                   </div>
+                                   <div className="col-lg-12 mb-4">
+                                        <div className="form-group">
+                                             <div className="d-flex align-items-center">
+                                                  <label> <b>(Receiver)</b> Phone Number*</label> &nbsp; &nbsp;
+                                                  <span className="disclaimer m-0">( mandatory in order to be contacted by the courier if necessary.)</span>
+                                             </div>
 
                                     <input
                                         onKeyDown={event => {

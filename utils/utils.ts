@@ -15,14 +15,15 @@ export const encryptData = (data: string) => {
     return encodeURIComponent(ciphertext.toString());
 };
 export const decryptData = (data: string) => {
+    console.log("🚀 ~ decryptData ~ data:", data)
     try {
         const decodedStr = decodeURIComponent(data);
         console.log("🚀 ~ decryptData ~ decodedStr:", decodedStr)
-        const res=  AES.decrypt(decodedStr, process.env.NEXT_PUBLIC_API_ENCRYPTER!).toString(enc.Utf8);
-        console.log("🚀 ~ decryptData ~ process.env.NEXT_PUBLIC_API_ENCRYPTER!:", process.env.NEXT_PUBLIC_API_ENCRYPTER!)
-        console.log("🚀 ~ decryptData ~ res:", res); 
+        const res = AES.decrypt(decodedStr, process.env.NEXT_PUBLIC_API_ENCRYPTER!).toString(enc.Utf8);
+        console.log("🚀 ~ decryptData ~ res:", res)
         return res;
-    } catch {
+    } catch (error) {
+        console.log("🚀 ~ decryptData ~ error:", error)
         return '';
     }
 };
@@ -196,24 +197,24 @@ export const fetchAbiFromDatabase = async (contractName: string): Promise<any | 
         // Catch unexpected errors outside of Supabase or JSON parsing
         return null;
     }
-}; 
+};
 export const filterAbi = (abi: Abi): (AbiFunction | AbiEvent)[] => {
     return abi.filter(
         (item): item is AbiFunction | AbiEvent =>
             item.type === 'function' || item.type === 'event'
     );
-}; 
-export const FormatedAbi = (abi: any) => { 
-   return  abi.abiConfig?.orderAbi ? (typeof abi.abiConfig.orderAbi === 'string'
-    ? filterAbi(JSON.parse(abi.abiConfig.orderAbi) as Abi)
-    : filterAbi(abi.abiConfig.orderAbi as Abi)) // Se è già un oggetto
-: undefined;
-}  
+};
+export const FormatedAbi = (abi: any) => {
+    return abi.abiConfig?.orderAbi ? (typeof abi.abiConfig.orderAbi === 'string'
+        ? filterAbi(JSON.parse(abi.abiConfig.orderAbi) as Abi)
+        : filterAbi(abi.abiConfig.orderAbi as Abi)) // Se è già un oggetto
+        : undefined;
+}
 export async function getUserByWalletAddress(walletAddress: string) {
     try {
-      const { data: userWallet, error } = await supabase
-        .from('user_wallets')
-        .select(`
+        const { data: userWallet, error } = await supabase
+            .from('user_wallets')
+            .select(`
           wallet_address,
           user:users!inner (
             id,
@@ -223,27 +224,27 @@ export async function getUserByWalletAddress(walletAddress: string) {
             is_admin
           )
         `)
-        .eq('wallet_address', walletAddress)
-        .single();
-  
-      if (error || !userWallet) {
-        console.log("🚀 ~ getUserByWalletAddress ~ errore:", error);
-        return null;
-      }
-  
-    //   console.log("🚀 ~ getUserByWalletAddress ~ userWallet:", userWallet);
-  
-      const user = userWallet.user;
-  
-      return {
-        ...user,
-        address: walletAddress,
-      };
+            .eq('wallet_address', walletAddress)
+            .single();
+
+        if (error || !userWallet) {
+            console.log("🚀 ~ getUserByWalletAddress ~ errore:", error);
+            return null;
+        }
+
+        //   console.log("🚀 ~ getUserByWalletAddress ~ userWallet:", userWallet);
+
+        const user = userWallet.user;
+
+        return {
+            ...user,
+            address: walletAddress,
+        };
     } catch (error) {
-      console.error('Errore in getUserByWalletAddress:', error);
-      return null;
+        console.error('Errore in getUserByWalletAddress:', error);
+        return null;
     }
-  } 
+}
 export const modifyBasketOnDB = async (wallet: string, items: any) => {
     try {
         // Calcola total_items e basket_price
@@ -293,10 +294,10 @@ export const modifyBasketOnDB = async (wallet: string, items: any) => {
     } catch (error) {
         console.log('🚀 ~ modifyBasketOnDB ~ error:', error);
     }
-};  
-export const deleteBasketOnDB = async (wallet: string) : Promise<boolean> => {
+};
+export const deleteBasketOnDB = async (wallet: string): Promise<boolean> => {
     try {
-       
+
         // Prova ad aggiornare il record
         const { data: editData, error: editError } = await supabase
             .from('basket')
@@ -305,18 +306,18 @@ export const deleteBasketOnDB = async (wallet: string) : Promise<boolean> => {
             .select();
 
         if (editError) {
-              console.log('🚀 ~ deleteBasketOnDB ~ editError:', editError);
+            console.log('🚀 ~ deleteBasketOnDB ~ editError:', editError);
             return false;
         }
 
         return true;
-        
+
     } catch (error) {
-        console.log('🚀 ~ modifyBasketOnDB ~ error:', error); 
+        console.log('🚀 ~ modifyBasketOnDB ~ error:', error);
         return true;
 
     }
-}; 
+};
 
 export const getBasketOnDB = async (wallet: string): Promise<ContextProductInfo[]> => {
     try {
@@ -333,4 +334,4 @@ export const getBasketOnDB = async (wallet: string): Promise<ContextProductInfo[
     }
 };
 
-  
+

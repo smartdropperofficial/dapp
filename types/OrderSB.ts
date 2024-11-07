@@ -43,13 +43,14 @@ export interface RefundSB {
 }
 export interface MessageSB {
      id?: string;  // UUID per identificare univocamente ogni messaggio
-     sender_wallet_address: string;  // Indirizzo del wallet del mittente
-     receiver_wallet_address: string;  // Indirizzo del wallet del destinatario
+     sender: string;  // Indirizzo del wallet del mittente
      ticket_id: string;  // ID del ticket associato al messaggio
+     customer_email?:string | null | undefined,
      content: string;  // Contenuto del messaggio
      msg_timestamp: string;  // Timestamp del messaggio
      read: boolean;  // Indica se il messaggio è stato letto
-     status: string;  // Stato del messaggio (es: "sent", "received", etc.)
+     status: string;  // Stato del messaggio (es: "sent", "received", etc.), 
+     order_id:string
 }
 
 

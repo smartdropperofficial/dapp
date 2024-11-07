@@ -19,15 +19,15 @@ const MessagesList: React.FC<MessagesListProps> = ({ messages, loggedInAddress, 
     }
 
     return (
-        <div className='d-flex overflow-y-auto'>
+        <div className="d-flex overflow-y-auto">
             {messages.map((mgs: MessageSB) => (
                 <MessageBubble
                     key={mgs.id}
-                    senderAddress={mgs.sender_wallet_address}
+                    sender={mgs.sender}
                     content={mgs.content}
                     timestamp={mgs.msg_timestamp}
                     status={mgs.status}
-                    isSentByLoggedInUser={mgs.sender_wallet_address === loggedInAddress}
+                    isSentByLoggedInUser={mgs.sender === loggedInAddress}
                 />
             ))}
         </div>

@@ -108,13 +108,11 @@ const ConfigContextProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                     return;
                 }
             } else {
-                // console.log('🚀 ~ fetchConfig ~ storedConfig:', storedConfig);
                 const parsedConfig = JSON.parse(storedConfig);
                 setConfig(parsedConfig);
             }
 
             if (storedConfig) {
-                // console.log('🚀 ~ fetchConfig ~ storedConfig:', storedConfig);
             }
         };
 

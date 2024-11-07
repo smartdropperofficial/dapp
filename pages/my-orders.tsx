@@ -98,7 +98,7 @@ const MyOrders = () => {
                                         ) : (
                                             // <Loading dark={true} />
                                             <ModalOverlay show={true}>
-                                                <Loading loadingText="Checking tax..." />
+                                                <Loading dark={false} />
                                             </ModalOverlay>
                                         )}
                                     </div>

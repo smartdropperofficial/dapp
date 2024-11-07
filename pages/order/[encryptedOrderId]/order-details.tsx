@@ -25,19 +25,15 @@ function OrderDetails() {
 
     useEffect(() => {
         if (encryptedOrderId) {
-            console.log('🚀 ~ Encrypted Order ID:', encryptedOrderId);
             const decodedOrderId = decodeURIComponent(encryptedOrderId as string);
-            console.log('🚀 ~ Decoded Order ID:', decodedOrderId);
 
             const tmpRedirectUrl = redirectPath.replace('[encryptedOrderId]', encryptedOrderId as string);
-            console.log('🚀 ~ Redirect URL before setting state:', tmpRedirectUrl);
             setRedirectUrl(tmpRedirectUrl);
         }
     }, [encryptedOrderId]);
 
     useEffect(() => {
         if (!session && !address && encryptedOrderId && redirectUrl !== '') {
-            console.log('🚀 ~ Redirecting to login with URL:', redirectUrl);
             setTimeout(() => {
                 router.push(`/login?redirect=${redirectPath.replace('[encryptedOrderId]', encodeURIComponent(encryptedOrderId as string))}`);
             }, 100); // Ritardo di 100ms per garantire la disponibilità di tutti i dati

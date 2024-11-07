@@ -74,77 +74,81 @@ const OrderProduct: React.FC<IMyOrderProductProps> = ({ product, order }) => {
                 </div>
                 <hr />
 
-                <div className="d-flex mt-4  flex-column  align-items-xl-start py-2">
-                    <div className="my-2 d-flex flex-column align-items-xl-start col-12 justify-content-between">
-                        <div className="">
-                            <b> Order TX:</b>
-                            {/* <Tooltip title="This represents your order created on the blockchain">
+            <div className="d-flex mt-4  flex-column  align-items-xl-start py-2">
+               <div className="my-2 d-flex flex-column align-items-xl-start col-12 justify-content-between">
+                  <div className="">
+                     <b> Order code:</b>
+                     {/* <Tooltip title="This represents your order created on the blockchain">
                         <IconButton>
                            <InfoIcon fontSize="small" sx={{ color: "black" }} />
                         </IconButton>
                      </Tooltip> */}
 
-                            <OverlayTrigger
-                                trigger={['hover', 'focus']}
-                                key={'right'}
-                                placement={'right'}
-                                overlay={
-                                    <Popover id={`popover-positioned-${'right'}`}>
-                                        <Popover.Header as="h3">This represents your order created on the blockchain</Popover.Header>
-                                        <Popover.Body>You will see the Tx hash after your order will be completed.</Popover.Body>
-                                    </Popover>
-                                }
-                            >
-                                <InfoIcon fontSize="small" sx={{ color: 'black' }} />
-                            </OverlayTrigger>
-                        </div>
-                        <div className="d-flex flex-column flex-xl-row col-12 justify-content-between">
-                            <a className="disclaimer pe-auto" href={`https://polygonscan.com/tx/${order?.creation_tx}`} target="_blank">
-                                {order?.creation_tx ? BreakCode(order?.creation_tx!) : 'No transaction hash'}
+                     <OverlayTrigger
+                       trigger={['hover', 'focus']} 
+                        key={'right'}
+                        placement={'right'}
+                        overlay={
+                           <Popover id={`popover-positioned-${'right'}`}>
+                              <Popover.Header as="h3">This represents your order created on the blockchain</Popover.Header>
+                              <Popover.Body>
+                                 You will see the Tx hash after your payment will be completed.
+                              </Popover.Body>
+                           </Popover>
+                        }
+                     >
+                        <InfoIcon fontSize="small" sx={{ color: "black" }} />
+                     </OverlayTrigger>
 
-                                <Tooltip title="Open on polygonscan">
-                                    <IconButton>
-                                        <OpenInNewIcon sx={{ color: '#ff9900' }} />
-                                    </IconButton>
-                                </Tooltip>
-                            </a>
-                            <div
-                                onClick={() => copyToClipboard(order?.creation_tx ?? '', setorderCopy)}
-                                style={{ cursor: 'pointer' }}
-                                onMouseLeave={() => {
-                                    setorderCopy('Copy');
-                                }}
-                            >
-                                <Tooltip title={orderCopy}>
-                                    <IconButton>
-                                        <ContentCopyIcon />
-                                    </IconButton>
-                                </Tooltip>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="my-2 d-flex flex-column align-items-xl-start col-12 justify-content-between">
-                        <div>
-                            <b>Pre-Order Payment TX:</b>
-                            <OverlayTrigger
-                                trigger={['hover', 'focus']}
-                                key={'right'}
-                                placement={'right'}
-                                overlay={
-                                    <Popover id={`popover-positioned-${'right'}`}>
-                                        <Popover.Header as="h3">
-                                            This represents your <b>payment Tx</b> created on the blockchain
-                                        </Popover.Header>
-                                        <Popover.Body>You will see the Tx hash after your payment will be completed.</Popover.Body>
-                                    </Popover>
-                                }
-                            >
-                                <InfoIcon fontSize="small" sx={{ color: 'black' }} />
-                            </OverlayTrigger>
-                        </div>
-                        <div className="d-flex flex-column flex-xl-row col-12 justify-content-between">
-                            <a className="disclaimer pe-auto" href={`https://polygonscan.com/tx/${order?.payment_tx}`} target="_blank">
-                                {order?.payment_tx ? BreakCode(order?.payment_tx!) : 'No transaction hash'}
+
+                  </div>
+                  <div className="d-flex flex-column flex-xl-row col-12 justify-content-between">
+                     <a className="disclaimer pe-auto" href={`https://polygonscan.com/tx/${order?.creation_tx}`} target="_blank">
+                        {order?.creation_tx ? BreakCode(order?.creation_tx!) : "No transaction hash"}
+
+                        <Tooltip title="Open on polygonscan">
+                           <IconButton>
+                              <OpenInNewIcon sx={{ color: "#ff9900" }} />
+                           </IconButton>
+                        </Tooltip>
+                     </a>
+                     <div
+                        onClick={() => copyToClipboard(order?.creation_tx ?? "", setorderCopy)}
+                        style={{ cursor: "pointer" }}
+                        onMouseLeave={() => {
+                           setorderCopy("Copy");
+                        }}
+                     >
+                        <Tooltip title={orderCopy}>
+                           <IconButton>
+                              <ContentCopyIcon />
+                           </IconButton>
+                        </Tooltip>
+                     </div>
+                  </div>
+               </div>
+               <div className="my-2 d-flex flex-column align-items-xl-start col-12 justify-content-between">
+                  <div>
+                     <b>Payment code:</b>
+                     <OverlayTrigger
+                       trigger={['hover', 'focus']} 
+                        key={'right'}
+                        placement={'right'}
+                        overlay={
+                           <Popover id={`popover-positioned-${'right'}`}>
+                              <Popover.Header as="h3">This represents your <b>payment Tx</b> created on the blockchain</Popover.Header>
+                              <Popover.Body>
+                                 You will see the Tx hash after your payment will be completed.
+                              </Popover.Body>
+                           </Popover>
+                        }
+                     >
+                        <InfoIcon fontSize="small" sx={{ color: "black" }} />
+                     </OverlayTrigger>
+                  </div>
+                  <div className="d-flex flex-column flex-xl-row col-12 justify-content-between">
+                     <a className="disclaimer pe-auto" href={`https://polygonscan.com/tx/${order?.payment_tx}`} target="_blank">
+                        {order?.payment_tx ? BreakCode(order?.payment_tx!) : "No transaction hash"}
 
                                 <Tooltip title="Open on polygonscan">
                                     <IconButton>

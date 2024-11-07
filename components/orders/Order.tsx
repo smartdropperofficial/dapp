@@ -1,13 +1,9 @@
 import { OrderSB, ProductSB } from '../../types/OrderSB';
 import OrderProduct from './OrderProduct';
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState, useContext, lazy, Suspense } from 'react';
 import ModalOverlay from '../UI/ModalOverlay';
-import Modal from '../UI/Modal';
-import ModalRefund from './ModalRefund';
 import { getOrder, getOrderStatusFromAmazon, updateOrder } from '../controllers/OrderController';
 import { OrderStatus } from '../../types/Order';
-import ModalStatusSteps from './ModalStatusSteps';
-import ModalReturnSteps from './ModalReturnSteps';
 import { Tracking } from '../../types/Tracking';
 import { getAmountToPay } from '../controllers/PaymentController';
 import { AmazonProduct } from '../../types/OrderAmazon';
@@ -21,8 +17,12 @@ import { ConfigContext } from '@/store/config-context';
 import Image from 'next/image';
 import { useSession } from 'next-auth/react';
 import { SessionExt } from '@/types/SessionExt';
-
+const OffCanvasResult = lazy(() => import('../UI/OffCanvasResult'));
 import StatusSteps from './StatusSteps';
+import { supabase } from '@/utils/supabaseClient';
+import TicketMessagebox from '../UI/TicketMessagebox';
+import MessageResult from '../UI/MessageResult';
+// import OffCanvasResult from '../UI/OffCanvasResult';
 
 interface IMyOrderProps {
     order: OrderSB;
@@ -31,6 +31,7 @@ interface IMyOrderProps {
 const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
     const { order: currentOrder } = props;
     const { data: session }: { data: SessionExt | null } = useSession() as { data: SessionExt | null };
+    const [isMounted, setIsMounted] = useState(false);
 
     const router = useRouter();
     const orderCtx = useContext(OrderContext);
@@ -39,22 +40,21 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
     const [orderItems, setOrderItems] = useState<ProductSB[]>([]);
     const [returnItems, setReturnItems] = useState<ProductSB[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [OpenTicketCanvaas, setOpenTicketCanvaas] = useState<boolean>(false);
     const [amazonStatus, setAmazonStatus] = useState<any>();
     const [taxRequestId, setTaxRequestId] = useState<string>();
     const [isDelivered, setIsDelivered] = useState<boolean>(false);
+    const [ticket, setTicket] = useState<any | null>(null);
+
     const [showModal, setShowModal] = useState<{ show: boolean; type: string; asin?: string }>({
         show: false,
         type: '',
     });
     const [isThirtyPassed, setIsThirtyPassed] = useState<number>(0);
 
-    const closeModal = (success?: string) => {
-        setShowModal({ show: false, type: '' });
-        if (success === 'refetch') {
-            refetchOrder();
-        }
-    };
-
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
     const refetchOrder = async () => {
         const newOrder = await getOrder(order.order_id!);
 
@@ -68,7 +68,7 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
 
         if (order.request_id) {
             const tmpAmazonStatus = await getOrderStatusFromAmazon(order.request_id!);
-            //  console.log("🚀 ~ fetchOrderStatus ~ tmpAmazonStatus:", tmpAmazonStatus);
+            console.log(`fetchOrderStatus ~ for order ${order.request_id}:`, tmpAmazonStatus);
             setAmazonStatus(tmpAmazonStatus);
             setOrderItems(order.products!);
 
@@ -169,6 +169,36 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
             }
         }
     };
+                const hasUpdated = await updateOrder(order.order_id!, updateDb);
+                console.log('🚀 ~ proceedToPayment ~ hasUpdated - 195:', hasUpdated);
+            } else if (amountToPay && amountToPay.error) {
+                switch (amountToPay.error) {
+                    case 'insufficient_zma_balance':
+                        processError(OrderStatus.INSUFFICIENT_ZMA_BALANCE, 'insufficient_zma_balance');
+                        break;
+                }
+            }
+        }
+    };
+
+    useEffect(() => {
+        const getTicket = async (order_id: string) => {
+            let { data: support_tickets, error } = await supabase.from('support_tickets').select('*').eq('order_id', order_id);
+
+            if (error) {
+                console.error('Error fetching ticket:', error);
+                return;
+            }
+
+            console.log('🚀 ~ getTicket ~ support_tickets:', support_tickets);
+            setTicket(support_tickets![0]); // Suppongo che support_tickets sia un array
+        };
+
+        // Verifica che l'ordine esista e che abbia un order_id valido
+        if (order && order.order_id) {
+            getTicket(order.order_id); // Passa l'order_id corretto
+        }
+    }, [order]); // Aggiungi order come dipendenza per eseguire il codice ogni volta che cambia
 
     const proceedToPayment = async () => {
         setIsLoading(true);
@@ -185,6 +215,15 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
         // Crea il messaggio con l'order_id
         const message = `order_id=${order_id}`;
         const user = `order_id=${session?.address}`;
+        if (hasAlreadySavedPrice?.length === products?.length) {
+            const encryptedOrderId = encryptData(order.order_id!);
+            router.push(`/pay/${encryptedOrderId}/checkout`);
+        }
+    };
+    const sendTicketToTelegram = (order_id: string | undefined) => {
+        // Crea il messaggio con l'order_id
+        const message = `order_id=${order_id}`;
+        const user = `order_id=${session?.address}`;
 
         // Codifica il messaggio in base64
         const encodedMessage = Buffer.from(message).toString('base64'); // Corretto: codifica in base64
@@ -196,7 +235,23 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
         // Apri il link in una nuova scheda
         window.open(telegramUrl, '_blank');
     };
+    const showticket = () => {
+        setOpenTicketCanvaas(true);
+    };
+    const openTicket = async () => {
+        const { data, error } = await supabase
+            .from('support_tickets')
+            .insert([{ order_id: order.order_id, user_wallet_address: session?.address, subject: 'New Ticket', status: 'open' }])
+            .select();
 
+        if (error) {
+            console.log('🚀 ~ openTicket ~ error:', error);
+            console.log('A ticket for this order already exists!');
+            return;
+        }
+        console.log('🚀 ~ openTicket ~ data:', data![0]);
+        setTicket(data![0]);
+    };
     const renderSwitch = (status: OrderStatus, asin: string, isReturned: boolean) => {
         switch (status) {
             case OrderStatus.PAYMENT_RECEIVED:
@@ -377,6 +432,41 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
                                         <b>* If you don&apos;t see any update after 1 hour please contact support on Telegram.</b>{" "}
                                    </span> */}
                             {/* <div className="m-auto">
+                {order.status === OrderStatus.SHIPPING_ADDRESS_REFUSED && (
+                    <div className="order-buttons text-center text-lg-end mt-3 mt-md-0 d-flex justify-content-center">
+                        <span className=" col-10 col-xl-8 text-danger text-center">
+                            <b>Shipping address refused</b> <br />
+                            Please, create order again.
+                        </span>
+                    </div>
+                )}
+                {order.status === OrderStatus.WAITING_TAX && (
+                    <div className="order-buttons text-center text-lg-end mt-3 mt-md-0 d-flex justify-content-center d-flex flex-column align-items-center">
+                        <span className="  col-10 col-xl-8 text-danger text-primary text-center my-1">
+                            <b>Waiting for taxes... </b> <br />
+                        </span>
+                        <button
+                            className="btn btn-success col-10 col-xl-8 my-1"
+                            disabled={true}
+                            // onClick={() => {
+                            //      router.push(`/pay/${encryptData(order.order_id!)}/checkout`);
+                            // }}
+                            onClick={() => {
+                                Swal.fire({
+                                    title: 'We are retrieving the total order amount from the Amazon Provider. This process can take up to 10 minutes, please wait and try again.',
+                                    icon: 'info',
+                                });
+                            }}
+                            style={{ backgroundColor: '#83ce89' }}
+                        >
+                            Click here to pay
+                        </button>
+                        <div className="d-flex col-10 col-xl-8">
+                            <span className="disclaimer alert alert-warning my-1 text-center">
+                                {' '}
+                                <b>* If you don&apos;t see any update after 1 hour please contact support on Telegram.</b>{' '}
+                            </span>
+                            {/* <div className="m-auto">
                                         <a href="https://discord.gg/FnMwpGfezw" target="_blank">
                                              <Image src="/icons/discord.png" alt="discord" width={50} height={50} />
                                         </a>
@@ -388,34 +478,39 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
                 {order.status === OrderStatus.WAITING_PAYMENT && (
                     <div className="order-buttons text-center text-lg-end mt-3 mt-md-0 d-flex justify-content-center">
                         <button className="btn btn-success col-10 col-xl-8" disabled={taxRequestId === undefined} onClick={proceedToPayment}>
-                            Confirm order
+                            Click here to pay
                         </button>
                     </div>
                 )}
-                {order.status === OrderStatus.ERROR && (
+
+                {order && OrderStatus && order.status === OrderStatus.ERROR && !ticket && (
                     <div className=" d-flex justify-content-center flex-column align-items-center">
                         <span className="my-2 col-10 col-xl-8 fw-bold">Error during the request, please try again or contact the support</span>
-                        <button className="btn btn-danger d-flex col-10 col-xl-8 " onClick={() => openNewRequest(order.order_id!)}>
-                            Please, contact us on Telegram
+                        <button className="btn btn-danger d-flex col-10 col-xl-8 " onClick={openTicket}>
+                            Please, open a support request
                         </button>
                     </div>
                 )}
             </div>
-            <ModalOverlay show={showModal.show}>
-                <Modal
-                    close={closeModal}
-                    title={showModal.type}
-                    content={
-                        showModal.type === 'View Return Status' ? (
-                            <ModalReturnSteps orderId={order.order_id!} requestId={order.request_id!} close={(success?: string) => closeModal(success)} />
-                        ) : showModal.type === 'View Status' ? (
-                            <ModalStatusSteps close={closeModal} asin={showModal.asin!} amazonStatus={amazonStatus} />
-                        ) : (
-                            <ModalRefund order={order} close={(success?: string) => closeModal(success)} />
-                        )
-                    }
-                />
-            </ModalOverlay>
+
+            {ticket && (
+                <div className="">
+                    <b>
+                        <i>Case:</i>
+                    </b>
+                    <i> {ticket.id}</i>
+                </div>
+            )}
+            <hr />
+            {isMounted && ticket && ticket.order_id === order.order_id ? (
+                <Suspense>
+                    <TicketMessagebox show={OpenTicketCanvaas} setShow={setOpenTicketCanvaas} orderId={order.order_id!} ticket={ticket}>
+                        <MessageResult orderId={order.order_id!} ticket={ticket} />
+                    </TicketMessagebox>
+                </Suspense>
+            ) : (
+                <div className=" d-flex justify-content-center flex-column align-items-center"></div>
+            )}
         </>
     );
 };

@@ -97,6 +97,7 @@ const Checkout = () => {
 
     const fetchOrderStatus = async () => {
         const currentOrder = await getOrder(orderId);
+        console.log('🚀 ~ fetchOrderStatus ~ currentOrder:', currentOrder);
 
         if (currentOrder?.status !== OrderStatus.WAITING_PAYMENT) {
             router.push('/my-orders');
@@ -727,7 +728,7 @@ const Checkout = () => {
                                             <div>
                                                 <p className="disclaimer text-start" style={{ backgroundColor: '' }}>
                                                     <InfoIcon style={{ fontSize: '14px' }} className="mx-2"></InfoIcon>
-                                                    These is the Retaile &apos; s shippping fees. - Amazon, Walmart, Ebay, etc...
+                                                    These is the Retailer &apos; s shippping fees. - Amazon, Walmart, Ebay, etc...
                                                 </p>
                                             </div>
                                         </div>

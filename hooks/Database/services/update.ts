@@ -48,7 +48,7 @@ export async function getDataFromSB(tableName: string, filterCriteria: Record<st
     if (!tableName) {
         throw new Error('Il nome della tabella è obbligatorio.');
     }
-    
+
     try {
         // Query dinamica sulla tabella fornita
         let query = supabase.from(tableName).select('*');
