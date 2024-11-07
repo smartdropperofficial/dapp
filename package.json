@@ -11,11 +11,9 @@
         "lint": "eslint ."
     },
     "dependencies": {
-        "@aws-amplify/cli": "^12.12.6",
         "@depay/coinbase-wallet-sdk": "^3.7.2",
         "@depay/js-verify-signature": "^3.1.8",
         "@depay/web3-wallets": "^17.5.0",
-        "@depay/widgets": "^12.16.4",
         "@emotion/react": "^11.10.6",
         "@emotion/styled": "^11.10.6",
         "@mui/icons-material": "^5.15.10",
@@ -47,7 +45,7 @@
         "l": "^0.6.0",
         "lodash.merge": "^4.6.2",
         "next": "^14.2.8",
-        "next-auth": "^4.18.8", 
+        "next-auth": "^4.18.8",
         "next-pwa": "^5.6.0",
         "npm": "^10.8.2",
         "order-id": "^2.1.2",
