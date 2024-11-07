@@ -49,6 +49,7 @@ interface OrderContextProps {
     scraper: string;
     showErrors: boolean;
     termsConditions: boolean;
+    TableOrdersCurrentPage: number;
     shippingInfoHandler: (payload: ShippingInfoType) => void;
     itemsHandler: (
         id: number,
@@ -77,6 +78,8 @@ interface OrderContextProps {
     deleteAllItems: () => boolean;
     setTermsAndConditions: () => void;
     editBasketQtyHandler: (id: number, qty: number) => void;
+    setTableOrdersCurrentPage: React.Dispatch<React.SetStateAction<number>>;
+
 }
 
 export const OrderContext = createContext<OrderContextProps>(null as unknown as OrderContextProps);
@@ -115,6 +118,7 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const [zone, setZone] = useState<string>(ZONE.US);
     const [isLoading, setIsLoading] = useState(false);
     const [email, setEmail] = useState<string>('');
+    const [TableOrdersCurrentPage, setTableOrdersCurrentPage] = useState<number>(1);
 
     const cleanItems = () => {
         items.splice(0, items.length);
@@ -568,6 +572,8 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
                 deleteAllItems,
                 setTermsAndConditions: setTermsAndConditions,
                 editBasketQtyHandler: editBasketQtyHandler,
+                TableOrdersCurrentPage,
+                setTableOrdersCurrentPage
             }}
         >
             {children}

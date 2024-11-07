@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useMemo } from 'react';
+import React, { useRef, useEffect, useState, useMemo, useContext } from 'react';
 import Table from 'react-bootstrap/Table';
 import { Button, Card, Col, Form } from 'react-bootstrap';
 import { OrderSB } from '@/types/OrderSB';
@@ -9,27 +9,34 @@ import { useRouter } from 'next/router';
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
 import Image from 'next/image';
-import OffCanvasResult from '../UI/OffCanvasResult';
-import TicketChat from '../Ticket/TicketChat';
+import { OrderContext } from '@/store/order-context';
+
 
 function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
+    const { TableOrdersCurrentPage, setTableOrdersCurrentPage } = useContext(OrderContext);
     const inputRef = useRef<HTMLInputElement>(null);
     const router = useRouter();
 
-    const [itemsPerPage, setItemsPerPage] = useState(30);
+    const [itemsPerPage, setItemsPerPage] = useState(5);
     const [orders, setOrders] = useState<OrderSB[]>([]);
     const [search, setSearch] = useState('');
     const [sort, setSort] = useState<'asc' | 'desc'>('desc');
     const [orderBy, setOrderBy] = useState<string>('created_at');
     const [currentPage, setCurrentPage] = useState(1);
-    const [showCanvas, setShowCanvas] = useState(false);
-    const [orderIdTicket, setOrderIdTicket] = useState('');
+
 
     useEffect(() => {
         console.log('🚀 ~ OrderTable ~ ordersProps:', ordersProps);
 
         setOrders(ordersProps);
     }, [ordersProps]);
+
+    useEffect(() => {
+        setCurrentPage(TableOrdersCurrentPage);
+    }, [])
+    useEffect(() => {
+        setTableOrdersCurrentPage(currentPage);
+    }, [currentPage])
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearch(e.target.value);
@@ -190,19 +197,7 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
         console.log('Order Details', orderId);
         router.push(`/pay/${tmpEnc}/checkout`);
     };
-    const openNewRequest = (order_id: string) => {
-        // Crea il messaggio con l'order_id
-        const message = `order_id=${order_id}`;
 
-        // Codifica il messaggio in base64
-        const encodedMessage = Buffer.from(message).toString('base64'); // Corretto: codifica in base64
-
-        // Crea l'URL Telegram con il messaggio codificato
-        const telegramUrl = `https://t.me/SmartDropperSupport_Bot?start=${encodedMessage}`;
-
-        // Apri il link in una nuova scheda
-        window.open(telegramUrl, '_blank');
-    };
 
     const RenderTable = () => (
         <Table responsive striped bordered>
@@ -278,7 +273,7 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
                     <RenderPagination />
                 </div>
             </Card>
-            <OffCanvasResult setShow={setShowCanvas} show={showCanvas} orderId={orderIdTicket}></OffCanvasResult>
+            {/* <OffCanvasResult setShow={setShowCanvas} show={showCanvas} orderId={orderIdTicket}></OffCanvasResult> */}
         </div>
     );
 }
