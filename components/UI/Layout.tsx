@@ -24,7 +24,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
     const [isMounted, setIsMounted] = useState(false);
     const router = useRouter();
     const [showMenuResp, setShowMenuResp] = useState<boolean>(false);
-    const [windowWidth, setWindowWidth] = useState(0);
+    const [windowWidth, setWindowWidth] = useState(0); 
+    const[showReCaptchaBtn, setShowReCaptchaBtn] =  useState<boolean>(false);
 
     // ** Stato per la verifica reCAPTCHA **
     const [isHuman, setIsHuman] = useState(false);
@@ -62,6 +63,9 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
             setIsHuman(false);
         }
     };
+useEffect(() => {
+  console.log(showReCaptchaBtn)
+}, [showReCaptchaBtn])
 
     return (
         <>
@@ -212,16 +216,19 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                                         </li>
 
                                         <li>
-                                            {/* ** Integrazione di reCAPTCHA e ConnectButton ** */}
-                                            {!isConnected && !isHuman ? (
-                                                <ReCAPTCHA
+                                        {!isConnected  && !showReCaptchaBtn &&  !isHuman && (<button className='btn btn-primary rounded-3 p-2' onClick={() => setShowReCaptchaBtn(true)}>Connect Wallet</button>)}
+                                            {!isConnected && !isHuman &&  showReCaptchaBtn && ( 
+                                               
+                                                 <ReCAPTCHA
                                                     ref={recaptchaRef}
                                                     sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
                                                     onChange={handleCaptchaVerification}
                                                 />
-                                            ) : (
-                                                <ConnectButton showBalance={{ smallScreen: false, largeScreen: false }} />
-                                            )}
+                                            ) 
+                                            
+                                            }
+                                            {isConnected &&
+                                                <ConnectButton showBalance={{ smallScreen: false, largeScreen: false }}  /> }
                                         </li>
 
                                         <li className="d-none d-xl-inline-block">
