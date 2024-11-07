@@ -320,8 +320,7 @@ const Checkout = () => {
         } else {
             const acceptobj = {
                 blockchain: 'polygon',
-                amount:
-                Number(
+                amount: Number(
                     (
                         Number(fees!.toFixed(2)) +
                         // Number(amountToPay?.subtotal?.toFixed(2)) +
@@ -331,16 +330,20 @@ const Checkout = () => {
                         exchangeFees!
                     ).toFixed(2)
                 ),
-
-                    token: '0xc2132d05d31c914a87c6611c10748aeb04b58e8f' as `0x${string}`,
-                receiver: '0x4790a1d817999dD302F4E58fe4663e7ee8934F90' as `0x${string}`,
-                // token: configContext.config?.coin_contract as `0x${string}`,
-                // receiver: configContext.config?.order_owner as `0x${string}`,
+                token: process.env.NODE_ENV === 'development' 
+                    ? (configContext.config?.coin_contract as `0x${string}`) 
+                    : '0xc2132d05d31c914a87c6611c10748aeb04b58e8f' as `0x${string}`,
+                receiver: process.env.NODE_ENV === 'development' 
+                    ? (configContext.config?.order_owner as `0x${string}`) 
+                    : '0x4790a1d817999dD302F4E58fe4663e7ee8934F90' as `0x${string}`,
                 // fee: {
                 //     amount: fees!.toFixed(2),
-                //     receiver: process.env.NEXT_PUBLIC_SMART_CONTRACT_COIN as `0x${string}`,
+                //     receiver: process.env.NODE_ENV === 'development' 
+                //         ? (configContext.config?.order_owner as `0x${string}`)
+                //         : (process.env.NEXT_PUBLIC_SMART_CONTRACT_COIN as `0x${string}`),
                 // },
             };
+            
             console.log(acceptobj);
 
             await DePayWidgets.Payment({
