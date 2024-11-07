@@ -95,10 +95,13 @@ function MessageResult({ orderId, ticket }: MessageResultProps) {
                         order_id={msg.order_id}
                     />
                 ))}
-            </div>
+            </div> 
+         {messages[messages.length -1]?.sender !== session?.address && ( 
             <div style={messageInputContainerStyle}>
-                <MessageInputBox onSendMessage={handleSendMessage} />
-            </div>
+            <MessageInputBox onSendMessage={handleSendMessage} />
+        </div>
+         )}
+            
         </div>
     );
 }
