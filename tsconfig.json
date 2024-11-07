@@ -5,7 +5,8 @@
       "dom",
       "dom.iterable",
       "esnext"
-    ], 
+    ],  
+    "typeRoots": ["./node_modules/@types", "./global.d.ts"],
     "types": ["jest"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -34,5 +35,6 @@
 , "__tests__/controllers/createOrderOnWeb3.test.js"  ],
   "exclude": [
     "node_modules"
-  ]
+  ], 
+  
 }
