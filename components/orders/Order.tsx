@@ -169,17 +169,6 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
             }
         }
     };
-                const hasUpdated = await updateOrder(order.order_id!, updateDb);
-                console.log('🚀 ~ proceedToPayment ~ hasUpdated - 195:', hasUpdated);
-            } else if (amountToPay && amountToPay.error) {
-                switch (amountToPay.error) {
-                    case 'insufficient_zma_balance':
-                        processError(OrderStatus.INSUFFICIENT_ZMA_BALANCE, 'insufficient_zma_balance');
-                        break;
-                }
-            }
-        }
-    };
 
     useEffect(() => {
         const getTicket = async (order_id: string) => {
@@ -206,15 +195,6 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
 
         const hasAlreadySavedPrice = products?.filter(product => product.price);
 
-        if (hasAlreadySavedPrice?.length === products?.length) {
-            const encryptedOrderId = encryptData(order.order_id!);
-            router.push(`/pay/${encryptedOrderId}/checkout`);
-        }
-    };
-    const openNewRequest = (order_id: string | undefined) => {
-        // Crea il messaggio con l'order_id
-        const message = `order_id=${order_id}`;
-        const user = `order_id=${session?.address}`;
         if (hasAlreadySavedPrice?.length === products?.length) {
             const encryptedOrderId = encryptData(order.order_id!);
             router.push(`/pay/${encryptedOrderId}/checkout`);
@@ -397,41 +377,6 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
                     );
                 })}
 
-                {order.status === OrderStatus.SHIPPING_ADDRESS_REFUSED && (
-                    <div className="order-buttons text-center text-lg-end mt-3 mt-md-0 d-flex justify-content-center">
-                        <span className=" col-10 col-xl-8 text-danger text-center">
-                            <b>Shipping address refused</b> <br />
-                            Please, create order again.
-                        </span>
-                    </div>
-                )}
-                {order.status === OrderStatus.WAITING_TAX && (
-                    <div className="order-buttons text-center text-lg-end mt-3 mt-md-0 d-flex justify-content-center d-flex flex-column align-items-center">
-                        <span className="  col-10 col-xl-8 text-danger text-primary text-center my-1">
-                            <b>Waiting for taxes... </b> <br />
-                        </span>
-                        <button
-                            className="btn btn-success col-10 col-xl-8 my-1"
-                            disabled={true}
-                            // onClick={() => {
-                            //      router.push(`/pay/${encryptData(order.order_id!)}/checkout`);
-                            // }}
-                            onClick={() => {
-                                Swal.fire({
-                                    title: 'We are retrieving the total order amount from the Amazon Provider. This process can take up to 10 minutes, please wait and try again.',
-                                    icon: 'info',
-                                });
-                            }}
-                            style={{ backgroundColor: '#83ce89' }}
-                        >
-                            Click to complete order
-                        </button>
-                        <div className="d-flex col-10 col-xl-8">
-                            {/* <span className="disclaimer alert alert-warning my-1 text-center">
-                                        {" "}
-                                        <b>* If you don&apos;t see any update after 1 hour please contact support on Telegram.</b>{" "}
-                                   </span> */}
-                            {/* <div className="m-auto">
                 {order.status === OrderStatus.SHIPPING_ADDRESS_REFUSED && (
                     <div className="order-buttons text-center text-lg-end mt-3 mt-md-0 d-flex justify-content-center">
                         <span className=" col-10 col-xl-8 text-danger text-center">
