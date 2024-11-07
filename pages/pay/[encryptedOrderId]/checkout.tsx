@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useAccount, useContractReads, useWaitForTransaction } from 'wagmi';
 import SmartShopperABI from '../../../utils/abi/SmartShopperABI.json';
@@ -210,8 +210,9 @@ const Checkout = () => {
 
     useEffect(() => {
         let FeeAmountToPay;
-        if (amountToPay?.total) {
-            FeeAmountToPay = amountToPay?.total;
+        if (amountToPay?.subtotal) {
+            FeeAmountToPay = amountToPay?.subtotal;
+          
         } else {
         }
 
@@ -320,14 +321,25 @@ const Checkout = () => {
             const acceptobj = {
                 blockchain: 'polygon',
                 amount:
-                    // Number(fee!.toFixed(2)) +
-                    Number(amountToPay?.subtotal?.toFixed(2)) + Number(amountToPay?.tax?.toFixed(2)) + zincFee + shippingFees! + exchangeFees!,
-                token: configContext.config?.coin_contract as `0x${string}`,
-                receiver: configContext.config?.order_owner as `0x${string}`,
-                fee: {
-                    amount: fees!.toFixed(2),
-                    receiver: process.env.NEXT_PUBLIC_SMART_CONTRACT_COIN as `0x${string}`,
-                },
+                Number(
+                    (
+                        Number(fees!.toFixed(2)) +
+                        // Number(amountToPay?.subtotal?.toFixed(2)) +
+                        Number(amountToPay?.tax?.toFixed(2)) +
+                        zincFee +
+                        shippingFees! +
+                        exchangeFees!
+                    ).toFixed(2)
+                ),
+
+                    token: '0xc2132d05d31c914a87c6611c10748aeb04b58e8f' as `0x${string}`,
+                receiver: '0x4790a1d817999dD302F4E58fe4663e7ee8934F90' as `0x${string}`,
+                // token: configContext.config?.coin_contract as `0x${string}`,
+                // receiver: configContext.config?.order_owner as `0x${string}`,
+                // fee: {
+                //     amount: fees!.toFixed(2),
+                //     receiver: process.env.NEXT_PUBLIC_SMART_CONTRACT_COIN as `0x${string}`,
+                // },
             };
             console.log(acceptobj);
 
@@ -396,7 +408,7 @@ const Checkout = () => {
     const processOrder = async () => {
         const updateDb: OrderSB = {
             status: OrderStatus.PAYMENT_RECEIVED,
-            amount_paid: Number(amountToPay.total.toFixed(2)),
+            total_amount_paid: Number(amountToPay.total.toFixed(2)),
             payment_tx: paymentTx,
             commission: Number(fees!.toFixed(2)),
         };
@@ -668,31 +680,38 @@ const Checkout = () => {
                             <Card>
                                 {amountToPay && !loadingPrices ? (
                                     <>
-                                        <div className="subtotal d-flex justify-content-between mt-3">
-                                            <strong>
-                                                {' '}
-                                                <p>SUBTOTAL:</p>
-                                            </strong>
-                                            <strong>
-                                                <p>$ {amountToPay.subtotal?.toFixed(2)}</p>
-                                            </strong>
-                                        </div>
-                                        {!subsContext.currentSubscription! && subsContext.selectedPackage?.id! > FreeSubId && (
+                                        {/* <div>
                                             <div className="subtotal d-flex justify-content-between mt-3">
-                                                <div>
-                                                    <strong>SUBSCRIPTION:</strong>
-                                                </div>
+                                                <strong>
+                                                    {' '}
+                                                    <p>SUBTOTAL:</p>
+                                                </strong>
                                                 <div>
                                                     <strong>
-                                                        ${' '}
-                                                        {subsContext.promoterReferral!
-                                                            ? Number(subsContext.selectedPackage?.promoPrice).toFixed(2)
-                                                            : Number(subsContext.selectedPackage?.price).toFixed(2)}
+                                                        <p>$ {amountToPay.subtotal?.toFixed(2)}</p>
                                                     </strong>
                                                 </div>
                                             </div>
+                                            <hr />
+                                        </div> */}
+                                        {!subsContext.currentSubscription! && subsContext.selectedPackage?.id! > FreeSubId && (
+                                            <div>
+                                                <div className="subtotal d-flex justify-content-between mt-3">
+                                                    <div>
+                                                        <strong>SUBSCRIPTION:</strong>
+                                                    </div>
+                                                    <div>
+                                                        <strong>
+                                                            ${' '}
+                                                            {subsContext.promoterReferral!
+                                                                ? Number(subsContext.selectedPackage?.promoPrice).toFixed(2)
+                                                                : Number(subsContext.selectedPackage?.price).toFixed(2)}
+                                                        </strong>
+                                                    </div>
+                                                </div>
+                                                <hr />
+                                            </div>
                                         )}
-                                        <hr />
                                         <div className="subtotal d-flex justify-content-between flex-column ">
                                             <div className="d-flex justify-content-between align-items-end">
                                                 <div className="">
@@ -931,8 +950,7 @@ const Checkout = () => {
                                                         }
                                                     >
                                                         <h4>
-                                                            {' '}
-                                                            <b> Pay order</b>
+                                                            <b>Pay to confirm order</b>
                                                         </h4>
                                                     </div>
                                                     <button
@@ -946,7 +964,7 @@ const Checkout = () => {
                                                         {Number(
                                                             (
                                                                 Number(fees!.toFixed(2)) +
-                                                                Number(amountToPay?.subtotal?.toFixed(2)) +
+                                                                // Number(amountToPay?.subtotal?.toFixed(2)) +
                                                                 Number(amountToPay?.tax?.toFixed(2)) +
                                                                 zincFee +
                                                                 shippingFees! +
@@ -954,21 +972,7 @@ const Checkout = () => {
                                                             ).toFixed(2)
                                                         )}
                                                     </button>
-                                                    {/* <CoinbaseButton
-                                                        amount={Number((
-                                                            Number(fees!.toFixed(2)) +
-                                                            Number(amountToPay?.subtotal?.toFixed(2)) +
-                                                            Number(amountToPay?.tax?.toFixed(2)) +
-                                                            zincFee +
-                                                            shippingFees! +
-                                                            exchangeFees!
-                                                        ).toFixed(2))
-                                                        }
-                                                        currency="USD"
-                                                        name="Example Charge"
-                                                        description="This is an example charge"
-                                                        redirectUrl={`/pay/${encryptData(orderId)}/thankYou`}
-                                                    /> */}
+
                                                     {subsContext.currentSubscription! && subsContext.canPay === false ? (
                                                         <span className="text-danger mt-2">You have exceeded your monthly limit</span>
                                                     ) : (
