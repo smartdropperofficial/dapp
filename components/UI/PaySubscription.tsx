@@ -160,7 +160,7 @@ const PaySubscription: React.FC<{
         return (price * percentage) / 100;
     };
     const openPaymentWidget = async () => {
-        const DePayWidgets = (await import('@depay/widgets')).default;
+        // const DePayWidgets = (await import('@depay/widgets')).default;
         const acceptobj = {
             blockchain: 'polygon',
             amount: price! - Number(calcPercentage(price, promoter?.percentage!)),

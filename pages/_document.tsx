@@ -7,7 +7,7 @@ export default function Document() {
                <Head>
                     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
                     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-                    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" /> 
+                    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
                     <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
 
                     <link rel="manifest" href="/site.webmanifest" />
@@ -23,6 +23,13 @@ export default function Document() {
                     <NextScript />
                     <div id="modal"></div>
                     <Script src="https://kit.fontawesome.com/400bd53359.js" strategy="lazyOnload" />
+                    <Script
+                         src="https://integrate.depay.com/widgets/v12.js"
+                         strategy="afterInteractive"
+                         async
+                         defer
+                    />
+
 
                </body>
           </Html>

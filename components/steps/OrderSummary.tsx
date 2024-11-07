@@ -17,7 +17,7 @@ import Skeleton from 'react-loading-skeleton';
 import { useOrder } from '../controllers/useOrder';
 import { updateOrder } from '../controllers/OrderController';
 import { OrderSB } from '@/types/OrderSB';
-import {useRouter} from "next/router"
+import { useRouter } from "next/router"
 import ModalOverlay from '../UI/ModalOverlay';
 import Loading from '../UI/Loading';
 
@@ -71,7 +71,6 @@ const OrderSummary: React.FC = () => {
     }
 
     const openPaymentDepayWidgetHandler = async () => {
-        const DePayWidgets = (await import('@depay/widgets')).default;
         if (!address) {
             Swal.fire({
                 title: 'Please connect your wallet to proceed',
@@ -82,16 +81,19 @@ const OrderSummary: React.FC = () => {
             const acceptobj = {
                 blockchain: 'polygon',
                 amount: Number(totalToPay?.toFixed(2)),
-                token: process.env.NODE_ENV === 'development' 
-                    ? (config_context.config?.coin_contract as `0x${string}`) 
-                    : '0xc2132d05d31c914a87c6611c10748aeb04b58e8f' as `0x${string}`,
-                receiver: process.env.NODE_ENV === 'development' 
-                    ? (config_context.config?.order_owner as `0x${string}`) 
-                    : '0x4790a1d817999dD302F4E58fe4663e7ee8934F90' as `0x${string}`,
+                token:
+                    process.env.NODE_ENV === 'development'
+                        ? (config_context.config?.coin_contract as `0x${string}`)
+                        : '0xc2132d05d31c914a87c6611c10748aeb04b58e8f' as `0x${string}`,
+                receiver:
+                    process.env.NODE_ENV === 'development'
+                        ? (config_context.config?.order_owner as `0x${string}`)
+                        : '0x4790a1d817999dD302F4E58fe4663e7ee8934F90' as `0x${string}`,
             };
-            
+
             console.log(acceptobj);
 
+            // Utilizza direttamente DePayWidgets per avviare il pagamento
             await DePayWidgets.Payment({
                 accept: [acceptobj],
                 currency: 'USD',
@@ -105,12 +107,11 @@ const OrderSummary: React.FC = () => {
                     },
                     fontFamily: '"Montserrat", sans-serif!important',
                     css: `
-                       @import url("https://fonts.googleapis.com/css2?family=Cardo:wght@400;700&display=swap");
-
-                       .ReactDialogBackground {
-                          background: rgba(0,0,0,0.8);
-                       }
-                     `,
+                @import url("https://fonts.googleapis.com/css2?family=Cardo:wght@400;700&display=swap");
+                .ReactDialogBackground {
+                  background: rgba(0,0,0,0.8);
+                }
+              `,
                 },
                 before: async () => {
                     const amountFromDb = await basketTotalFromDb();
@@ -129,10 +130,9 @@ const OrderSummary: React.FC = () => {
                         return false;
                     }
                 },
-                succeeded: (transaction: any) => {
+                succeeded: (transaction) => {
                     if (!succeededCalled.current) {
                         config_context.setIsLoading(true);
-
                         succeededCalled.current = true;
                         console.log('succeeded called with transaction.id:', transaction.id);
                         setPaymentTx(transaction.id);
@@ -141,29 +141,24 @@ const OrderSummary: React.FC = () => {
                         console.warn('succeeded callback called multiple times. Ignoring subsequent calls.');
                     }
                 },
-                failed: (transaction: any) => {
+                failed: (transaction) => {
                     Swal.fire({
-                        title: 'Error during the payment, please try again or contact the support.',
+                        title: 'Error during the payment, please try again or contact support.',
                         icon: 'error',
                     });
                     console.error('Payment failed:', transaction);
                 },
-                error: (error: any) => {
+                error: (error) => {
                     Swal.fire({
-                        title: 'Error during the payment, please try again or contact the support.',
+                        title: 'Error during the payment, please try again or contact support.',
                         icon: 'error',
                     });
                     console.error('Payment error:', error);
                 },
             });
-            // DePayWidgets.Payment({
-            //      integration: "f3bf2aa3-5731-484e-9bb3-5ede215f3fe0",
-            //      payload: {
-            //           orderid: orderId,
-            //      },
-            // });
         }
     };
+
 
     const performPreOrderCreation = async () => {
         if (!orderIsProcessing && !orderHasBeenProcessed) {
