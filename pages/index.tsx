@@ -107,7 +107,7 @@ export default function Home() {
             </Head>
 
             {step === 3 ? (
-                <div className="container h-100 d-flex justify-content-center align-items-start flex-column">
+                <div className="container h-100 d-flex justify-content-center align-items-lg-start align-items-center flex-column">
                     <div className="row w-100 justify-content-lg-start justify-content-center">
                         <div className="d-flex flex-column flex-lg-row">
                             <section className="col-md-10 col-lg-7 col-12 p-0 py-lg-3 mx-lg-3 mb-5 ">
