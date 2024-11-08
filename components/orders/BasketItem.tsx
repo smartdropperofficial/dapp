@@ -3,7 +3,7 @@ import { SubscriptionContext } from '@/store/subscription-context';
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import Swal from 'sweetalert2';
 
-const BasketItem = ({ id, el }: { id: string; el: any }) => {
+const BasketItem = ({ id, el }: { id: any; el: any }) => {
     const [quantity, setQuantity] = useState(el.quantity);
     const [inputValue, setInputValue] = useState(el.quantity); // Stato per l'input temporaneo
     const orderContext = useContext(OrderContext);
@@ -21,8 +21,8 @@ const BasketItem = ({ id, el }: { id: string; el: any }) => {
             console.log("🚀 ~ timeoutRef.current=setTimeout ~ subContext?.currentSubscription?.subscriptionModel?.shopLimit:", subContext?.currentSubscription?.subscriptionModel?.shopLimit)
 
             timeoutRef.current = setTimeout(() => {
-                if(subContext?.currentSubscription?.subscriptionModel?.shopLimit! > 0 )  {
-                    if ( 
+                if (subContext?.currentSubscription?.subscriptionModel?.shopLimit! > 0) {
+                    if (
                         CanAddMoreItems(value) <
                         subContext?.currentSubscription?.subscriptionModel?.shopLimit! - subContext?.currentSubscription?.totShopAmountPaid!
                     ) {
@@ -35,12 +35,12 @@ const BasketItem = ({ id, el }: { id: string; el: any }) => {
                         });
                         setInputValue(quantity); // Reimposta l'input a `quantity` corrente se il limite è superato
                     }
-                } else{
+                } else {
                     setQuantity(value); return;
-                   
+
                 }
 
-               
+
             }, 1500);
         }
     };
