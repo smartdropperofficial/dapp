@@ -13,7 +13,7 @@ import { OrderContext } from '@/store/order-context';
 
 
 function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
-    const { TableOrdersCurrentPage, setTableOrdersCurrentPage } = useContext(OrderContext);
+    const { TableOrdersCurrentPage, setTableOrdersCurrentPage, OrderTablePagination, setOrderTablePagination } = useContext(OrderContext);
     const inputRef = useRef<HTMLInputElement>(null);
     const router = useRouter();
 
@@ -22,7 +22,7 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
     const [search, setSearch] = useState('');
     const [sort, setSort] = useState<'asc' | 'desc'>('desc');
     const [orderBy, setOrderBy] = useState<string>('created_at');
-    const [currentPage, setCurrentPage] = useState(1);
+    const [currentPage, setCurrentPage] = useState(5);
 
 
     useEffect(() => {
@@ -33,10 +33,14 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
 
     useEffect(() => {
         setCurrentPage(TableOrdersCurrentPage);
+        setItemsPerPage(OrderTablePagination);
     }, [])
     useEffect(() => {
         setTableOrdersCurrentPage(currentPage);
     }, [currentPage])
+    useEffect(() => {
+        setOrderTablePagination(itemsPerPage);
+    }, [itemsPerPage])
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearch(e.target.value);

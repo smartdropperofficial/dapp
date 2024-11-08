@@ -50,6 +50,7 @@ interface OrderContextProps {
     showErrors: boolean;
     termsConditions: boolean;
     TableOrdersCurrentPage: number;
+    OrderTablePagination: number;
     shippingInfoHandler: (payload: ShippingInfoType) => void;
     itemsHandler: (
         id: number,
@@ -79,6 +80,7 @@ interface OrderContextProps {
     setTermsAndConditions: () => void;
     editBasketQtyHandler: (id: number, qty: number) => void;
     setTableOrdersCurrentPage: React.Dispatch<React.SetStateAction<number>>;
+    setOrderTablePagination: React.Dispatch<React.SetStateAction<number>>;
 
 }
 
@@ -119,6 +121,7 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const [isLoading, setIsLoading] = useState(false);
     const [email, setEmail] = useState<string>('');
     const [TableOrdersCurrentPage, setTableOrdersCurrentPage] = useState<number>(1);
+    const [OrderTablePagination, setOrderTablePagination] = useState<number>(5);
 
     const cleanItems = () => {
         items.splice(0, items.length);
@@ -573,7 +576,9 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
                 setTermsAndConditions: setTermsAndConditions,
                 editBasketQtyHandler: editBasketQtyHandler,
                 TableOrdersCurrentPage,
-                setTableOrdersCurrentPage
+                setTableOrdersCurrentPage,
+                OrderTablePagination,
+                setOrderTablePagination,
             }}
         >
             {children}

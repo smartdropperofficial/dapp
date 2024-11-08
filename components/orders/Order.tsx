@@ -432,7 +432,7 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
                     <div className=" d-flex justify-content-center flex-column align-items-center">
                         <span className="my-2 col-10 col-xl-8 fw-bold">Error during the request, please try again or contact the support</span>
                         <button className="btn btn-danger d-flex col-10 col-xl-8 " onClick={openTicket}>
-                            Please, open a support request
+                            Open a support request
                         </button>
                     </div>
                 )}
