@@ -3,7 +3,7 @@ import Table from 'react-bootstrap/Table';
 import { Button, Card, Col, Form } from 'react-bootstrap';
 import { OrderSB } from '@/types/OrderSB';
 import { encryptData, formatSPDate } from '@/utils/utils';
-import { OrderStatus } from '@/types/Order';
+import { OrderStatus, OrderTableStatus } from '@/types/Order';
 import { FaSortUp, FaSortDown } from 'react-icons/fa';
 import { useRouter } from 'next/router';
 import Pagination from '@mui/material/Pagination';
@@ -67,7 +67,9 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
             });
         });
     }, [orders, search]);
-
+    const filterByStatus = (status: OrderStatus) => {
+        return filteredOrders.filter(order => order.status === status);
+    }
     const sortedOrders = useMemo(() => {
         return [...filteredOrders].sort((a, b) => {
             const aValue = a[orderBy as keyof OrderSB];
@@ -105,17 +107,15 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
     };
 
     const RenderSearch = () => (
-        <Card className="p-4 mb-4">
-            <Form.Control
-                ref={inputRef}
-                type="text"
-                value={search}
-                onChange={handleSearch}
-                required
-                placeholder="Filter by Search... ie: Order Id, Created At, Action"
-                className="m-lg-2 my-4 col-lg-4"
-            />
-        </Card>
+        <Form.Control
+            ref={inputRef}
+            type="text"
+            value={search}
+            onChange={handleSearch}
+            required
+            placeholder="Filter by Search"
+            className="m-lg-2 my-4 col-lg-4"
+        />
     );
 
     const RenderItemsPerPage = () => (
@@ -140,51 +140,45 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
 
     const RenderAction = (order: OrderSB) => {
         switch (order?.status) {
-            case OrderStatus.WAITING_PAYMENT:
+            case OrderTableStatus.WAITING_PAYMENT.value:
                 return (
                     <Button className="btn-success col-10" onClick={() => GoToCheckout(order.order_id!)}>
-                        Confirm Order{' '}
+                        {OrderTableStatus.WAITING_PAYMENT.description}
                     </Button>
                 );
 
-            case OrderStatus.WAITING_TAX:
+            case OrderTableStatus.WAITING_TAX.value:
                 return (
-                    <span className="col-10 col-xl-8  text-center my-1 p-2 rounded-2" style={{ backgroundColor: '#ffeeb1', color: '#a96500' }}>
-                        <b> Waiting for taxes</b>
+                    <span className="col-10 col-xl-8 text-center my-1 p-2 rounded-2" style={{ backgroundColor: '#ffeeb1', color: '#a96500' }}>
+                        <b>{OrderTableStatus.WAITING_TAX.description}</b>
                     </span>
                 );
-            case OrderStatus.ERROR:
+
+            case OrderTableStatus.ERROR.value:
                 return (
                     <span className="col-10 col-xl-8 text-danger text-center my-1 p-2 rounded-2" style={{ backgroundColor: '#ffc7c7' }}>
-                        <b> Error </b>
+                        <b>{OrderTableStatus.ERROR.description}</b>
                     </span>
                 );
 
-            case OrderStatus.PAYMENT_RECEIVED:
+            case OrderTableStatus.PAYMENT_RECEIVED.value:
                 return (
                     <span className="col-10 col-xl-8 text-success text-center my-1 p-2 rounded-2" style={{ backgroundColor: '#d3ffcb' }}>
-                        <b> Paid</b>
+                        <b>{OrderTableStatus.PAYMENT_RECEIVED.description}</b>
                     </span>
                 );
 
-            case OrderStatus.PRODUCT_UNAVAILABLE:
+            case OrderTableStatus.PRODUCT_UNAVAILABLE.value:
                 return (
                     <span className="col-10 col-xl-8 text-success text-center my-1 p-2 rounded-2" style={{ backgroundColor: '#d3ffcb' }}>
-                        <b> Product Unavailable</b>
+                        <b>{OrderTableStatus.PRODUCT_UNAVAILABLE.description}</b>
                     </span>
                 );
 
-            case OrderStatus.ERROR:
+            case OrderTableStatus.SENT_TO_AMAZON.value:
                 return (
-                    <span className="col-10 col-xl-8 text-success text-center my-1 p-2 rounded-2" style={{ backgroundColor: '#d3ffcb' }}>
-                        <b> Errro</b>
-                    </span>
-                );
-
-            case OrderStatus.SENT_TO_AMAZON:
-                return (
-                    <span className="col-10 col-xl-8  text-center my-1 p-2 rounded-2" style={{ backgroundColor: '#a2d1ff', color: '#0c41a5' }}>
-                        <b> Sent to Retailer</b>
+                    <span className="col-10 col-xl-8 text-center my-1 p-2 rounded-2" style={{ backgroundColor: '#a2d1ff', color: '#0c41a5' }}>
+                        <b>{OrderTableStatus.SENT_TO_AMAZON.description}</b>
                     </span>
                 );
         }
@@ -201,8 +195,30 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
         console.log('Order Details', orderId);
         router.push(`/pay/${tmpEnc}/checkout`);
     };
-
-
+    const RenderStatusFilter = () => (
+        <div className="d-flex col-lg-6 col-6 justify-content-lg-end justify-content-center align-items-center">
+            <Form.Group as={Col} controlId="status" className="my-2">
+                <div className="d-flex col-lg-6 col-8 justify-content-lg-start justify-content-center align-items-center">
+                    <Form.Label className="d-flex col-lg-6 col-12 align-items-lg-start mb-0 text-start">Filter by Status</Form.Label>
+                    <Form.Select
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        required
+                        className="form-select border-3"
+                        aria-label="Filter by Status"
+                        style={{ backgroundColor: '#ececec', width: 'fit-content' }}
+                    >
+                        <option value="">All</option>
+                        {Object.values(OrderTableStatus).map((status) => (
+                            <option key={status.value} value={status.value}>
+                                {status.description}
+                            </option>
+                        ))}
+                    </Form.Select>
+                </div>
+            </Form.Group>
+        </div>
+    );
     const RenderTable = () => (
         <Table responsive striped bordered>
             <thead>
@@ -267,7 +283,11 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
 
     return (
         <div>
-            <RenderSearch />
+            <Card className="p-4 mb-4">
+                <RenderSearch />
+                <RenderStatusFilter />
+            </Card>
+
             <Card>
                 <RenderTable />
             </Card>

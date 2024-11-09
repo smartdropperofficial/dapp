@@ -120,7 +120,7 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
                     case 'request_processing':
                         break;
                     case 'product_unavailable':
-                        processError(OrderStatus.PRODUCT_UNAVAILABLE, 'Product unavailable, please try again or contact the support.');
+                        processError(OrderStatus.PRODUCT_UNAVAILABLE, 'Product unavailable.The product might no longer be available on Amazon or teh quantity requested is not available.');
                         break;
                     case 'shipping_address_refused':
                         processError(OrderStatus.SHIPPING_ADDRESS_REFUSED, 'Shipping address refused, please try again or contact the support.');
