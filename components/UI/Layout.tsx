@@ -24,8 +24,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
     const [isMounted, setIsMounted] = useState(false);
     const router = useRouter();
     const [showMenuResp, setShowMenuResp] = useState<boolean>(false);
-    const [windowWidth, setWindowWidth] = useState(0); 
-    const[showReCaptchaBtn, setShowReCaptchaBtn] =  useState<boolean>(false);
+    const [windowWidth, setWindowWidth] = useState(0);
+    const [showReCaptchaBtn, setShowReCaptchaBtn] = useState<boolean>(false);
 
     // ** Stato per la verifica reCAPTCHA **
     const [isHuman, setIsHuman] = useState(false);
@@ -63,9 +63,9 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
             setIsHuman(false);
         }
     };
-useEffect(() => {
-  console.log(showReCaptchaBtn)
-}, [showReCaptchaBtn])
+    useEffect(() => {
+        console.log(showReCaptchaBtn)
+    }, [showReCaptchaBtn])
 
     return (
         <>
@@ -194,14 +194,14 @@ useEffect(() => {
                                         </li>
                                         <li className="d-none d-xl-inline-block">
                                             <Link href="/subscribe" legacyBehavior>
-                                                <a className={`${isMounted && router.asPath !== '/subscribe' && 'text-black'}`} onClick={() => {}}>
+                                                <a className={`${isMounted && router.asPath !== '/subscribe' && 'text-black'}`} onClick={() => { }}>
                                                     Subscribe
                                                 </a>
                                             </Link>
                                         </li>
                                         <li className="d-none d-xl-inline-block">
                                             <Link href="/my-orders" legacyBehavior>
-                                                <a className={`${isMounted && router.asPath !== '/my-orders' && 'text-black  text-center'}`} onClick={() => {}}>
+                                                <a className={`${isMounted && router.asPath !== '/my-orders' && 'text-black  text-center'}`} onClick={() => { }}>
                                                     My Orders
                                                 </a>
                                             </Link>
@@ -216,24 +216,24 @@ useEffect(() => {
                                         </li>
 
                                         <li>
-                                        {!isConnected  && !showReCaptchaBtn &&  !isHuman && (<button className='btn btn-primary rounded-3 p-2' onClick={() => setShowReCaptchaBtn(true)}>Connect Wallet</button>)}
-                                            {!isConnected && !isHuman &&  showReCaptchaBtn && ( 
-                                               
-                                                 <ReCAPTCHA
+                                            {!isConnected && !showReCaptchaBtn && !isHuman && (<button className='btn btn-primary rounded-3 p-2' onClick={() => setShowReCaptchaBtn(true)}>Connect Wallet</button>)}
+                                            {!isConnected && !isHuman && showReCaptchaBtn && (
+
+                                                <ReCAPTCHA
                                                     ref={recaptchaRef}
                                                     sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
                                                     onChange={handleCaptchaVerification}
                                                 />
-                                            ) 
-                                            
+                                            )
+
                                             }
-                                            {isConnected &&
-                                                <ConnectButton showBalance={{ smallScreen: false, largeScreen: false }}  /> }
+                                            {isHuman || isConnected &&
+                                                <ConnectButton showBalance={{ smallScreen: false, largeScreen: false }} />}
                                         </li>
 
                                         <li className="d-none d-xl-inline-block">
                                             <Link href="/settings" legacyBehavior>
-                                                <a className={`${isMounted && router.asPath !== '/Settings' && 'text-black  text-center'}`} onClick={() => {}}>
+                                                <a className={`${isMounted && router.asPath !== '/Settings' && 'text-black  text-center'}`} onClick={() => { }}>
                                                     Settings
                                                 </a>
                                             </Link>
