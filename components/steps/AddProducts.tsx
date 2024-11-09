@@ -277,11 +277,11 @@ const AddProducts = () => {
                     {subContext?.currentSubscription ? (
                         <div className="w-100 d-flex justify-content-end">
                             <div className="d-flex flex-column ">
-                                <div className="d-flex align-items-center justify-content-end ">
+                                <div className="d-flex align-items-center justify-content-end flex-column flex-lg-row  ">
                                     <div className="mx-2 fs-5  m-0">
                                         <b> Monthly Shop budget left:</b>
                                     </div>
-                                    <div className="d-flex align-items-center  justify-content-end" style={{ width: '30%' }}>
+                                    <div className="d-flex align-items-center  justify-content-end col-lg-3 col-12" >
                                         <label className="text-danger h4 " htmlFor="spent-limit"></label>
                                         <input
                                             disabled={true}

@@ -269,7 +269,7 @@ export const modifyBasketOnDB = async (wallet: string, items: any) => {
 
         // Se nessun record è stato aggiornato (editData è vuoto), inserisci un nuovo record
         if (editData.length === 0) {
-            console.log('Nessun record trovato, creando un nuovo record nel database.');
+            console.log('Nessun record trovato, creando un nuovo record nel database...');
 
             const { data: addData, error: addError } = await supabase
                 .from('basket')
@@ -296,18 +296,20 @@ export const modifyBasketOnDB = async (wallet: string, items: any) => {
     }
 };
 export const deleteBasketOnDB = async (wallet: string): Promise<boolean> => {
+    console.log("🚀 ~ deleteBasketOnDB ~ wallet:", wallet)
     try {
-
-        // Prova ad aggiornare il record
-        const { data: editData, error: editError } = await supabase
+        const { data: deleteItem, error: editError } = await supabase
             .from('basket')
             .delete()
             .eq('wallet_address', wallet)
-            .select();
+
 
         if (editError) {
             console.log('🚀 ~ deleteBasketOnDB ~ editError:', editError);
             return false;
+        }
+        if (deleteItem) {
+            console.log('🚀 ~ deleteBasketOnDB ~ deleteItem:', deleteItem);
         }
 
         return true;

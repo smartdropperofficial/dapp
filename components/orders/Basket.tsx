@@ -78,18 +78,7 @@ function Basket() {
                                             {/* <b> Price: ${el.price!.toFixed(2)}  </b> */}
                                         </div>
                                         <BasketItem id={el.id} el={el} />
-                                        <div className="col-12  position-relative d-flex p-0 justify-content-end align-items-center">
-                                            <div className=" d-flex ">
-                                                <Fab
-                                                    sx={{ color: 'red' }}
-                                                    aria-label="add"
-                                                    className="mx-2"
-                                                    onClick={e => orderContext.incrementHandler(el.id, 'delete')}
-                                                >
-                                                    <DeleteForeverIcon />
-                                                </Fab>
-                                            </div>
-                                        </div>
+
                                     </div>
                                 </ItemCard>
                             </div>

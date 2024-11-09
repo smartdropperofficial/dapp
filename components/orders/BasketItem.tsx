@@ -1,7 +1,9 @@
 import { OrderContext } from '@/store/order-context';
 import { SubscriptionContext } from '@/store/subscription-context';
+import { Fab } from '@mui/material';
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import Swal from 'sweetalert2';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
 const BasketItem = ({ id, el }: { id: any; el: any }) => {
     const [quantity, setQuantity] = useState(el.quantity);
@@ -14,7 +16,7 @@ const BasketItem = ({ id, el }: { id: any; el: any }) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = parseInt(e.target.value, 10);
 
-        if (!isNaN(value) && value >= 0) {
+        if (!isNaN(value) && value > 0) {
             setInputValue(value); // Aggiorna solo il valore di input temporaneo
 
             if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -40,14 +42,16 @@ const BasketItem = ({ id, el }: { id: any; el: any }) => {
 
                 }
 
-
             }, 1500);
+        } else {
+            return
         }
     };
 
     // Esegui `editBasketQtyHandler` quando `quantity` viene aggiornato
     useEffect(() => {
         if (quantity !== el.quantity) {
+            setInputValue(quantity);
             orderContext.editBasketQtyHandler(id, quantity);
         }
     }, [quantity, id, orderContext, el.quantity]);
@@ -66,19 +70,35 @@ const BasketItem = ({ id, el }: { id: any; el: any }) => {
     }, []);
 
     return (
-        <div className="row mt-3 d-flex flex-column col-12">
-            <div className="col-12 d-flex align-items-center mb-5 justify-content-start">
-                <span className="font-weight-bold">Total:</span>
-                <input
-                    type="number"
-                    inputMode="numeric"
-                    onChange={handleChange}
-                    className="font-weight-bold bg-white py-2 px-4 flex-column m-2"
-                    value={inputValue}
-                    min={0}
-                />
-                <span>${(el?.quantity * el?.price).toFixed(2)}</span>
+        <div className="row mt-3 d-flex col-12 justify-content-lg-center align-items-end  justify-content-center  flex-column ">
+            <div className='d-flex align-items-center '>
+                <i className="fa fa-trash cursor-pointer mx-2" aria-hidden="true" onClick={() => orderContext.deleteAllItems()} > </i>
+                <div
+                    className="d-flex  align-items-center justify-content-center px-1 col-8 col-lg-5 "
+                    style={{ border: '3px solid #ff9900', borderRadius: '0px', outline: 'none', backgroundColor: 'white' }}
+
+                >
+                    {/* {quantity < 2 ?
+                     <i className="fa fa-trash cursor-pointer" aria-hidden="true" onClick={() => orderContext.deleteAllItems()} > </i>
+                     : <i className="fa fa-minus cursor-pointer" aria-hidden="true" onClick={() => setQuantity(quantity - 1)}></i>
+            
+                 }  */}
+                    {quantity > 1 && <i className="fa fa-minus cursor-pointer" aria-hidden="true" onClick={() => setQuantity(quantity - 1)}></i>}
+                    <input
+                        type="number"
+                        inputMode="numeric"
+                        onChange={handleChange}
+                        className="font-weight-bold bg-white mx-4 flex-column m-2 text-center "
+                        style={{ border: 'none', borderRadius: '5px', outline: 'none', width: '100px', }}
+                        value={inputValue}
+                        min={0}
+                    />
+                    <i className="fa fa-plus" aria-hidden="true" onClick={() => setQuantity(quantity + 1)}></i>
+
+                </div>
             </div>
+            <span className='mt-2' style={{ width: 'fit-content' }}>${(el?.quantity * el?.price).toFixed(2)}</span>
+
         </div>
     );
 };

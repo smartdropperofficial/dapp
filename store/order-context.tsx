@@ -319,6 +319,8 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
         }
     };
     const deleteAllItems = (): boolean => {
+        console.log("🚀 ~ deleteAllItems ~   session?.address!:", session?.address!)
+
         deleteBasketOnDB(session?.address!)
             .then(res => {
                 setItems([]);
