@@ -224,6 +224,8 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
                             </option>
                         ))}
                     </Form.Select>
+                </div>
+
             </Form.Group>
         </div>
     );
