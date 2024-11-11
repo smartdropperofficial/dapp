@@ -137,7 +137,8 @@ const AddProducts = () => {
                                                 orderContext.itemsHandler(orderContext.items.length + 1, 'OXYLABS', 'add', productInfo);
                                             } else {
                                                 Swal.fire({
-                                                    title: 'You have reached your montly shop limit, please upgrade your subscription',
+                                                    title: 'Exceeded Monthly Amount Limit',
+                                                    text: 'This amount exceed maximum limit for this subscription level.',
                                                     icon: 'error',
                                                 });
                                                 return;

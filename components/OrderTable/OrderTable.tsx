@@ -35,9 +35,11 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
         setCurrentPage(TableOrdersCurrentPage);
         setItemsPerPage(OrderTablePagination);
     }, [])
+
     useEffect(() => {
         setTableOrdersCurrentPage(currentPage);
     }, [currentPage])
+
     useEffect(() => {
         setOrderTablePagination(itemsPerPage);
     }, [itemsPerPage])
@@ -181,6 +183,13 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
                         <b>{OrderTableStatus.SENT_TO_AMAZON.description}</b>
                     </span>
                 );
+            case OrderTableStatus.SHIPPING_ADDRESS_REFUSED.value:
+                return (
+                    <span className="col-10 col-xl-8 text-danger text-center my-1 p-2 rounded-2" style={{ backgroundColor: '#ffc7c7' }}>
+
+                        <b>{OrderTableStatus.SHIPPING_ADDRESS_REFUSED.description}</b>
+                    </span>
+                );
         }
     };
 
@@ -215,7 +224,6 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
                             </option>
                         ))}
                     </Form.Select>
-                </div>
             </Form.Group>
         </div>
     );

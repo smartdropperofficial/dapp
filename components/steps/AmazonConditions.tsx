@@ -92,14 +92,18 @@ const AmazonConditions: React.FC = () => {
                             <div className="d-lg-flex col-12 flex-column">
                                 <div className="form-check  col-lg-12">
                                     <input
-                                        className="form-check-input"
+                                        className="form-check-input fw-bold"
                                         type="checkbox"
                                         name="termsCheckbox"
                                         id="termsCheckbox"
                                         onChange={order_context.setTermsAndConditions}
                                         checked={order_context.termsConditions}
+                                        style={{ borderColor: order_context.termsConditions ? 'green' : 'red' }}
                                     />
-                                    <label className="form-check-label" htmlFor="termsCheckbox">
+                                    <label className="form-check-label fw-bold" htmlFor="termsCheckbox"
+                                        style={{ color: order_context.termsConditions ? 'black' : 'red' }}
+
+                                    >
                                         I Accept all the Terms
                                     </label>
                                 </div>

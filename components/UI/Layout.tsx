@@ -67,6 +67,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
         console.log(showReCaptchaBtn)
     }, [showReCaptchaBtn])
 
+
+
     return (
         <>
             <div className="d-flex flex-column justify-content-between align-items-between">
@@ -227,7 +229,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                                             )
 
                                             }
-                                            {isHuman || isConnected &&
+                                            {(isHuman || isConnected) &&
                                                 <ConnectButton showBalance={{ smallScreen: false, largeScreen: false }} />}
                                         </li>
 

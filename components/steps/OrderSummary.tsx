@@ -332,7 +332,7 @@ const OrderSummary: React.FC = () => {
                     <Alert variant="warning">
                         <Alert.Heading> Pre-order Payment Notice</Alert.Heading>
                         <p>
-                            Smart Dropper will start the <u>pre-order process. </u> &nbsp; It means that you will only be charged for the{' '}
+                            Smart Dropper will start the <u>pre-order process. </u> &nbsp; It means that  you will <u>only be charged</u> for the{' '}
                             <b>price of the merchandise</b>, excluding
                             <b> Shipping*</b> and <b>Local taxes**</b>.&nbsp; Once the payment is confirmed on Blockchain, our system will start the process of
                             tax calculation. <br />

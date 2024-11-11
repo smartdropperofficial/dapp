@@ -3,8 +3,9 @@ import { OrderContext } from '../../store/order-context';
 import { USA_COUNTRIES } from '../../utils/constants';
 import Swal from 'sweetalert2';
 import { Alert, AlertTitle } from '@mui/material';
+import { OrderSB } from '@/types/OrderSB';
 
-const ShippingInfo: React.FC = () => {
+const ChangeShippingInfo: React.FC<{ order: OrderSB }> = ({ order }) => {
     const ctx = useContext(OrderContext);
 
     const [shippingType, setShippingType] = useState('address');
@@ -67,11 +68,11 @@ const ShippingInfo: React.FC = () => {
                                     {/* <span className="disclaimer">(whatever you wish)</span> */}
                                     <input
                                         type="text"
-                                        onChange={e => inputHandler(e, 'firstName')}
-                                        value={ctx?.shippingInfo?.firstName}
+                                        onChange={e => inputHandler(e, 'first_name')}
+                                        value={order?.shipping_info?.first_name}
                                         className="form-control mt-2"
                                     />
-                                    {ctx.showErrors && !ctx.shippingInfo?.firstName && <small className="d-block text-danger mt-2">Field Required.</small>}
+                                    {ctx.showErrors && !order?.shipping_info?.first_name && <small className="d-block text-danger mt-2">Field Required.</small>}
                                 </div>
                             </div>
                             <div className="col-lg-6 mb-4 ">
@@ -81,11 +82,11 @@ const ShippingInfo: React.FC = () => {
 
                                     <input
                                         type="text"
-                                        onChange={e => inputHandler(e, 'lastName')}
-                                        value={ctx?.shippingInfo?.lastName}
+                                        onChange={e => inputHandler(e, 'last_name')}
+                                        value={order?.shipping_info?.last_name}
                                         className="form-control mt-2"
                                     />
-                                    {ctx.showErrors && !ctx.shippingInfo?.lastName && <small className="d-block text-danger mt-2">Field Required.</small>}
+                                    {ctx.showErrors && !order?.shipping_info?.last_name && <small className="d-block text-danger mt-2">Field Required.</small>}
                                 </div>
                             </div>
                             <div className="col-12 mb-4">
@@ -101,10 +102,10 @@ const ShippingInfo: React.FC = () => {
                                     <input
                                         type="email"
                                         onChange={e => inputHandler(e, 'email')}
-                                        value={ctx?.shippingInfo?.email}
+                                        value={order?.shipping_info?.email}
                                         className="form-control mt-2"
                                     />
-                                    {ctx.showErrors && !ctx.shippingInfo?.email && <small className="d-block text-danger mt-2">Field Required.</small>}
+                                    {ctx.showErrors && !order?.shipping_info?.email && <small className="d-block text-danger mt-2">Field Required.</small>}
                                 </div>
                             </div>
                             <div className="col-12 mb-4">
@@ -114,11 +115,11 @@ const ShippingInfo: React.FC = () => {
 
                                     <input
                                         type="text"
-                                        onChange={e => inputHandler(e, 'addressLine1')}
-                                        value={ctx.shippingInfo?.addressLine1}
+                                        onChange={e => inputHandler(e, 'address_line1')}
+                                        value={order?.shipping_info?.address_line1}
                                         className="form-control mt-2"
                                     />
-                                    {ctx.showErrors && !ctx.shippingInfo?.addressLine1 && <small className="d-block text-danger mt-2">Field Required.</small>}
+                                    {ctx.showErrors && !order?.shipping_info?.address_line1 && <small className="d-block text-danger mt-2">Field Required.</small>}
                                 </div>
                             </div>
                             <div className="col-12 mb-4">
@@ -126,27 +127,27 @@ const ShippingInfo: React.FC = () => {
                                     <label>Address Line 2</label>
                                     {/* <span className="disclaimer">(whatever you wish)</span> */}
 
-                                    <input type="text" onChange={(e) => inputHandler(e, "addressLine2")} value={ctx.shippingInfo?.addressLine2} className="form-control mt-2" />
+                                    <input type="text" onChange={(e) => inputHandler(e, "address_line2")} value={order?.shipping_info?.address_line2} className="form-control mt-2" />
                                 </div>
                             </div>
                             <div className="col-xl-2 mb-4">
                                 <div className="form-group">
                                     <label>Zip Code*</label>
-                                    <input type="text" onChange={(e) => inputHandler(e, "zipCode")} value={ctx?.shippingInfo?.zipCode} className="form-control mt-2" />
-                                    {ctx.showErrors && !ctx.shippingInfo?.zipCode && <small className="d-block text-danger mt-2">Field Required.</small>}
+                                    <input type="text" onChange={(e) => inputHandler(e, "zip_code")} value={order?.shipping_info?.zip_code} className="form-control mt-2" />
+                                    {ctx.showErrors && !order?.shipping_info?.zip_code && <small className="d-block text-danger mt-2">Field Required.</small>}
                                 </div>
                             </div>
                             <div className="col-xl-6 mb-4">
                                 <div className="form-group">
                                     <label>City*</label>
-                                    <input type="text" onChange={(e) => inputHandler(e, "city")} value={ctx?.shippingInfo?.city} className="form-control mt-2" />
-                                    {ctx.showErrors && !ctx.shippingInfo?.city && <small className="d-block text-danger mt-2">Field Required.</small>}
+                                    <input type="text" onChange={(e) => inputHandler(e, "city")} value={order?.shipping_info?.city} className="form-control mt-2" />
+                                    {ctx.showErrors && !order?.shipping_info?.city && <small className="d-block text-danger mt-2">Field Required.</small>}
                                 </div>
                             </div>
                             <div className="col-xl-4 mb-4">
                                 <div className="form-group">
                                     <label>State*</label>
-                                    <select onChange={(e) => inputHandler(e, "state")} value={ctx?.shippingInfo?.state} className="py-0 form-control mt-2">
+                                    <select onChange={(e) => inputHandler(e, "state")} value={order?.shipping_info?.state} className="py-0 form-control mt-2">
                                         <option value="">--- Select State ---</option>
                                         {USA_COUNTRIES.map((el, i) => (
                                             <option key={i} value={el?.abbreviation}>
@@ -154,7 +155,7 @@ const ShippingInfo: React.FC = () => {
                                             </option>
                                         ))}
                                     </select>
-                                    {ctx.showErrors && !ctx.shippingInfo?.state && <small className="d-block text-danger mt-2">Field Required.</small>}
+                                    {ctx.showErrors && !order?.shipping_info?.state && <small className="d-block text-danger mt-2">Field Required.</small>}
                                 </div>
                             </div>
                             <div className="col-lg-12 mb-4">
@@ -172,11 +173,11 @@ const ShippingInfo: React.FC = () => {
                                         }}
                                         pattern="^[0-9]*[.,]?[0-9]*$"
                                         type="text"
-                                        onChange={e => inputHandler(e, 'phoneNumber')}
-                                        value={ctx.shippingInfo?.phoneNumber}
+                                        onChange={e => inputHandler(e, 'phone_number')}
+                                        value={order?.shipping_info?.phone_number}
                                         className="form-control mt-2"
                                     />
-                                    {ctx.showErrors && !ctx.shippingInfo?.phoneNumber && <small className="d-block text-danger mt-2">Field Required.</small>}
+                                    {ctx.showErrors && !order?.shipping_info?.phone_number && <small className="d-block text-danger mt-2">Field Required.</small>}
                                 </div>
                             </div>
                         </div>
@@ -239,8 +240,8 @@ const ShippingInfo: React.FC = () => {
                                     <label>Your Email*</label> &nbsp;
                                     <span className="disclaimer">(Mandatory to communicate the delivery process)</span>
                                 </div>
-                                <input type="email" onChange={e => inputHandler(e, 'email')} value={ctx?.shippingInfo?.email} className="form-control mt-2" />
-                                {ctx.showErrors && !ctx.shippingInfo?.email && <small className="d-block text-danger mt-2">Field Required.</small>}
+                                <input type="email" onChange={e => inputHandler(e, 'email')} value={order?.shipping_info?.email} className="form-control mt-2" />
+                                {ctx.showErrors && !order?.shipping_info?.email && <small className="d-block text-danger mt-2">Field Required.</small>}
                             </div>
                         </div>
                         <div className="col-12 mb-4">
@@ -248,11 +249,11 @@ const ShippingInfo: React.FC = () => {
                                 <label>Address Line 1*</label>
                                 <input
                                     type="text"
-                                    onChange={e => inputHandler(e, 'addressLine1')}
-                                    value={ctx?.shippingInfo?.addressLine1}
+                                    onChange={e => inputHandler(e, 'address_line1')}
+                                    value={order?.shipping_info?.address_line1}
                                     className="form-control mt-2"
                                 />
-                                {ctx.showErrors && !ctx.shippingInfo?.addressLine1 && <small className="d-block text-danger mt-2">Field Required.</small>}
+                                {ctx.showErrors && !order?.shipping_info?.address_line1 && <small className="d-block text-danger mt-2">Field Required.</small>}
                             </div>
                         </div>
                         <div className="col-12 mb-4">
@@ -260,8 +261,8 @@ const ShippingInfo: React.FC = () => {
                                 <label>Address Line 2</label>
                                 <input
                                     type="text"
-                                    onChange={e => inputHandler(e, 'addressLine2')}
-                                    value={ctx?.shippingInfo?.addressLine2}
+                                    onChange={e => inputHandler(e, 'address_line2')}
+                                    value={order?.shipping_info?.address_line2}
                                     className="form-control mt-2"
                                 />
                             </div>
@@ -271,24 +272,24 @@ const ShippingInfo: React.FC = () => {
                                 <label>Zip Code*</label>
                                 <input
                                     type="text"
-                                    onChange={e => inputHandler(e, 'zipCode')}
-                                    value={ctx?.shippingInfo?.zipCode}
+                                    onChange={e => inputHandler(e, 'zip_code')}
+                                    value={order?.shipping_info?.zip_code}
                                     className="form-control mt-2"
                                 />
-                                {ctx.showErrors && !ctx.shippingInfo?.zipCode && <small className="d-block text-danger mt-2">Field Required.</small>}
+                                {ctx.showErrors && !order?.shipping_info?.zip_code && <small className="d-block text-danger mt-2">Field Required.</small>}
                             </div>
                         </div>
                         <div className="col-lg-6 mb-4">
                             <div className="form-group">
                                 <label>City*</label>
-                                <input type="text" onChange={e => inputHandler(e, 'city')} value={ctx?.shippingInfo?.city} className="form-control mt-2" />
-                                {ctx.showErrors && !ctx?.shippingInfo?.city && <small className="d-block text-danger mt-2">Field Required.</small>}
+                                <input type="text" onChange={e => inputHandler(e, 'city')} value={order?.shipping_info?.city} className="form-control mt-2" />
+                                {ctx.showErrors && !order?.shipping_info?.city && <small className="d-block text-danger mt-2">Field Required.</small>}
                             </div>
                         </div>
                         <div className="col-lg-4 mb-4">
                             <div className="form-group">
                                 <label>State*</label>
-                                <select onChange={e => inputHandler(e, 'state')} value={ctx?.shippingInfo?.state} className="py-0 form-control mt-2">
+                                <select onChange={e => inputHandler(e, 'state')} value={order?.shipping_info?.state} className="py-0 form-control mt-2">
                                     <option value="">--- Select State ---</option>
                                     {USA_COUNTRIES.map((el, i) => (
                                         <option key={i} value={el.abbreviation}>
@@ -296,7 +297,7 @@ const ShippingInfo: React.FC = () => {
                                         </option>
                                     ))}
                                 </select>
-                                {ctx.showErrors && !ctx?.shippingInfo?.state && <small className="d-block text-danger mt-2">Field Required.</small>}
+                                {ctx.showErrors && !order?.shipping_info?.state && <small className="d-block text-danger mt-2">Field Required.</small>}
                             </div>
                         </div>
                         <div className="col-lg-12 mb-4">
@@ -311,11 +312,11 @@ const ShippingInfo: React.FC = () => {
                                     }}
                                     pattern="^[0-9]*[.,]?[0-9]*$"
                                     type="text"
-                                    onChange={e => inputHandler(e, 'phoneNumber')}
-                                    value={ctx?.shippingInfo?.phoneNumber}
+                                    onChange={e => inputHandler(e, 'phone_number')}
+                                    value={order?.shipping_info?.phone_number}
                                     className="form-control mt-2"
                                 />
-                                {ctx.showErrors && !ctx.shippingInfo?.phoneNumber && <small className="d-block text-danger mt-2">Field Required.</small>}
+                                {ctx.showErrors && !order?.shipping_info?.phone_number && <small className="d-block text-danger mt-2">Field Required.</small>}
                             </div>
                         </div>
                     </section>
@@ -325,4 +326,4 @@ const ShippingInfo: React.FC = () => {
     );
 };
 
-export default ShippingInfo;
+export default ChangeShippingInfo;
