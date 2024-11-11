@@ -3,7 +3,7 @@ import OrderProduct from './OrderProduct';
 import { useEffect, useState, useContext, lazy, Suspense } from 'react';
 import ModalOverlay from '../UI/ModalOverlay';
 import { getOrder, getOrderStatusFromAmazon, updateOrder } from '../controllers/OrderController';
-import { OrderStatus } from '../../types/Order';
+import { OrderStatus, OrderTableStatus } from '../../types/Order';
 import { Tracking } from '../../types/Tracking';
 import { getAmountToPay } from '../controllers/PaymentController';
 import { AmazonProduct } from '../../types/OrderAmazon';
@@ -22,6 +22,8 @@ import StatusSteps from './StatusSteps';
 import { supabase } from '@/utils/supabaseClient';
 import TicketMessagebox from '../UI/TicketMessagebox';
 import MessageResult from '../UI/MessageResult';
+import ChangeShippingInfo from '../steps/ChangeShippingInfo';
+import Modal from '../UI/Modal';
 // import OffCanvasResult from '../UI/OffCanvasResult';
 
 interface IMyOrderProps {
@@ -45,7 +47,7 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
     const [taxRequestId, setTaxRequestId] = useState<string>();
     const [isDelivered, setIsDelivered] = useState<boolean>(false);
     const [ticket, setTicket] = useState<any | null>(null);
-
+    const [replacingOrder, setReplacingOrder] = useState<boolean>(false);
     const [showModal, setShowModal] = useState<{ show: boolean; type: string; asin?: string }>({
         show: false,
         type: '',
@@ -63,6 +65,64 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
         }
     };
 
+    const ReplaceOrder = async () => {
+        setReplacingOrder(true);
+
+        const UpdateOnDb = async () => {
+            const updateDb: OrderSB = {
+                status: OrderStatus.WAITING_TAX,
+            };
+
+            let { data: orders, error } = await supabase
+                .from('orders')
+                .update({ status: OrderStatus.WAITING_TAX })
+                .eq('order_id', order.order_id!);
+            if (error) {
+                console.error('Error fetching order:', error);
+                return;
+            }
+            refetchOrder();
+        }
+
+        const data = {
+            amazon_api: configCtx?.config?.amazon_api!,
+            order,
+        };
+        const encryptedOrder = encryptData(JSON.stringify(data));
+        console.log('🚀 ~ createOrderOnAmazon ~ encryptedOrder:', encryptedOrder);
+
+        try {
+            const createOrderResponse = await fetch('/api/RetryOrderOnAmazon', {
+                method: 'POST',
+                body: encryptedOrder,
+                headers: { 'Content-Type': 'plain/text' },
+            });
+            const response = await createOrderResponse.json();
+            console.log('🚀 ~ createOrderOnAmazon ~ response:', response);
+
+            switch (createOrderResponse.status) {
+                case 201:
+                    Swal.fire({
+                        title: 'Order has been replaced successfully',
+                        icon: 'success',
+                    });
+                    UpdateOnDb();
+                    setReplacingOrder(false);
+                    break;
+                case 400:
+                case 401:
+                default:
+                    Swal.fire({ icon: 'error', title: 'Error during the request, please try again or contact the support' });
+            }
+            setReplacingOrder(false);
+
+        } catch (error) {
+            setReplacingOrder(false);
+
+            console.error('Error replacing order:', error);
+            Swal.fire({ icon: 'error', title: 'Error during the request, please try again or contact the support' });
+        }
+    }
     const fetchOrderStatus = async () => {
         setTaxRequestId(order.tax_request_id);
 
@@ -200,24 +260,23 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
             router.push(`/pay/${encryptedOrderId}/checkout`);
         }
     };
-    const sendTicketToTelegram = (order_id: string | undefined) => {
-        // Crea il messaggio con l'order_id
-        const message = `order_id=${order_id}`;
-        const user = `order_id=${session?.address}`;
+    // const sendTicketToTelegram = (order_id: string | undefined) => {
+    //     const message = `order_id=${order_id}`;
+    //     const user = `order_id=${session?.address}`;
 
-        // Codifica il messaggio in base64
-        const encodedMessage = Buffer.from(message).toString('base64'); // Corretto: codifica in base64
-        const encodedUser = Buffer.from(user).toString('base64'); // Corretto: codifica in base64
+    //     // Codifica il messaggio in base64
+    //     const encodedMessage = Buffer.from(message).toString('base64'); // Corretto: codifica in base64
+    //     const encodedUser = Buffer.from(user).toString('base64'); // Corretto: codifica in base64
 
-        // Crea l'URL Telegram con il messaggio codificato
-        const telegramUrl = `https://t.me/SmartDropperSupport_Bot?start=${encodedMessage}&user=${encodedUser}`;
+    //     // Crea l'URL Telegram con il messaggio codificato
+    //     const telegramUrl = `https://t.me/SmartDropperSupport_Bot?start=${encodedMessage}&user=${encodedUser}`;
 
-        // Apri il link in una nuova scheda
-        window.open(telegramUrl, '_blank');
-    };
-    const showticket = () => {
-        setOpenTicketCanvaas(true);
-    };
+    //     // Apri il link in una nuova scheda
+    //     window.open(telegramUrl, '_blank');
+    // };
+    // const showticket = () => {
+    //     setOpenTicketCanvaas(true);
+    // };
     const openTicket = async () => {
         const { data, error } = await supabase
             .from('support_tickets')
@@ -296,20 +355,18 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
                     </button>
                 );
 
-            case OrderStatus.SHIPPING_ADDRESS_REFUSED:
-                return (
-                    <>
-                        <button
-                            className="btn btn-secondary m-1 col-10 col-xl-8"
-                            onClick={() => showInfoSwal('Your shipping address has been refused, please create a new order')}
-                        >
-                            <WarningAmberIcon /> <span className="text-danger m-1 d-flex align-items-center">Shipping address refused</span>
-                        </button>
-                        {/* <button className="btn btn-primary m-1 col-10 col-xl-8" onClick={() => ChangeAddress()}>
-              Change address
-            </button> */}
-                    </>
-                );
+            // case OrderStatus.SHIPPING_ADDRESS_REFUSED:
+            //     return (
+            //         <>
+            //             <button
+            //                 className="btn btn-secondary m-1 col-10 col-xl-8"
+            //                 onClick={() => showInfoSwal('Your shipping address has been refused, please create a new order')}
+            //             >
+            //                 <WarningAmberIcon /> <span className="text-danger m-1 d-flex align-items-center">Shipping address refused</span>
+            //             </button>
+
+            //         </>
+            //     );
             case OrderStatus.PRODUCT_UNAVAILABLE:
                 return (
                     <a
@@ -379,10 +436,10 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
 
                 {order.status === OrderStatus.SHIPPING_ADDRESS_REFUSED && (
                     <div className="order-buttons text-center text-lg-end mt-3 mt-md-0 d-flex justify-content-center">
-                        <span className=" col-10 col-xl-8 text-danger text-center">
-                            <b>Shipping address refused</b> <br />
-                            Please, create order again.
-                        </span>
+                        <div className=" col-10 col-xl-8 text-danger text-center  d-flex justify-content-center flex-column align-items-center">
+                            <b>SHIPPING ADDRESS REFUSED  <br />Please, replace order again.</b> <br />
+
+                        </div>
                     </div>
                 )}
                 {order.status === OrderStatus.WAITING_TAX && (
@@ -393,9 +450,7 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
                         <button
                             className="btn btn-success col-10 col-xl-8 my-1"
                             disabled={true}
-                            // onClick={() => {
-                            //      router.push(`/pay/${encryptData(order.order_id!)}/checkout`);
-                            // }}
+
                             onClick={() => {
                                 Swal.fire({
                                     title: 'We are retrieving the total order amount from the Amazon Provider. This process can take up to 10 minutes, please wait and try again.',
@@ -411,12 +466,7 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
                                 {' '}
                                 <b>* If you don&apos;t see any update after 1 hour please contact support on Telegram.</b>{' '}
                             </span>
-                            {/* <div className="m-auto">
-                                        <a href="https://discord.gg/FnMwpGfezw" target="_blank">
-                                             <Image src="/icons/discord.png" alt="discord" width={50} height={50} />
-                                        </a>
-                                        
-                                   </div> */}
+
                         </div>
                     </div>
                 )}
@@ -431,7 +481,7 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
                 {order && OrderStatus && order.status === OrderStatus.ERROR && !ticket && (
                     <div className=" d-flex justify-content-center flex-column align-items-center">
                         <span className="my-2 col-10 col-xl-8 fw-bold">Error during the request, please try again or contact the support</span>
-                        <button className="btn btn-danger d-flex col-10 col-xl-8 " onClick={openTicket}>
+                        <button className="btn btn-dark d-flex col-10 col-xl-8 " onClick={openTicket}>
                             Open a support request
                         </button>
                     </div>
@@ -456,6 +506,21 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
             ) : (
                 <div className=" d-flex justify-content-center flex-column align-items-center"></div>
             )}
+            {/* {isMounted && order.status === OrderStatus.SHIPPING_ADDRESS_REFUSED ? (
+                <div>
+                    <ChangeShippingInfo order={order} />
+                    <button className="btn btn-dark d-flex col-12 " onClick={ReplaceOrder} disabled={replacingOrder}>
+                        Replace Order
+                    </button>
+                </div>
+            ) : (
+                <div className=" d-flex justify-content-center flex-column align-items-center col-12"></div>
+            )} */}
+            {/* {replacingOrder && (
+                <ModalOverlay show={isLoading}>
+                    <Loading loadingText="Replacing order...." />
+                </ModalOverlay>
+            )} */}
         </>
     );
 };

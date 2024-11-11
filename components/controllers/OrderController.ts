@@ -181,14 +181,13 @@ export const createOrderOnWeb3 = async (subId: number, orderId: string | null, b
         return false;
     }
 };
-
 const generateOrderObject = (ctx: any, orderId: string, address: string): OrderSB | null => {
     console.log('🚀 ~ file: OrderController.ts:136 ~ generateOrderObject ~ ctx', ctx.items);
     try {
         return {
             wallet_address: address,
             country: 'US',
-            status: OrderStatus.CREATED,
+            status: OrderStatus.WAITING_TAX,
             order_id: orderId,
             email: ctx.email,
             currency: 'USD',
