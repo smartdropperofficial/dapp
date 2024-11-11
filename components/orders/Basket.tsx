@@ -1,37 +1,14 @@
 /* eslint-disable @next/next/no-img-element */
 import React, { useContext } from 'react';
-import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
 import { OrderContext } from '../../store/order-context';
 import ItemCard from '../UI/ItemCard';
 import '@/utils/utils/';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import Link from 'next/link';
-import { Fab } from '@mui/material';
-import { SubscriptionContext } from '@/store/subscription-context';
-import Swal from 'sweetalert2';
 import BasketItem from './BasketItem';
 function Basket() {
-    const subContext = useContext(SubscriptionContext);
     const orderContext = useContext(OrderContext);
 
-    const incrementButtonHandler = (id: number, price: number) => {
-        if (subContext?.currentSubscription?.subscriptionModel?.shopLimit! > 0) {
-            if (price + basketTotal() + subContext?.currentSubscription?.totShopAmountPaid! > subContext?.currentSubscription?.subscriptionModel?.shopLimit!) {
-                Swal.fire({
-                    title: 'Warning',
-                    text: 'You have reached the limit of your subscription',
-                    icon: 'warning',
-                    confirmButtonText: 'Ok',
-                });
-            } else {
-                orderContext.incrementHandler(id, 'add');
-            }
-        } else {
-            // console.log('incrementButtonHandler', id)
-            orderContext.incrementHandler(id, 'add');
-        }
-    };
+
     const basketTotal = (): number => {
         let total = 0;
         orderContext.items.forEach(el => {
@@ -39,15 +16,7 @@ function Basket() {
         });
         return total;
     };
-    const amountLeft = (): string => {
-        if (subContext?.currentSubscription?.subscriptionModel?.shopLimit! && subContext?.currentSubscription?.totShopAmountPaid! && basketTotal()) {
-            const tot = subContext?.currentSubscription?.subscriptionModel.shopLimit! - subContext?.currentSubscription?.totShopAmountPaid! - basketTotal();
-            // return tot.toFixed(2);
-            return tot > 0 ? '$' + tot.toFixed(2) : '$0.00';
-        } else {
-            return 'Unlimited';
-        }
-    };
+
 
     return (
         <section id="basket">

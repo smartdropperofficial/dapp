@@ -20,7 +20,7 @@ const BasketItem = ({ id, el }: { id: any; el: any }) => {
             setInputValue(value); // Aggiorna solo il valore di input temporaneo
 
             if (timeoutRef.current) clearTimeout(timeoutRef.current);
-            console.log("🚀 ~ timeoutRef.current=setTimeout ~ subContext?.currentSubscription?.subscriptionModel?.shopLimit:", subContext?.currentSubscription?.subscriptionModel?.shopLimit)
+            // console.log("🚀 ~ timeoutRef.current=setTimeout ~ subContext?.currentSubscription?.subscriptionModel?.shopLimit:", subContext?.currentSubscription?.subscriptionModel?.shopLimit)
 
             timeoutRef.current = setTimeout(() => {
                 if (subContext?.currentSubscription?.subscriptionModel?.shopLimit! > 0) {
