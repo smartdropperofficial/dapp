@@ -11,7 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     // Usa req.body per ottenere il token nella richiesta POST
     const { token } = req.body;
-    
+
     if (!token) {
       return res.status(400).json({ error: 'Token mancante nella richiesta' });
     }
@@ -60,7 +60,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Associa il wallet all'utente
     const { error: walletError } = await supabase
       .from('user_wallets')
-      .insert([{ user_id: user.id, wallet_address }]);
+      .insert([{ user_id: user.user_id, wallet_address }]);
 
     if (walletError && walletError.code !== '23505') {
       // Ignora l'errore di chiave duplicata

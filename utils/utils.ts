@@ -217,11 +217,12 @@ export async function getUserByWalletAddress(walletAddress: string) {
             .select(`
           wallet_address,
           user:users!inner (
-            id,
+            user_id,
             email,
-            email_verified,
+            email_verified, 
             config_db,
-            is_admin
+            is_admin, 
+            is_promoter
           )
         `)
             .eq('wallet_address', walletAddress)

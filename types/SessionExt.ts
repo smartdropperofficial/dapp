@@ -1,6 +1,7 @@
 import { Session } from 'next-auth';
 
 export interface SessionExt extends Session {
+    user_id?: number | null;
     address?: string | null;
     userid?: number | null;
     email?: string | null;
@@ -10,5 +11,5 @@ export interface SessionExt extends Session {
     is_promoter_active?: boolean | null;
     isAdmin?: boolean | null;
     config_db: boolean;
-    needsEmail?:boolean;
+    needsEmail?: boolean;
 }

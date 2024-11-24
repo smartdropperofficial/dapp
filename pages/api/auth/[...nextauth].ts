@@ -34,7 +34,7 @@ export default async function auth(req: any, res: any) {
                     if (result.success) {
                         // const userRole = await getUserRole(siwe?.address); // Fetch user role from database
                         return {
-                          id: siwe.address,
+                            id: siwe.address,
                             //role: userRole,
                         };
                     }
@@ -52,7 +52,7 @@ export default async function auth(req: any, res: any) {
         providers.pop();
     }
 
-    return await NextAuth(req, res, { 
+    return await NextAuth(req, res, {
         debug: true,
         providers,
         session: {
@@ -60,31 +60,32 @@ export default async function auth(req: any, res: any) {
         },
         secret: process.env.NEXTAUTH_SECRET!,
         callbacks: {
-            async session({ session, token}: { session: any; token: any }) { 
-             
-                    const userRole = await getUserByWalletAddress(token.sub) as any;
-                     /* eslint-disable */
-                    if (userRole && userRole?.email_verified) {        
+            async session({ session, token }: { session: any; token: any }) {
 
-                        // eslint-disable-next-line
-                        token.email = userRole?.email;
-                        // eslint-disable-next-line
-                        token.verified = userRole?.email_verified;
-                        // eslint-disable-next-line
-                        token.isPromoter = userRole?.is_promoter;
-                        // eslint-disable-next-line
-                        token.is_promoter_active = userRole?.is_promoter_active;
-                        // eslint-disable-next-line
-                        token.isAdmin = userRole?.is_admin;
-                        // eslint-disable-next-liney
-                        token.config_db = userRole?.config_db;
+                const userRole = await getUserByWalletAddress(token.sub) as any;
+                /* eslint-disable */
+                if (userRole && userRole?.email_verified) {
 
-                    } else {
-                        token.verified = false;
-                    }
-              
+                    // eslint-disable-next-line 
+                    token.user_id = userRole?.user_id;
+                    token.email = userRole?.email;
+                    // eslint-disable-next-line
+                    token.verified = userRole?.email_verified;
+                    // eslint-disable-next-line
+                    token.isPromoter = userRole?.is_promoter;
+                    // eslint-disable-next-line
+                    token.is_promoter_active = userRole?.is_promoter_active;
+                    // eslint-disable-next-line
+                    token.isAdmin = userRole?.is_admin;
+                    // eslint-disable-next-liney
+                    token.config_db = userRole?.config_db;
 
-                 session.address = token.sub;
+                } else {
+                    token.verified = false;
+                }
+
+                session.userid = token.user_id;
+                session.address = token.sub;
                 session.email = token?.email; // Add user email to session
                 session.verified = token?.verified; // Add user email to session
                 session.isPromoter = token?.isPromoter; // Add user email to session
