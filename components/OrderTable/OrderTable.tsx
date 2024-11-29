@@ -4,7 +4,7 @@ import { Button, Card, Col, Form } from 'react-bootstrap';
 import { OrderSB } from '@/types/OrderSB';
 import { encryptData, formatSPDate } from '@/utils/utils';
 import { OrderStatus, OrderTableStatus } from '@/types/Order';
-import { FaSortUp, FaSortDown } from 'react-icons/fa';
+import { FaSortUp, FaSortDown, FaCommentAlt } from 'react-icons/fa';
 import { useRouter } from 'next/router';
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
@@ -13,7 +13,7 @@ import { OrderContext } from '@/store/order-context';
 
 
 function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
-    const { TableOrdersCurrentPage, setTableOrdersCurrentPage, OrderTablePagination, setOrderTablePagination } = useContext(OrderContext);
+    const { TableOrdersCurrentPage, setTableOrdersCurrentPage, OrderTablePagination, setOrderTablePagination, setOrderTableFilter, OrderTableFilter } = useContext(OrderContext);
     const inputRef = useRef<HTMLInputElement>(null);
     const router = useRouter();
 
@@ -34,15 +34,18 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
     useEffect(() => {
         setCurrentPage(TableOrdersCurrentPage);
         setItemsPerPage(OrderTablePagination);
+        setOrderTableFilter(OrderTableFilter);
     }, [])
 
     useEffect(() => {
         setTableOrdersCurrentPage(currentPage);
     }, [currentPage])
-
     useEffect(() => {
         setOrderTablePagination(itemsPerPage);
     }, [itemsPerPage])
+    useEffect(() => {
+        setOrderTableFilter(OrderTableFilter);
+    }, [OrderTableFilter])
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearch(e.target.value);
@@ -61,14 +64,18 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
     const filteredOrders = useMemo(() => {
         return orders.filter(order => {
             const searchValue = search.toLowerCase();
-            return Object.values(order).some(value => {
+            const matchesSearch = Object.values(order).some(value => {
                 if (typeof value === 'string') {
                     return value.toLowerCase().includes(searchValue);
                 }
                 return false;
             });
+
+            const matchesFilter = OrderTableFilter ? order.status === OrderTableFilter : true;
+
+            return matchesSearch && matchesFilter;
         });
-    }, [orders, search]);
+    }, [orders, search, OrderTableFilter]);
     const filterByStatus = (status: OrderStatus) => {
         return filteredOrders.filter(order => order.status === status);
     }
@@ -108,6 +115,10 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
         setCurrentPage(1);
     };
 
+    const handlerFilter = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setOrderTableFilter(e.target.value);
+
+    }
     const RenderSearch = () => (
         <Form.Control
             ref={inputRef}
@@ -142,10 +153,10 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
 
     const RenderAction = (order: OrderSB) => {
         switch (order?.status) {
-            case OrderTableStatus.WAITING_PAYMENT.value:
+            case OrderTableStatus.WAITING_CONFIRMATION.value:
                 return (
                     <Button className="btn-success col-10" onClick={() => GoToCheckout(order.order_id!)}>
-                        {OrderTableStatus.WAITING_PAYMENT.description}
+                        {OrderTableStatus.WAITING_CONFIRMATION.description}
                     </Button>
                 );
 
@@ -210,8 +221,8 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
                 <div className="d-flex col-lg-6 col-8 justify-content-lg-start justify-content-center align-items-center">
                     <Form.Label className="d-flex col-lg-6 col-12 align-items-lg-start mb-0 text-start">Filter by Status</Form.Label>
                     <Form.Select
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
+                        value={OrderTableFilter}
+                        onChange={handlerFilter}
                         required
                         className="form-select border-3"
                         aria-label="Filter by Status"
@@ -248,6 +259,9 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
                     <th data-key="details" style={{ cursor: 'pointer' }}>
                         Order details {orderBy === 'details' && (sort === 'asc' ? <FaSortUp /> : <FaSortDown />)}
                     </th>
+                    <th data-key="details" style={{ cursor: 'pointer' }}>
+                        Ticket
+                    </th>
                     {/* <th data-key="details" style={{ cursor: 'pointer' }}>
                         Support request
                     </th> */}
@@ -265,6 +279,11 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
                         <td className="align-middle">
                             <Button onClick={() => GotoOrderDetails(order.order_id!)} style={{ backgroundColor: '#616161' }}>
                                 Details
+                            </Button>
+                        </td>
+                        <td className="align-middle cursor-auto " >
+                            <Button style={{ backgroundColor: '#616161' }}>
+                                <FaCommentAlt />
                             </Button>
                         </td>
                         {/* <td className='align-middle'> <Button onClick={order?.ticket_id ? () => openTicketMessages(order?.order_id!) : () => openNewRequest(order?.order_id!)} style={{ backgroundColor: order?.ticket_id ? '#616161' : '#primary' }}
