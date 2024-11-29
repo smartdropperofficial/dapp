@@ -39,7 +39,7 @@ const Referral = () => {
     const { getAllPromotersSubscriptionsOnBC, withdrawPromoterProfitOnBC } = useSubscriptionManagement();
     const { width, height } = useWindowSize();
     const { address } = useAccount();
-
+    const confettiShownRef = useRef(false);
     const [showConfetti, setShowConfetti] = useState(false);
     const [copied, setCopied] = useState(false);
     const [referralcode, setReferralCode] = useState<string | null>(null);
@@ -141,6 +141,7 @@ const Referral = () => {
     }, [promoterSubscriptions]);
 
     const copyToClipboard = () => {
+        alert(promoter?.referralCode);
         if (promoter?.referralCode) {
             navigator.clipboard.writeText(promoter.referralCode);
             setCopied(true);
@@ -155,12 +156,21 @@ const Referral = () => {
             const confettiShown = localStorage.getItem('confettiShown');
             if (!confettiShown) {
                 setShowConfetti(true);
-                const timer = setTimeout(() => setShowConfetti(false), 5000);
+                const timer = setTimeout(() => setShowConfetti(false), 2000);
                 localStorage.setItem('confettiShown', 'true'); // Ensure the effect runs only once
                 return () => clearTimeout(timer);
             }
         }
     }, [subContext.promoter]);
+    // useEffect(() => {
+    //     if (!confettiShownRef.current) {
+    //         setShowConfetti(true);
+    //         confettiShownRef.current = true; // Impedisce che il Confetti riparta
+    //         const timer = setTimeout(() => setShowConfetti(false), 2000); // Ferma il Confetti dopo 5 secondi
+
+    //         return () => clearTimeout(timer); // Pulisce il timer
+    //     }
+    // }, []);
 
     useEffect(() => {
         calcPromoterProfit();
@@ -313,7 +323,7 @@ const Referral = () => {
                                         </div>
                                     </section>
                                 </Card>
-                                <section className="d-flex flex-column mt-4 ">
+                                {/* <section className="d-flex flex-column mt-4 ">
                                     <Card>
                                         <div className="d-flex flex-column align-items-center ">
                                             <br />
@@ -356,7 +366,7 @@ const Referral = () => {
                                             <div className="mb-3"></div>
                                         </div>
                                     </Card>
-                                </section>
+                                </section> */}
                                 <section className="mt-5 d-flex table-responsive p-3 " style={{ maxWidth: '100%', backgroundColor: 'white' }}>
                                     <table className="table table-striped table-bordered w-100" style={{ maxWidth: '100%' }}>
                                         <thead>
@@ -434,7 +444,7 @@ const Referral = () => {
                                         >
                                             <img src="/icons/usdt.svg" alt="usdt" width={30} height={30} />
                                             <div className="d-flex align-items-center justify-content-center w-100">
-                                                <span>Usdt - {Number(profit).toFixed(2)}</span>
+                                                <span>USDT {Number(profit).toFixed(2)}</span>
                                             </div>
                                         </button>
                                     </div>
@@ -522,22 +532,24 @@ const Referral = () => {
 //     };
 // });
 export default Referral;
-// export async function getServerSideProps(context: GetSessionParams | undefined ) {
-//     const session :  SessionExt | null  = await getSession(context); // Recupera la sessione come preferisci
-//     console.log("🚀 ~ getServerSideProps ~ session:", session)
+export async function getServerSideProps(context: GetSessionParams | undefined) {
 
-//     if (!session || session.email === '' || session.verified === false) {
-//         return {
-//             redirect: {
-//                 destination: '/verify-email',
-//                 permanent: false,
-//             },
-//         };
-//     }
+    const session: SessionExt | null = (await getSession(context)) as SessionExt | null;
 
-//     return {
-//         props: {
-//             session,
-//         },
-//     };
-// }
+    console.log("🚀 ~ getServerSideProps ~ session:", session)
+
+    if (session && session.email !== '' && session.verified === true && session.isPromoter === false) {
+        return {
+            redirect: {
+                destination: '/',
+                permanent: false,
+            },
+        };
+    }
+
+    return {
+        props: {
+            session,
+        },
+    };
+}
