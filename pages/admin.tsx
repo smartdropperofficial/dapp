@@ -18,6 +18,7 @@ import { withAuth } from '@/withAuth';
 import AddOrder from '@/hooks/Contracts/Order/components/AddOrder';
 import FindSubsByAddress from '@/hooks/Contracts/Subscription/components/FindSubsByAddress';
 import GetFunds from '@/hooks/Contracts/Subscription/components/GetFunds';
+import SubscriptionPlansList from '@/hooks/Contracts/Subscription/components/SubscriptionPlansList';
 
 const Admin: React.FC = () => {
     const { disconnect } = useDisconnect();
@@ -96,6 +97,13 @@ const Admin: React.FC = () => {
                     <Card>
                         <div className="my-3">
                             <FindSubsByAddress></FindSubsByAddress>
+                        </div>
+                    </Card>
+                </div>
+                <div className="col-12 mb-3 p-1">
+                    <Card>
+                        <div className="my-3">
+                            <SubscriptionPlansList></SubscriptionPlansList>
                         </div>
                     </Card>
                 </div>

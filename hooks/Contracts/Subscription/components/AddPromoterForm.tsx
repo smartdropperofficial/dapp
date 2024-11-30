@@ -12,29 +12,9 @@ const AddPromoterForm: React.FC = () => {
     const [promoterAddress, setPromoterAddress] = useState('');
     const [email, setEmail] = useState('');
     const [isActive, setIsActive] = useState(true);
-    const [promoters, setPromoters] = useState<PromoterModel[]>([]);
     const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        const fetchPromoters = async () => {
-            try {
-                const result = await getPromotersOnBC();
-                console.log("🚀 ~ fetchPromoters ~ result:", result)
-                // const promotersData: PromoterModel[] = result.map((item: any) => ({
-                //     promoterAddress: item.promoterAddress,
-                //     isActive: item.isActive,
-                //     percentage: item.percentage,
-                //     profit: item.profit,
-                //     referralCode: item.referralCode,
-                // }));
-                setPromoters(result);
-            } catch (error) {
-                console.error('Error fetching promoters:', error);
-            }
-        };
 
-        fetchPromoters();
-    }, [getPromotersOnBC]);
 
     const validateEmail = (email: string): boolean => {
         const re = /\S+@\S+\.\S+/;
@@ -107,7 +87,7 @@ const AddPromoterForm: React.FC = () => {
                 </div>
             </Form>
             <div className="h-50 overflow-y-auto">
-                <PromotersTable promoters={promoters} />
+                <PromotersTable />
             </div>
         </div>
     );

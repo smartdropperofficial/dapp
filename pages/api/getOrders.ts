@@ -11,7 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (address) {
         // Chiamata a RPC per ottenere i dati
         const { data, error } = await supabase
-             .from('orders')
+          .from('orders')
           // .rpc('get_orders_with_tickets', { wallet_address: address }) // Passaggio dei parametri RPC
           .select('*')  // Seleziona tutti i campi
           .eq('wallet_address', address)

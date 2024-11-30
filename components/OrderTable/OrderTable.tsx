@@ -260,11 +260,9 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
                         Order details {orderBy === 'details' && (sort === 'asc' ? <FaSortUp /> : <FaSortDown />)}
                     </th>
                     <th data-key="details" style={{ cursor: 'pointer' }}>
-                        Ticket
+                        Request
                     </th>
-                    {/* <th data-key="details" style={{ cursor: 'pointer' }}>
-                        Support request
-                    </th> */}
+
                 </tr>
             </thead>
             <tbody>
@@ -282,9 +280,11 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
                             </Button>
                         </td>
                         <td className="align-middle cursor-auto " >
-                            <Button style={{ backgroundColor: '#616161' }}>
-                                <FaCommentAlt />
-                            </Button>
+                            {order?.ticket_id &&
+                                <Button style={{ backgroundColor: '#616161' }}>
+                                    <FaCommentAlt />
+                                </Button>
+                            }
                         </td>
                         {/* <td className='align-middle'> <Button onClick={order?.ticket_id ? () => openTicketMessages(order?.order_id!) : () => openNewRequest(order?.order_id!)} style={{ backgroundColor: order?.ticket_id ? '#616161' : '#primary' }}
                         > {order?.ticket_id ? <>See Request</> : <>Open Request</>} </Button></td> */}

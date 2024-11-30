@@ -34,6 +34,7 @@ export interface SubscriptionPlans {
     promoFees: number;
     isPromoActive: boolean;
     shopLimit: number;
+
 }
 
 export interface SubscriptionManagementModel {
@@ -42,7 +43,7 @@ export interface SubscriptionManagementModel {
     promoterAddress?: string;
     start?: string;
     end?: string;
-    subscriptionModel?: SubscriptionPlans;
+    subscriptionModel: SubscriptionPlans;
     totAmountPaid?: number;
     totShopAmountPaid?: number;
     paymentTx?: string;

@@ -9,9 +9,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 			if (requestId) {
 				const headers = new Headers();
-				headers.append("Authorization", `Basic ${Buffer.from(`${process.env.NEXT_PUBLIC_AMAZON_API_KEY}:`).toString("base64")}`);
+				headers.append("Authorization", `Basic ${Buffer.from(`${process.env.NEXT_PUBLIC_ZINC_API_KEY}:`).toString("base64")}`);
 
-				const response = await fetch(`${process.env.AMAZON_API_URL}/returns/${requestId}`, {
+				const response = await fetch(`${process.env.ORDER_API_URL}/returns/${requestId}`, {
 					method: "GET",
 					headers: headers,
 				});
@@ -22,6 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 					const labelUrls = amazonResponse?.label_urls?.length > 0 ? amazonResponse.label_urls : ["waiting"];
 					const labelUrlsObj = { labelUrls: labelUrls };
 
+					console.log("🚀 ~ handler ~ labelUrlsObj:", labelUrlsObj)
 					res.status(200).json(labelUrlsObj);
 				} else {
 					res.status(200).json({ error: amazonResponse.code });

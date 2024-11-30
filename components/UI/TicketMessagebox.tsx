@@ -12,7 +12,7 @@ interface TicketMessageboxProps {
 function TicketMessagebox({ show, setShow, orderId, ticket, children }: TicketMessageboxProps) {
     return (
         <div>
-            <Card className=" border-0 d-flex justify-content-center align-items-center">{children}</Card>
+            <Card className=" border-0 d-flex justify-content-center align-items-center" >{children}</Card>
         </div>
     );
 }

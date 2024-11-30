@@ -1,12 +1,12 @@
 import useSubscriptionManagement from '@/hooks/Contracts/Subscription/customHooks/useSubscriptionManagement';
-import { SubscriptionManagementModel } from '@/hooks/Contracts/Subscription/types';
+import { SubscriptionManagementModel, SubscriptionPlans } from '@/hooks/Contracts/Subscription/types';
 import { isDateExpired } from '@/utils/utils';
 import React, { useEffect, useState } from 'react';
 import { Card } from 'react-bootstrap';
 import Skeleton from 'react-loading-skeleton';
 
 function SubcriptionDetails({ subId }: { subId: number }) {
-    const { changeTotShopAmountPaidOnBC: changeTotShopAmountPaid, getSubscriptionByIdOnBC: getSubscriptionById } = useSubscriptionManagement();
+    const { changeTotShopAmountPaidOnBC: changeTotShopAmountPaid, getSubscriptionByIdOnBC: getSubscriptionById, updateSubscriptionFeeOnBC } = useSubscriptionManagement();
     const [subscription, setSubscription] = useState<SubscriptionManagementModel | null>(null); // Fix this
     const [newTotShopAmountPaid, setNewTotShopAmountPaid] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
@@ -43,6 +43,42 @@ function SubcriptionDetails({ subId }: { subId: number }) {
     const setsetNewTotShopAmountPaidHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
         setNewTotShopAmountPaid(Number(event.target.value));
     };
+    const handleFeesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newFees = Number(e.target.value);
+
+        setSubscription((prev) => {
+            if (prev && prev.subscriptionModel) {
+                const updatedSubscriptionModel: SubscriptionPlans = {
+                    ...prev.subscriptionModel,
+                    fees: newFees,
+                };
+
+                return {
+                    ...prev,
+                    subscriptionModel: updatedSubscriptionModel,
+                };
+            }
+            return prev;
+        });
+    };
+
+    const setPromoterPercentageHandler = async (id: number, fees: number) => {
+        // console.log('setPromoterPercentageHandler', id, fees);
+        await updateSubscriptionFeeOnBC(id, fees);
+    }
+
+
+
+
+    // Controlla se il valore della percentuale è invariato o non valido
+    const isPercentageUnchanged =
+        subscription?.subscriptionModel?.fees === subscription?.subscriptionModel?.fees;
+
+    const isPercentageInvalid =
+        subscription?.subscriptionModel?.fees === undefined ||
+        subscription?.subscriptionModel?.fees < 0 ||
+        subscription?.subscriptionModel?.fees > 20;
+
     useEffect(() => {
         if (subscription) {
             setNewTotShopAmountPaid(0);
@@ -75,30 +111,38 @@ function SubcriptionDetails({ subId }: { subId: number }) {
                                   onChange={e => setPromoterActiveHandler(subscription?.promoterAddress, e.target.checked)} // Fix this
                               />
                           </li> */}
-                                {/* <li className="list-group-item d-flex col-12">
-                              <div className="d-flex  align-items-center">
-                                  <strong>Percentage:</strong>
-                              </div>
-                              <div className="d-flex  align-items-center justify-content-end w-100">
-                                  <b>%</b>
-                                  <input
-                                      type="number"
-                                      value={subscription?.percentage}
-                                      style={{ width: '15%', textAlign: 'center' }}
-                                      onChange={e => setSubscription({ ...subscription!, percentage: Number(e.target.value) })}
-                                      pattern="[0-9]"
-                                      min={0}
-                                      max={50}
-                                  />
-                                  <button
-                                      className="mx-1 rounded-5 p-1 px-4"
-                                      style={{ backgroundColor: '#ff9900', color: 'white', border: 'none' }}
-                                      onClick={() => setPromoterPercentageHandler(subscription?.promoterAddress, subscription?.percentage)}
-                                  >
-                                      confirm
-                                  </button>
-                              </div>
-                          </li> */}
+                                <li className="list-group-item d-flex col-12">
+                                    <div className="d-flex align-items-center">
+                                        <strong>Percentage:</strong>
+                                    </div>
+                                    <div className="d-flex align-items-center justify-content-end w-100">
+                                        <b>%</b>
+                                        <input
+                                            type="number"
+                                            value={subscription.subscriptionModel.fees}
+                                            style={{ width: '15%', textAlign: 'center' }}
+                                            onChange={handleFeesChange}
+                                            pattern="\d*"
+                                            min={0}
+                                            max={50}
+                                            step={1}
+                                        />
+
+                                        <button
+                                            className="mx-1 rounded-5 p-1 px-4"
+                                            style={{ backgroundColor: '#ff9900', color: 'white', border: 'none' }}
+                                            onClick={() =>
+                                                setPromoterPercentageHandler(
+                                                    subscription.id!,
+                                                    subscription.subscriptionModel.fees
+                                                )
+                                            }
+                                        >
+                                            Confirm
+                                        </button>
+                                    </div>
+                                </li>
+
                                 <li className="list-group-item d-flex justify-content-between">
                                     <strong>PLAN:</strong>
                                     <span className="text-end">{subscription?.subscriptionModel?.name.toUpperCase()}</span>
@@ -128,13 +172,13 @@ function SubcriptionDetails({ subId }: { subId: number }) {
                                                     pattern="[0-9]"
                                                     min={0}
                                                     max={subscription?.subscriptionModel?.shopLimit!}
-                                                    //   disabled={subContext.currentSubscription?.subscriptionModel.shopLimit! === 0 || subContext.currentSubscription?.totShopAmountPaid! > subContext.currentSubscription?.subscriptionModel.shopLimit!}
+                                                //   disabled={subContext.currentSubscription?.subscriptionModel.shopLimit! === 0 || subContext.currentSubscription?.totShopAmountPaid! > subContext.currentSubscription?.subscriptionModel.shopLimit!}
                                                 />
                                                 <button
                                                     className="mx-1 rounded-5 p-1 px-4"
                                                     style={{ backgroundColor: '#ff9900', color: 'white', border: 'none' }}
                                                     onClick={changeTotShopAmountPaidHandleClick}
-                                                    //   disabled={newTotShopAmountPaid === 0 ||    subContext.currentSubscription?.totShopAmountPaid! >  subContext.currentSubscription?.subscriptionModel.shopLimit!}
+                                                //   disabled={newTotShopAmountPaid === 0 ||    subContext.currentSubscription?.totShopAmountPaid! >  subContext.currentSubscription?.subscriptionModel.shopLimit!}
                                                 >
                                                     confirm
                                                 </button>

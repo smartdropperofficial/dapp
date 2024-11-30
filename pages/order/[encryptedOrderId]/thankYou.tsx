@@ -87,7 +87,7 @@ const OrderCompleted = () => {
                 });
 
                 const updateDb: OrderSB = {
-                    status: OrderStatus.WAITING_PAYMENT,
+                    status: OrderStatus.WAITING_CONFIRMATION,
                     products: newProducts,
                     tax_amount: amountToPay.tax,
                     subtotal_amount: amountToPay.subtotal,

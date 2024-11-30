@@ -69,8 +69,9 @@ class TransactionError extends CustomError {
 export class ErrorManager {
     static handleError(message: string): string | void {
         const isMessageInList = (messages: string[], contextMessage: string): string | null => {
-            return messages.find(keyword => contextMessage.includes(keyword)) || null;
+            return messages.find(keyword => contextMessage === keyword) || null;
         };
+
         let keyword;
         try {
             keyword = isMessageInList(UNAUTHORIZED.messages, message);
@@ -134,6 +135,9 @@ export class ErrorManager {
             keyword = isMessageInList(TRANSACTION_ERROR.messages, message);
             if (keyword) throw new TransactionError(keyword);
         } catch (error) {
+            if (error instanceof CustomError) {
+                throw error;
+            }
             throw new CustomError(message, 'Errore sconosciuto');
         }
     }

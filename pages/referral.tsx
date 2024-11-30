@@ -141,7 +141,6 @@ const Referral = () => {
     }, [promoterSubscriptions]);
 
     const copyToClipboard = () => {
-        alert(promoter?.referralCode);
         if (promoter?.referralCode) {
             navigator.clipboard.writeText(promoter.referralCode);
             setCopied(true);
@@ -162,15 +161,7 @@ const Referral = () => {
             }
         }
     }, [subContext.promoter]);
-    // useEffect(() => {
-    //     if (!confettiShownRef.current) {
-    //         setShowConfetti(true);
-    //         confettiShownRef.current = true; // Impedisce che il Confetti riparta
-    //         const timer = setTimeout(() => setShowConfetti(false), 2000); // Ferma il Confetti dopo 5 secondi
 
-    //         return () => clearTimeout(timer); // Pulisce il timer
-    //     }
-    // }, []);
 
     useEffect(() => {
         calcPromoterProfit();

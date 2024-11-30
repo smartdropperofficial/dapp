@@ -99,7 +99,7 @@ const Checkout = () => {
         const currentOrder = await getOrder(orderId);
         console.log('🚀 ~ fetchOrderStatus ~ currentOrder:', currentOrder);
 
-        if (currentOrder?.status !== OrderStatus.WAITING_PAYMENT) {
+        if (currentOrder?.status !== OrderStatus.WAITING_CONFIRMATION) {
             router.push('/my-orders');
         } else {
             setOrder(currentOrder);
@@ -282,7 +282,7 @@ const Checkout = () => {
                 showCheckout.current.hasFetchedSC = true;
             }
         },
-        onError(error) { },
+        onError() { },
     });
 
     useEffect(() => {
@@ -371,7 +371,7 @@ const Checkout = () => {
                     const currentOrder = await getOrder(orderId);
                     const amountExpeted =
                         Number(amountToPay?.subtotal?.toFixed(2)) + Number(amountToPay?.tax?.toFixed(2)) + zincFee + shippingFees! + exchangeFees!;
-                    if (currentOrder?.status !== OrderStatus.WAITING_PAYMENT || acceptobj.amount !== Number(amountExpeted)) {
+                    if (currentOrder?.status !== OrderStatus.WAITING_CONFIRMATION || acceptobj.amount !== Number(amountExpeted)) {
                         console.error(
                             `Depay - Payment - before : Amount expected:(${amountExpeted}) but the amount into the Widget has a different amount. acceptobj is (${acceptobj.amount}) `
                         );

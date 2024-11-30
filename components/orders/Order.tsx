@@ -65,64 +65,64 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
         }
     };
 
-    const ReplaceOrder = async () => {
-        setReplacingOrder(true);
+    // const ReplaceOrder = async () => {
+    //     setReplacingOrder(true);
 
-        const UpdateOnDb = async () => {
-            const updateDb: OrderSB = {
-                status: OrderStatus.WAITING_TAX,
-            };
+    //     const UpdateOnDb = async () => {
+    //         const updateDb: OrderSB = {
+    //             status: OrderStatus.WAITING_TAX,
+    //         };
 
-            let { data: orders, error } = await supabase
-                .from('orders')
-                .update({ status: OrderStatus.WAITING_TAX })
-                .eq('order_id', order.order_id!);
-            if (error) {
-                console.error('Error fetching order:', error);
-                return;
-            }
-            refetchOrder();
-        }
+    //         let { data: orders, error } = await supabase
+    //             .from('orders')
+    //             .update({ status: OrderStatus.WAITING_TAX })
+    //             .eq('order_id', order.order_id!);
+    //         if (error) {
+    //             console.error('Error fetching order:', error);
+    //             return;
+    //         }
+    //         refetchOrder();
+    //     }
 
-        const data = {
-            amazon_api: configCtx?.config?.amazon_api!,
-            order,
-        };
-        const encryptedOrder = encryptData(JSON.stringify(data));
-        console.log('🚀 ~ createOrderOnAmazon ~ encryptedOrder:', encryptedOrder);
+    //     const data = {
+    //         amazon_api: configCtx?.config?.amazon_api!,
+    //         order,
+    //     };
+    //     const encryptedOrder = encryptData(JSON.stringify(data));
+    //     console.log('🚀 ~ createOrderOnAmazon ~ encryptedOrder:', encryptedOrder);
 
-        try {
-            const createOrderResponse = await fetch('/api/RetryOrderOnAmazon', {
-                method: 'POST',
-                body: encryptedOrder,
-                headers: { 'Content-Type': 'plain/text' },
-            });
-            const response = await createOrderResponse.json();
-            console.log('🚀 ~ createOrderOnAmazon ~ response:', response);
+    //     try {
+    //         const createOrderResponse = await fetch('/api/RetryOrderOnAmazon', {
+    //             method: 'POST',
+    //             body: encryptedOrder,
+    //             headers: { 'Content-Type': 'plain/text' },
+    //         });
+    //         const response = await createOrderResponse.json();
+    //         console.log('🚀 ~ createOrderOnAmazon ~ response:', response);
 
-            switch (createOrderResponse.status) {
-                case 201:
-                    Swal.fire({
-                        title: 'Order has been replaced successfully',
-                        icon: 'success',
-                    });
-                    UpdateOnDb();
-                    setReplacingOrder(false);
-                    break;
-                case 400:
-                case 401:
-                default:
-                    Swal.fire({ icon: 'error', title: 'Error during the request, please try again or contact the support' });
-            }
-            setReplacingOrder(false);
+    //         switch (createOrderResponse.status) {
+    //             case 201:
+    //                 Swal.fire({
+    //                     title: 'Order has been replaced successfully',
+    //                     icon: 'success',
+    //                 });
+    //                 UpdateOnDb();
+    //                 setReplacingOrder(false);
+    //                 break;
+    //             case 400:
+    //             case 401:
+    //             default:
+    //                 Swal.fire({ icon: 'error', title: 'Error during the request, please try again or contact the support' });
+    //         }
+    //         setReplacingOrder(false);
 
-        } catch (error) {
-            setReplacingOrder(false);
+    //     } catch (error) {
+    //         setReplacingOrder(false);
 
-            console.error('Error replacing order:', error);
-            Swal.fire({ icon: 'error', title: 'Error during the request, please try again or contact the support' });
-        }
-    }
+    //         console.error('Error replacing order:', error);
+    //         Swal.fire({ icon: 'error', title: 'Error during the request, please try again or contact the support' });
+    //     }
+    // }
     const fetchOrderStatus = async () => {
         setTaxRequestId(order.tax_request_id);
 
@@ -209,7 +209,7 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
                 });
 
                 const updateDb: OrderSB = {
-                    status: OrderStatus.WAITING_PAYMENT,
+                    status: OrderStatus.WAITING_CONFIRMATION,
                     products: newProducts,
                     tax_amount: amountToPay.tax,
                     subtotal_amount: amountToPay.subtotal,
@@ -278,19 +278,50 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
     //     setOpenTicketCanvaas(true);
     // };
     const openTicket = async () => {
+
         const { data, error } = await supabase
-            .from('support_tickets')
-            .insert([{ order_id: order.order_id, user_wallet_address: session?.address, subject: 'New Ticket', status: 'open' }])
-            .select();
+            .rpc('create_support_ticket', {
+                p_order_id: order.order_id,
+                p_user_wallet_address: session?.address
+            });
 
         if (error) {
             console.log('🚀 ~ openTicket ~ error:', error);
-            console.log('A ticket for this order already exists!');
+            console.log('A ticket for this order already exists or an error occurred!');
             return;
         }
-        console.log('🚀 ~ openTicket ~ data:', data![0]);
-        setTicket(data![0]);
+
+        // Fetch the newly created ticket
+        const { data: ticketData, error: ticketError } = await supabase
+            .from('support_tickets')
+            .select('*')
+            .eq('order_id', order.order_id)
+            .eq('user_wallet_address', session?.address)
+            .single();
+
+        if (ticketError) {
+            console.log('🚀 ~ openTicket ~ ticketError:', ticketError);
+            return;
+        }
+
+        console.log('🚀 ~ openTicket ~ ticketData:', ticketData);
+
+        // Update the orders table with the new ticket_id
+        const { error: updateError } = await supabase
+            .from('orders')
+            .update({ ticket_id: ticketData.id }) // Assuming 'id' is the primary key of the ticket
+            .eq('id', order.order_id); // Assuming 'id' is the primary key of the orders table
+
+        if (updateError) {
+            console.log('🚀 ~ openTicket ~ updateError:', updateError);
+            return;
+        }
+
+        console.log('🚀 ~ openTicket ~ Ticket ID added to orders:', ticketData.id);
+        setTicket(ticketData);
     };
+
+
     const renderSwitch = (status: OrderStatus, asin: string, isReturned: boolean) => {
         switch (status) {
             case OrderStatus.PAYMENT_RECEIVED:
@@ -459,7 +490,7 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
                             }}
                             style={{ backgroundColor: '#83ce89' }}
                         >
-                            Click here to pay
+                            Confirm order
                         </button>
                         <div className="d-flex col-10 col-xl-8">
                             <span className="disclaimer alert alert-warning my-1 text-center">
@@ -470,10 +501,10 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
                         </div>
                     </div>
                 )}
-                {order.status === OrderStatus.WAITING_PAYMENT && (
+                {order.status === OrderStatus.WAITING_CONFIRMATION && (
                     <div className="order-buttons text-center text-lg-end mt-3 mt-md-0 d-flex justify-content-center">
                         <button className="btn btn-success col-10 col-xl-8" disabled={taxRequestId === undefined} onClick={proceedToPayment}>
-                            Click here to pay
+                            Confirm order
                         </button>
                     </div>
                 )}

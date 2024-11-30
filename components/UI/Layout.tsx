@@ -9,23 +9,22 @@ import { useRouter } from 'next/router';
 import { SessionExt } from '../../types/SessionExt';
 import { getSession, signOut, useSession } from 'next-auth/react';
 import { useAccount, useDisconnect } from 'wagmi'; // Assicurati di avere useAccount
-import Swal from 'sweetalert2';
-import { ConfigContext } from '@/store/config-context';
-import Messages from './Messages';
+
 import ModalOverlay from './ModalOverlay';
 import Loading from './Loading';
 import ReCAPTCHA from 'react-google-recaptcha';
+import Swal from 'sweetalert2';
 
 const Layout: React.FC<{ children: React.ReactNode }> = props => {
     const orderCtx = useContext(OrderContext);
     const { data: session }: { data: SessionExt | null; status: string } = useSession() as { data: SessionExt | null; status: string };
     const year = new Date().getFullYear();
-
     const [isMounted, setIsMounted] = useState(false);
     const router = useRouter();
     const [showMenuResp, setShowMenuResp] = useState<boolean>(false);
     const [windowWidth, setWindowWidth] = useState(0);
     const [showReCaptchaBtn, setShowReCaptchaBtn] = useState<boolean>(false);
+    const [isCaptchaVerified, setIsCaptchaVerified] = useState(false);
 
     // ** Stato per la verifica reCAPTCHA **
     const [isHuman, setIsHuman] = useState(false);
@@ -53,20 +52,18 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
             setShowMenuResp(false);
         }
     }, [windowWidth]);
-    // Assicurati di includere isChrome nell'array delle dipendenze
 
     // ** Gestisce la verifica reCAPTCHA **
-    const handleCaptchaVerification = (token: string | null) => {
-        if (token) {
-            setIsHuman(true);
-        } else {
-            setIsHuman(false);
-        }
-    };
+    // const handleCaptchaVerification = (token: string | null) => {
+    //     if (token) {
+    //         setIsHuman(true);
+    //     } else {
+    //         setIsHuman(false);
+    //     }
+    // };
     useEffect(() => {
         console.log(showReCaptchaBtn)
     }, [showReCaptchaBtn])
-
 
 
     return (
@@ -117,17 +114,20 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                                             </Link>
                                         </li>
                                         <li className="d-xl-none">
-                                            <Link href="/referral" legacyBehavior>
-                                                <a
-                                                    className={`d-flex align-items-center  ${isMounted && router.asPath !== '/subscribe' && 'text-black'}`}
-                                                    onClick={() => {
-                                                        setShowMenuResp(false);
-                                                    }}
-                                                    style={{ borderStyle: 'dotted' }}
-                                                >
-                                                    Referral
-                                                </a>
-                                            </Link>
+                                            {session && session.isPromoter === true && (
+                                                <Link href="/referral" legacyBehavior>
+                                                    <a
+                                                        className={`d-flex align-items-center  ${session && session.isPromoter === true ? 'text-black' : ''
+                                                            }`}
+                                                        onClick={() => {
+                                                            setShowMenuResp(false);
+                                                        }}
+                                                        style={{ borderStyle: 'dotted' }}
+                                                    >
+                                                        Referral
+                                                    </a>
+                                                </Link>
+                                            )}
                                         </li>
                                         <li className="d-xl-none">
                                             <Link href="/settings" legacyBehavior>
@@ -156,11 +156,13 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                                         </li>
 
                                         <li className="d-none d-xl-inline-block fw-bold">
-                                            <Link href="/referral" legacyBehavior>
-                                                <a className={`${isMounted}`} style={{ borderStyle: 'dotted' }}>
-                                                    Referral
-                                                </a>
-                                            </Link>
+                                            {session && session.isPromoter === true && (
+                                                <Link href="/referral" legacyBehavior>
+                                                    <a className={`${isMounted}`} style={{ borderStyle: 'dotted' }}>
+                                                        Referral
+                                                    </a>
+                                                </Link>
+                                            )}
                                         </li>
                                     </ul>
                                 </nav>
@@ -217,7 +219,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                                             </Link>
                                         </li>
 
-                                        <li>
+                                        {/* <li>
                                             {!isConnected && !showReCaptchaBtn && !isHuman && (<button className='btn btn-primary rounded-3 p-2' onClick={() => setShowReCaptchaBtn(true)}>Connect Wallet</button>)}
                                             {!isConnected && !isHuman && showReCaptchaBtn && (
 
@@ -231,7 +233,38 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                                             }
                                             {(isHuman || isConnected) &&
                                                 <ConnectButton showBalance={{ smallScreen: false, largeScreen: false }} />}
+                                        </li> */}
+                                        <li>
+                                            {!isConnected && !isCaptchaVerified && (
+                                                <div >
+                                                    <ReCAPTCHA
+                                                        sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
+                                                        onChange={(value) => {
+                                                            if (value) {
+                                                                setIsCaptchaVerified(true);
+                                                                Swal.fire({
+                                                                    title: 'Captcha verified!',
+                                                                    icon: 'success',
+                                                                });
+                                                            } else {
+                                                                setIsCaptchaVerified(false);
+                                                                Swal.fire({
+                                                                    title: 'Captcha verified error!',
+                                                                    icon: 'error',
+                                                                });
+                                                            }
+                                                        }}
+                                                    />
+                                                </div>
+                                            )}
+                                            {!isConnected && isCaptchaVerified && (
+                                                <ConnectButton showBalance={{ smallScreen: false, largeScreen: false }} />
+                                            )}
+                                            {isConnected && (
+                                                <ConnectButton showBalance={{ smallScreen: false, largeScreen: false }} />
+                                            )}
                                         </li>
+
 
                                         <li className="d-none d-xl-inline-block">
                                             <Link href="/settings" legacyBehavior>
@@ -240,12 +273,13 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                                                 </a>
                                             </Link>
                                         </li>
-                                        <li className="d-none d-xl-inline-block fw-bold">
+                                        <li className="d-none d-xl-inline-block fw-bold"> {session && session.isPromoter === true && (
                                             <Link href="/referral" legacyBehavior>
                                                 <a className={`${isMounted} p-1`} style={{ borderStyle: 'dotted' }}>
                                                     Referral
                                                 </a>
                                             </Link>
+                                        )}
                                         </li>
                                         <li className="ms-3 d-xl-none">
                                             <button className="btn p-0 open-menu d-xl-none" onClick={() => setShowMenuResp(true)}>
