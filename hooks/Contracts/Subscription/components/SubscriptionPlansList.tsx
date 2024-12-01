@@ -58,9 +58,9 @@ function SubscriptionPlansList() {
                     </Accordion.Header>
                     <Accordion.Body>
                         <ul className="list-group">
-                            <li className="list-group-item d-flex justify-content-between">
+                            <li className="list-group-item d-flex align-items-center  justify-content-lg-between justify-content-center flex-column flex-lg-row">
                                 <strong>Percentage:</strong>
-                                <div className="d-flex align-items-center justify-content-end">
+                                <div className="d-flex align-items-center justify-content-center justify-content-lg-end flex-column flex-lg-row">
                                     <b>%</b>
                                     <input
                                         type="number"
@@ -71,6 +71,7 @@ function SubscriptionPlansList() {
                                         min={0}
                                         max={50}
                                         step={1}
+                                        className='my-1 mx-0'
                                     />
                                     <button
                                         className="mx-1 rounded-5 p-1 px-4"
@@ -83,9 +84,9 @@ function SubscriptionPlansList() {
                                     </button>
                                 </div>
                             </li>
-                            <li className="list-group-item d-flex justify-content-between">
+                            <li className="list-group-item d-flex align-items-center justify-content-lg-between justify-content-center flex-column flex-lg-row">
                                 <strong>Price:</strong>
-                                <div className="d-flex align-items-center justify-content-end">
+                                <div className="d-flex align-items-center justify-content-center justify-content-lg-end flex-column flex-lg-row">
                                     <b>%</b>
                                     <input
                                         type="number"
@@ -96,6 +97,9 @@ function SubscriptionPlansList() {
                                         min={0}
                                         max={50}
                                         step={1}
+                                        className='my-1 mx-0'
+
+
                                     />
                                     <button
                                         className="mx-1 rounded-5 p-1 px-4"
