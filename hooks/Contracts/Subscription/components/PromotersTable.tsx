@@ -5,12 +5,13 @@ import { BigNumber } from 'ethers';
 import { PromoterModel } from '../types';
 import { useSession } from 'next-auth/react';
 import { SessionExt } from '../../../../types/SessionExt';
+import usePromoterManagement from '../customHooks/usePromoterManagement';
 const PromotersTable = () => {
     const { data: session }: { data: SessionExt | null } = useSession() as { data: SessionExt | null };
     const [promoters, setPromoters] = useState<PromoterModel[]>([]);
 
     const scale = 100; // Define the scale for 2 decimal places
-    const { getPromotersOnBC, addPromoterOnBC } = usePromoterContract();
+    const { getPromotersOnBC, addPromoterOnBC } = usePromoterManagement();
 
     useEffect(() => {
         const fetchPromoters = async () => {
@@ -46,8 +47,8 @@ const PromotersTable = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {promotersProp?.length > 0 ? (
-                        promotersProp?.map(promoter => (
+                    {promoters?.length > 0 ? (
+                        promoters?.map(promoter => (
                             <tr key={promoter.promoterAddress}>
                                 <td>{promoter?.promoterAddress}</td>
                                 <td>{promoter?.isActive ? 'Active' : 'Inactive'}</td>
@@ -68,7 +69,5 @@ const PromotersTable = () => {
 };
 
 export default PromotersTable;
-function usePromoterContract(): { getPromotersOnBC: any; addPromoterOnBC: any; } {
-    throw new Error('Function not implemented.');
-}
+
 
