@@ -23,7 +23,7 @@ export enum OrderStatus {
      CREATED = "CREATED",
      WAITING_TAX = "WAITING_TAX",
      WAITING_CONFIRMATION = "WAITING_CONFIRMATION",
-     PAYMENT_RECEIVED = "PAYMENT_RECEIVED",
+     ORDER_CONFIRMED = "ORDER_CONFIRMED",
      SENT_TO_AMAZON = "SENT_TO_AMAZON",
      RETURNED_TO_AMAZON = "RETURNED_TO_AMAZON",
      RETURNED = "RETURNED",
@@ -36,8 +36,8 @@ export enum OrderStatus {
 }
 export const OrderTableStatus = {
      WAITING_TAX: { value: "WAITING_TAX", description: "Waiting Tax" },
-     WAITING_CONFIRMATION: { value: "WAITING_CONFIRMATION", description: "Corfirm Order" },
-     PAYMENT_RECEIVED: { value: "PAYMENT_RECEIVED", description: "Payment Received" },
+     WAITING_CONFIRMATION: { value: "WAITING_CONFIRMATION", description: "Confirm Order" },
+     ORDER_CONFIRMED: { value: "ORDER_CONFIRMED", description: "Order Confirmed" },
      SENT_TO_AMAZON: { value: "SENT_TO_AMAZON", description: "Sent to Amazon" },
      SHIPPING_ADDRESS_REFUSED: { value: "SHIPPING_ADDRESS_REFUSED", description: "Shipping Address Refused" },
      PRODUCT_UNAVAILABLE: { value: "PRODUCT_UNAVAILABLE", description: "Product Unavailable" },

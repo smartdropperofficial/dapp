@@ -185,7 +185,7 @@ const OrderSummary: React.FC = () => {
 
                     if (hasCreated.created) {
                         const updateDb: OrderSB = {
-                            payment_tx: paymentTx,
+                            pre_order_payment_tx: paymentTx,
                             pre_order_amount: Number(ctx.basketTotal().toFixed(2)),
                         };
                         const hasUpdated = await updateOrder(hasCreated.data.order_id, updateDb);

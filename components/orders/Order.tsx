@@ -324,7 +324,7 @@ const Order: React.FC<IMyOrderProps> = (props: IMyOrderProps) => {
 
     const renderSwitch = (status: OrderStatus, asin: string, isReturned: boolean) => {
         switch (status) {
-            case OrderStatus.PAYMENT_RECEIVED:
+            case OrderStatus.ORDER_CONFIRMED:
                 return (
                     <button
                         onClick={() => showInfoSwal('We are placing your order on Amazon, please come back later')}

@@ -174,10 +174,10 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
                     </span>
                 );
 
-            case OrderTableStatus.PAYMENT_RECEIVED.value:
+            case OrderTableStatus.ORDER_CONFIRMED.value:
                 return (
                     <span className="col-10 col-xl-8 text-success text-center my-1 p-2 rounded-2" style={{ backgroundColor: '#d3ffcb' }}>
-                        <b>{OrderTableStatus.PAYMENT_RECEIVED.description}</b>
+                        <b>{OrderTableStatus.ORDER_CONFIRMED.description}</b>
                     </span>
                 );
 

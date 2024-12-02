@@ -9,7 +9,9 @@ export interface OrderSB {
      shipping_info?: ShippingInfoSB;
      products?: ProductSB[];
      request_id?: string;
-     payment_tx?: string;
+     pre_order_payment_tx?: string;
+     tax_payment_tx?: string;
+     order_creation_tx?: string;
      unlock_tx?: string;
      return_tx?: string;
      creation_tx?: string;

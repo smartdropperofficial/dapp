@@ -67,40 +67,7 @@ function SubcriptionPlanDetails({ subId }: { subId: number }) {
                                         ...{subscription?.subscriber?.substring(subscription?.subscriber.length - 20, subscription?.subscriber.length - 1)}
                                     </span>
                                 </li>
-                                {/* <li className="list-group-item d-flex justify-content-between">
-                              <strong>Is active:</strong>
-                              <Form.Check // prettier-ignore
-                                  type="switch"
-                                  id="custom-switch"
-                                  label={subscription?. ? 'Active' : 'Inactive'}
-                                  checked={subscription?.isActive}
-                                  onChange={e => setPromoterActiveHandler(subscription?.promoterAddress, e.target.checked)} // Fix this
-                              />
-                          </li> */}
-                                {/* <li className="list-group-item d-flex col-12">
-                              <div className="d-flex  align-items-center">
-                                  <strong>Percentage:</strong>
-                              </div>
-                              <div className="d-flex  align-items-center justify-content-end w-100">
-                                  <b>%</b>
-                                  <input
-                                      type="number"
-                                      value={subscription?.percentage}
-                                      style={{ width: '15%', textAlign: 'center' }}
-                                      onChange={e => setSubscription({ ...subscription!, percentage: Number(e.target.value) })}
-                                      pattern="[0-9]"
-                                      min={0}
-                                      max={50}
-                                  />
-                                  <button
-                                      className="mx-1 rounded-5 p-1 px-4"
-                                      style={{ backgroundColor: '#ff9900', color: 'white', border: 'none' }}
-                                      onClick={() => setPromoterPercentageHandler(subscription?.promoterAddress, subscription?.percentage)}
-                                  >
-                                      confirm
-                                  </button>
-                              </div>
-                          </li> */}
+
                                 <li className="list-group-item d-flex justify-content-between">
                                     <strong>PLAN:</strong>
                                     <span className="text-end">{subscription?.subscriptionModel?.name.toUpperCase()}</span>
@@ -130,13 +97,13 @@ function SubcriptionPlanDetails({ subId }: { subId: number }) {
                                                     pattern="[0-9]"
                                                     min={0}
                                                     max={subscription?.subscriptionModel?.shopLimit!}
-                                                    //   disabled={subContext.currentSubscription?.subscriptionModel.shopLimit! === 0 || subContext.currentSubscription?.totShopAmountPaid! > subContext.currentSubscription?.subscriptionModel.shopLimit!}
+                                                //   disabled={subContext.currentSubscription?.subscriptionModel.shopLimit! === 0 || subContext.currentSubscription?.totShopAmountPaid! > subContext.currentSubscription?.subscriptionModel.shopLimit!}
                                                 />
                                                 <button
                                                     className="mx-1 rounded-5 p-1 px-4"
                                                     style={{ backgroundColor: '#ff9900', color: 'white', border: 'none' }}
                                                     onClick={changeTotShopAmountPaidHandleClick}
-                                                    //   disabled={newTotShopAmountPaid === 0 ||    subContext.currentSubscription?.totShopAmountPaid! >  subContext.currentSubscription?.subscriptionModel.shopLimit!}
+                                                //   disabled={newTotShopAmountPaid === 0 ||    subContext.currentSubscription?.totShopAmountPaid! >  subContext.currentSubscription?.subscriptionModel.shopLimit!}
                                                 >
                                                     confirm
                                                 </button>

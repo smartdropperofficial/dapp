@@ -411,9 +411,9 @@ const Checkout = () => {
     };
     const processOrder = async () => {
         const updateDb: OrderSB = {
-            status: OrderStatus.PAYMENT_RECEIVED,
+            status: OrderStatus.ORDER_CONFIRMED,
             total_amount_paid: Number(amountToPay.total.toFixed(2)),
-            payment_tx: paymentTx,
+            tax_payment_tx: paymentTx,
             commission: Number(fees!.toFixed(2)),
         };
 

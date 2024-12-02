@@ -147,8 +147,8 @@ const OrderProduct: React.FC<IMyOrderProductProps> = ({ product, order }) => {
                             </OverlayTrigger>
                         </div>
                         <div className="d-flex flex-column flex-xl-row col-12 justify-content-between">
-                            <a className="disclaimer pe-auto" href={`https://polygonscan.com/tx/${order?.payment_tx}`} target="_blank">
-                                {order?.payment_tx ? BreakCode(order?.payment_tx!) : "No transaction hash"}
+                            <a className="disclaimer pe-auto" href={`https://polygonscan.com/tx/${order?.pre_order_payment_tx}`} target="_blank">
+                                {order?.pre_order_payment_tx ? BreakCode(order?.pre_order_payment_tx!) : "No transaction hash"}
 
                                 <Tooltip title="Open on polygonscan">
                                     <IconButton>
@@ -158,7 +158,7 @@ const OrderProduct: React.FC<IMyOrderProductProps> = ({ product, order }) => {
                             </a>
 
                             <div
-                                onClick={() => copyToClipboard(order?.payment_tx ?? '', setPaymentCopy)}
+                                onClick={() => copyToClipboard(order?.pre_order_payment_tx ?? '', setPaymentCopy)}
                                 style={{ cursor: 'pointer' }}
                                 onMouseLeave={() => {
                                     setPaymentCopy('Copy');
@@ -173,7 +173,7 @@ const OrderProduct: React.FC<IMyOrderProductProps> = ({ product, order }) => {
                         </div>
                     </div>
                 </div>
-                {order?.payment_tx && !order?.creation_tx && (
+                {order?.pre_order_payment_tx && !order?.creation_tx && (
                     <div className="d-flex col-12">
                         <span className="disclaimer alert alert-warning my-1 text-center col-12">
                             * If you don&apos;t see any <b> Order code</b> 1 hour after Order Payment and Order Confirmation, contact support on Telegram
