@@ -26,7 +26,8 @@ export interface OrderSB {
      email?: string;
      currency?: string;
      retailer?: string;
-     ticket_id?: string;  // Aggiunta dei ticket di supporto
+     ticket_id?: string;  // Aggiunta dei ticket di supporto 
+     subscription_id?: string;     
 }
 
 export interface TicketSB {

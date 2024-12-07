@@ -185,35 +185,38 @@ export const createOrderOnWeb3 = async (subId: number, orderId: string | null, b
 const generateOrderObject = (ctx: any, orderId: string, address: string): OrderSB | null => {
     console.log('🚀 ~ file: OrderController.ts:136 ~ generateOrderObject ~ ctx', ctx.items);
     try {
+        if (!ctx || !ctx.shippingInfo || !ctx.items) {
+            return null;
+        }
         return {
             wallet_address: address,
             country: 'US',
             status: OrderStatus.CREATED,
             order_id: orderId,
-            email: ctx.email,
+            email: ctx.email || '',
             currency: 'USD',
-            retailer: ctx.retailer,
-
+            retailer: ctx.retailer || '',
+            subscription_id: ctx.currentSubscription || '',
             shipping_info: {
-                first_name: ctx.shippingInfo.firstName,
-                last_name: ctx.shippingInfo.lastName,
-                address_line1: ctx.shippingInfo.addressLine1,
-                address_line2: ctx.shippingInfo.addressLine2,
-                zip_code: ctx.shippingInfo.zipCode,
-                city: ctx.shippingInfo.city,
-                state: ctx.shippingInfo.state,
-                phone_number: ctx.shippingInfo.phoneNumber,
-                email: ctx.shippingInfo.email,
+                first_name: ctx.shippingInfo.firstName || '',
+                last_name: ctx.shippingInfo.lastName || '',
+                address_line1: ctx.shippingInfo.addressLine1 || '',
+                address_line2: ctx.shippingInfo.addressLine2 || '',
+                zip_code: ctx.shippingInfo.zipCode || '',
+                city: ctx.shippingInfo.city || '',
+                state: ctx.shippingInfo.state || '',
+                phone_number: ctx.shippingInfo.phoneNumber || '',
+                email: ctx.shippingInfo.email || '',
             },
             products: ctx.items.map((product: ProductSB) => {
                 return {
-                    asin: product.asin,
-                    image: product.image,
-                    symbol: product.symbol,
-                    title: product.title,
-                    url: product.url,
-                    price: product.price.toFixed(2),
-                    quantity: product.quantity,
+                    asin: product.asin || '',
+                    image: product.image || '',
+                    symbol: product.symbol || '',
+                    title: product.title || '',
+                    url: product.url || '',
+                    price: product.price ? product.price.toFixed(2) : '0.00',
+                    quantity: product.quantity || 0,
                 };
             }),
         };
