@@ -49,12 +49,13 @@ const BasketItem = ({ id, el }: { id: any; el: any }) => {
     };
 
     // Esegui `editBasketQtyHandler` quando `quantity` viene aggiornato
-    useEffect(() => {
-        if (quantity !== el.quantity) {
-            setInputValue(quantity);
-            orderContext.editBasketQtyHandler(id, quantity);
+    const handleClick = (newQuantity: number) => {
+        setQuantity(newQuantity);
+        if (newQuantity !== el.quantity) {
+            setInputValue(newQuantity);
+            orderContext.editBasketQtyHandler(id, newQuantity);
         }
-    }, [quantity, id, orderContext, el.quantity]);
+    };
 
     const CanAddMoreItems = (newQuantity: number): number => {
         return orderContext.items.reduce((total, item) => {
@@ -93,7 +94,7 @@ const BasketItem = ({ id, el }: { id: any; el: any }) => {
                         value={inputValue}
                         min={0}
                     />
-                    <i className="fa fa-plus" aria-hidden="true" onClick={() => setQuantity(quantity + 1)}></i>
+                    <i className="fa fa-plus" aria-hidden="true" onClick={() => handleClick(quantity + 1)}></i>
 
                 </div>
             </div>
