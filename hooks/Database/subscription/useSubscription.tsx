@@ -4,15 +4,15 @@ import { convertToDecimal, convertToScaled } from '@/utils/utils';
 import { checkErrorMessage } from '@/errors/checkErrorMessage';
 import { ConfigContext } from '@/store/config-context';
 import { createDataOnSB, getDataFromSB, updateDataOnSB } from '../services/update';
-import { SubscriptionPlansSB } from '../types';
-import { SubscriptionManagementSB } from '../types';
+import { SubscriptionPlans } from '../types';
+import { SubscriptionManagementModel } from '../types';
 import { id } from 'ethers/lib/utils.js';
 
-const useSubscriptionModel = () => {
+const useSubscriptionManagement = () => {
     const { config } = useContext(ConfigContext);
-    const TABLE = 'subscription_plans';
+    const TABLE = 'subscription';
 
-    const getSubscriptionByPeriod = useCallback(async (subscriptionPeriod: number): Promise<SubscriptionManagementSB[]> => {
+    const getSubscriptionByPeriod = useCallback(async (subscriptionPeriod: number): Promise<SubscriptionManagementModel[]> => {
         if (!getDataFromSB) throw new Error('getData is not initialized');
         try {
             const result = await getDataFromSB(TABLE, { subscriptionPeriod: subscriptionPeriod });
@@ -32,7 +32,7 @@ const useSubscriptionModel = () => {
             throw error;
         }
     }, []);
-    const getSubscriptionByType = useCallback(async (subscriptionType: number): Promise<SubscriptionManagementSB[]> => {
+    const getSubscriptionByType = useCallback(async (subscriptionType: number): Promise<SubscriptionManagementModel[]> => {
         if (!getDataFromSB) throw new Error('getData is not initialized');
 
         try {
@@ -50,7 +50,7 @@ const useSubscriptionModel = () => {
             }));
         } catch (error: any) {
             checkErrorMessage(error.message);
-            return [] as SubscriptionManagementSB[];
+            return [] as SubscriptionManagementModel[];
         }
     }, []);
     const addSubscriptionModelOnSB = useCallback(
@@ -111,7 +111,7 @@ const useSubscriptionModel = () => {
             checkErrorMessage(error.message);
         }
     }, []);
-    const getSubscriptionModels = useCallback(async (): Promise<SubscriptionPlansSB[]> => {
+    const getSubscriptionModels = useCallback(async (): Promise<SubscriptionPlans[]> => {
         if (getDataFromSB) {
             try {
                 const result = await getDataFromSB(TABLE);
@@ -130,12 +130,55 @@ const useSubscriptionModel = () => {
             } catch (error: any) {
                 checkErrorMessage(error.message);
 
-                return [] as SubscriptionPlansSB[];
+                return [] as SubscriptionPlans[];
             }
         } else {
-            return [] as SubscriptionPlansSB[];
+            return [] as SubscriptionPlans[];
         }
     }, []);
+    const getSubscriptionsByAddress = useCallback(async (subscriber: string): Promise<SubscriptionManagementModel[]> => {
+        if (!getDataFromSB) throw new Error('getData is not initialized');
+        try {
+            const result = await getDataFromSB(TABLE, { wallet: subscriber });
+            return result.map((sub: any) => ({
+                id: sub.id,
+                subscriptionType: sub.subscriptionType,
+                subscriptionPeriod: sub.subscriptionPeriod,
+                name: sub.name,
+                price: convertToDecimal(sub.price),
+                period: sub.period,
+                enabled: sub.enabled,
+                fees: convertToDecimal(sub.fees),
+                shopLimit: sub.shopLimit,
+            }));
+        } catch (error: any) {
+            checkErrorMessage(error.message);
+
+            throw error;
+        }
+    }, []);
+    const getLastValidSubscription = useCallback(async (subscriber: string): Promise<SubscriptionManagementModel | null> => {
+        if (!getDataFromSB) throw new Error('getData is not initialized');
+        try {
+            const result = await getDataFromSB(TABLE, { wallet: subscriber });
+            return result.map((sub: any) => ({
+                id: sub.id,
+                subscriptionType: sub.subscriptionType,
+                subscriptionPeriod: sub.subscriptionPeriod,
+                name: sub.name,
+                price: convertToDecimal(sub.price),
+                period: sub.period,
+                enabled: sub.enabled,
+                fees: convertToDecimal(sub.fees),
+                shopLimit: sub.shopLimit,
+            }));
+        } catch (error: any) {
+            checkErrorMessage(error.message);
+
+            throw error;
+        }
+    }, []);
+
 
     return {
         getSubscriptionByPeriod,
@@ -145,5 +188,8 @@ const useSubscriptionModel = () => {
         changeSubscriptionPrice,
         changeSubscriptionTypeShopLimit,
         getSubscriptionModels,
+        getSubscriptionsByAddress,
+        getLastValidSubscription
     };
 };
+export default useSubscriptionManagement;

@@ -13,7 +13,7 @@ export enum SubscriptionPeriod {
 }
 
 // Define Structs in TypeScript
-export interface PromoterModelSB {
+export interface PromoterModel {
     percentage: number;
     isActive: boolean;
     promoterAddress: string;
@@ -21,7 +21,7 @@ export interface PromoterModelSB {
     referralCode: string;
 }
 
-export interface SubscriptionPlansSB {
+export interface SubscriptionPlans {
     id: number;
     subscriptionType: SubscriptionType;
     subscriptionPeriod: SubscriptionPeriod;
@@ -36,17 +36,34 @@ export interface SubscriptionPlansSB {
     shopLimit: number;
 }
 
-export interface SubscriptionManagementSB {
+// export interface SubscriptionManagementSB {
+//     id: number;
+//     subscriber: string;
+//     promoterAddress: string;
+//     start: string;
+//     end: string;
+//     subscriptionType: SubscriptionType;
+//     subscriptionPeriod: SubscriptionPeriod;
+//     totAmountPaid: number;
+//     totShopAmountPaid: number;
+//     paymentTx: string;
+//     promoterProfit: number;
+//     promoterWithdrawn: boolean;
+// }
+export interface SubscriptionManagementModel {
     id: number;
-    subscriber: string;
-    promoterAddress: string;
-    start: string;
-    end: string;
-    subscriptionType: SubscriptionType;
-    subscriptionPeriod: SubscriptionPeriod;
-    totAmountPaid: number;
-    totShopAmountPaid: number;
-    paymentTx: string;
-    promoterProfit: number;
-    promoterWithdrawn: boolean;
+    createdAt: string;
+    subscriber: string | null;
+    promoterAddress: string | null;
+    start: string | null;
+    end: string | null;
+    subscriptionType: number;
+    paymentTx: string | null;
+    promoterWithdrawn: boolean | null;
+    subscriptionTx: string | null;
+    promoterWithdrawnTx: string | null;
+    budgetLeft: number | null;
+    monthlyBudget: number | null;
+    planId: number | null;
+    subscriptionId: string | null;
 }
