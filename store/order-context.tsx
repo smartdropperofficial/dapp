@@ -503,6 +503,7 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
         const fetchBasketItems = async (wallet: string) => {
             try {
                 const items: ContextProductInfo[] = await getBasketOnDB(wallet);
+                console.log("🚀 ~ fetchBasketItems ~ items:", items)
                 if (items?.length > 0) {
                     setItems(items);
                 }

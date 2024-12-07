@@ -214,7 +214,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                                         <li className="d-inline-block d-xl-none mx-3">
                                             <Link href="/" legacyBehavior>
                                                 <a className="d-block position-relative w-100 h-100">
-                                                    <Image src="/assets/logo-mobile.svg" width={50} height={50} alt="SmartShopper Logo Mobile" />
+                                                    <Image src="/icons/SD_icon_orange.svg" width={50} height={50} alt="SmartShopper Logo Mobile" />
                                                 </a>
                                             </Link>
                                         </li>

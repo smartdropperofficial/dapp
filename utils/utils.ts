@@ -15,15 +15,15 @@ export const encryptData = (data: string) => {
     return encodeURIComponent(ciphertext.toString());
 };
 export const decryptData = (data: string) => {
-    console.log("🚀 ~ decryptData ~ data:", data)
+    console.log('🚀 ~ decryptData ~ data:', data);
     try {
         const decodedStr = decodeURIComponent(data);
-        console.log("🚀 ~ decryptData ~ decodedStr:", decodedStr)
+        console.log('🚀 ~ decryptData ~ decodedStr:', decodedStr);
         const res = AES.decrypt(decodedStr, process.env.NEXT_PUBLIC_API_ENCRYPTER!).toString(enc.Utf8);
-        console.log("🚀 ~ decryptData ~ res:", res)
+        console.log('🚀 ~ decryptData ~ res:', res);
         return res;
     } catch (error) {
-        console.log("🚀 ~ decryptData ~ error:", error)
+        console.log('🚀 ~ decryptData ~ error:', error);
         return '';
     }
 };
@@ -66,14 +66,13 @@ export function formatDateTime(timestampSeconds?: number): string {
     return new Date(timestampMilliseconds).toLocaleString();
 }
 export function isDateExpired(dateString?: string): boolean {
-
+    alert(dateString);
     if (!dateString) {
-        throw new Error("La data deve essere fornita");
+        throw new Error('La data deve essere fornita');
     }
 
     const now = new Date();
     const inputDate = parse(dateString, 'd/M/yyyy, HH:mm:ss', new Date());
-
 
     if (!isValid(inputDate)) {
         return false;
@@ -124,15 +123,13 @@ export const checkTxError = (error: any): boolean => {
         } else {
             console.log('🚀 ~ Replacement transaction failed or was cancelled');
             return false;
-
         }
     } else {
         console.log('🚀 ~ error:', error);
         checkErrorMessage(error.message);
         return false;
-
     }
-}
+};
 export const getFormatedSubscriptionObject = (subscription: any): SubscriptionManagementModel => {
     return {
         id: Number(subscription.id),
@@ -158,9 +155,9 @@ export const getFormatedSubscriptionObject = (subscription: any): SubscriptionMa
         totShopAmountPaid: Number(convertToDecimal(subscription.totShopAmountPaid)),
         paymentTx: subscription?.paymentTx,
         promoterProfit: Number(formatUnits(Number(ethers.BigNumber.from(subscription?.promoterProfit)), 6)),
-        promoterWithdrawn: subscription.promoterWithdrawn
-    }
-}
+        promoterWithdrawn: subscription.promoterWithdrawn,
+    };
+};
 export const formatSPDate = (dateString: string): string => {
     const date = new Date(dateString);
     const formattedDate = format(date, 'yyyy-MM-dd HH:mm:ss');
@@ -170,10 +167,7 @@ export const formatSPDate = (dateString: string): string => {
 export const fetchAbiFromDatabase = async (contractName: string): Promise<any | null> => {
     try {
         // Define the data type as an object with string keys
-        const { data, error } = await supabase
-            .from('abi_contracts')
-            .select(contractName)
-            .single();
+        const { data, error } = await supabase.from('abi_contracts').select(contractName).single();
 
         // Handle errors returned by Supabase
         if (error) {
@@ -199,22 +193,21 @@ export const fetchAbiFromDatabase = async (contractName: string): Promise<any | 
     }
 };
 export const filterAbi = (abi: Abi): (AbiFunction | AbiEvent)[] => {
-    return abi.filter(
-        (item): item is AbiFunction | AbiEvent =>
-            item.type === 'function' || item.type === 'event'
-    );
+    return abi.filter((item): item is AbiFunction | AbiEvent => item.type === 'function' || item.type === 'event');
 };
 export const FormatedAbi = (abi: any) => {
-    return abi.abiConfig?.orderAbi ? (typeof abi.abiConfig.orderAbi === 'string'
-        ? filterAbi(JSON.parse(abi.abiConfig.orderAbi) as Abi)
-        : filterAbi(abi.abiConfig.orderAbi as Abi)) // Se è già un oggetto
+    return abi.abiConfig?.orderAbi
+        ? typeof abi.abiConfig.orderAbi === 'string'
+            ? filterAbi(JSON.parse(abi.abiConfig.orderAbi) as Abi)
+            : filterAbi(abi.abiConfig.orderAbi as Abi) // Se è già un oggetto
         : undefined;
-}
+};
 export async function getUserByWalletAddress(walletAddress: string) {
     try {
         const { data: userWallet, error } = await supabase
             .from('user_wallets')
-            .select(`
+            .select(
+                `
           wallet_address,
           user:users!inner (
             user_id,
@@ -224,12 +217,13 @@ export async function getUserByWalletAddress(walletAddress: string) {
             is_admin, 
             is_promoter
           )
-        `)
+        `
+            )
             .eq('wallet_address', walletAddress)
             .single();
 
         if (error || !userWallet) {
-            console.log("🚀 ~ getUserByWalletAddress ~ errore:", error);
+            console.log('🚀 ~ getUserByWalletAddress ~ errore:', error);
             return null;
         }
 
@@ -297,13 +291,9 @@ export const modifyBasketOnDB = async (wallet: string, items: any) => {
     }
 };
 export const deleteBasketOnDB = async (wallet: string): Promise<boolean> => {
-    console.log("🚀 ~ deleteBasketOnDB ~ wallet:", wallet)
+    console.log('🚀 ~ deleteBasketOnDB ~ wallet:', wallet);
     try {
-        const { data: deleteItem, error: editError } = await supabase
-            .from('basket')
-            .delete()
-            .eq('wallet_address', wallet)
-
+        const { data: deleteItem, error: editError } = await supabase.from('basket').delete().eq('wallet_address', wallet);
 
         if (editError) {
             console.log('🚀 ~ deleteBasketOnDB ~ editError:', editError);
@@ -314,11 +304,9 @@ export const deleteBasketOnDB = async (wallet: string): Promise<boolean> => {
         }
 
         return true;
-
     } catch (error) {
         console.log('🚀 ~ modifyBasketOnDB ~ error:', error);
         return true;
-
     }
 };
 
@@ -336,5 +324,3 @@ export const getBasketOnDB = async (wallet: string): Promise<ContextProductInfo[
         return [];
     }
 };
-
-
