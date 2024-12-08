@@ -153,8 +153,8 @@ const Subscribe = () => {
                                                                 </td>
                                                                 <td>{sub.start}</td>
                                                                 <td>{sub.end}</td>
-                                                                <td>{isDateExpired(sub.end) ? 'yes' : 'no'}</td>
-                                                                <td>{sub?.totShopAmountPaid}</td>
+                                                                <td>{isDateExpired(sub.end!) ? 'yes' : 'no'}</td>
+                                                                <td>${sub?.monthlyBudget?.toFixed(2)}</td>
                                                             </tr>
                                                         );
                                                     })

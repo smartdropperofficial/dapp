@@ -134,7 +134,7 @@ const useSubscriptionManagement = () => {
                     //     totAmountPaid: convertToDecimal(subscription.totAmountPaid),
                     //     paymentTx: subscription?.paymentTx,
                     //     promoterProfit: convertToDecimal(subscription?.promoterProfit),
-                    //     totShopAmountPaid: convertToDecimal(subscription.totShopAmountPaid),
+                    //     totShopAmountPaid: convertToDecimal(subscription.monthlyBudget),
                     //     promoterWithdrawn: subscription.promoterWithdrawn,
                     // };
                 } catch (error: any) {
@@ -176,7 +176,7 @@ const useSubscriptionManagement = () => {
                     //     totAmountPaid: convertToDecimal(subscription.totAmountPaid),
                     //     paymentTx: subscription?.paymentTx,
                     //     promoterProfit: convertToDecimal(subscription?.promoterProfit),
-                    //     totShopAmountPaid: convertToDecimal(subscription.totShopAmountPaid),
+                    //     totShopAmountPaid: convertToDecimal(subscription.monthlyBudget),
                     //     promoterWithdrawn: subscription.promoterWithdrawn,
                     // };
                 } catch (error: any) {
@@ -247,7 +247,7 @@ const useSubscriptionManagement = () => {
     //                     return null as unknown as SubscriptionManagementModel;
     //                 }  
     //                 console.log("🚀 ~ subscription:",  Number(subscription.id))
-    //                 console.log("🚀 ~ totShopAmountPaid:",  convertToDecimal(subscription.totShopAmountPaid))
+    //                 console.log("🚀 ~ totShopAmountPaid:",  convertToDecimal(subscription.monthlyBudget))
 
     //                 return {
     //                     id: Number(subscription.id),
@@ -272,7 +272,7 @@ const useSubscriptionManagement = () => {
     //                     totAmountPaid: convertToDecimal(subscription.totAmountPaid),
     //                     paymentTx: subscription?.paymentTx,
     //                     promoterProfit: convertToDecimal(subscription?.promoterProfit), 
-    //                     totShopAmountPaid: convertToDecimal(subscription.totShopAmountPaid),
+    //                     totShopAmountPaid: convertToDecimal(subscription.monthlyBudget),
     //                     promoterWithdrawn: subscription.promoterWithdrawn,
     //                 };
     //             } catch (error: any) {
@@ -334,7 +334,7 @@ const useSubscriptionManagement = () => {
                         //promoterProfit: convertToDecimal(subscription?.promoterProfit),
 
                         promoterProfit: formatUnits(Number(ethers.BigNumber.from(subscription?.promoterProfit)), 6),
-                        totShopAmountPaid: Number(formatUnits((subscription.totShopAmountPaid, 6))),
+                        totShopAmountPaid: Number(formatUnits((subscription.monthlyBudget, 6))),
 
                         promoterWithdrawn: subscription.promoterWithdrawn
                     } as any;
@@ -377,7 +377,7 @@ const useSubscriptionManagement = () => {
                     //     totAmountPaid: convertToDecimal(subscription.totAmountPaid),
                     //     paymentTx: subscription?.paymentTx,
                     //     promoterProfit: convertToDecimal(subscription?.promoterProfit),
-                    //     totShopAmountPaid: convertToDecimal(subscription.totShopAmountPaid),
+                    //     totShopAmountPaid: convertToDecimal(subscription.monthlyBudget),
 
                     //     promoterWithdrawn: subscription.promoterWithdrawn,
                     // }));  
@@ -411,7 +411,7 @@ const useSubscriptionManagement = () => {
                     //     //promoterProfit: convertToDecimal(subscription?.promoterProfit),
 
                     //     promoterProfit: formatUnits(Number(ethers.BigNumber.from(subscription?.promoterProfit)), 6),
-                    //     totShopAmountPaid: Number(formatUnits((subscription.totShopAmountPaid, 6))),
+                    //     totShopAmountPaid: Number(formatUnits((subscription.monthlyBudget, 6))),
                     //     promoterWithdrawn: subscription.promoterWithdrawn
                     // }));
                 } catch (error: any) {
@@ -455,7 +455,7 @@ const useSubscriptionManagement = () => {
                     //     totAmountPaid: subscription.totAmountPaid,
                     //     paymentTx: subscription?.paymentTx,
                     //     promoterProfit: convertToDecimal(subscription?.promoterProfit),
-                    //     totShopAmountPaid: convertToDecimal(subscription.totShopAmountPaid),
+                    //     totShopAmountPaid: convertToDecimal(subscription.monthlyBudget),
                     //     promoterWithdrawn: subscription.promoterWithdrawn,
                     // };
                 } catch (error: any) {

@@ -1,10 +1,10 @@
 import { useEffect, useState, useCallback, useContext } from 'react';
 import Swal from 'sweetalert2';
-import { convertToDecimal, convertToScaled } from '@/utils/utils';
+import { convertToDecimal, convertToScaled, encryptData } from '@/utils/utils';
 import { checkErrorMessage } from '@/errors/checkErrorMessage';
 import { ConfigContext } from '@/store/config-context';
 import { createDataOnSB, getDataFromSB, updateDataOnSB } from '../services/update';
-import { SubscriptionPlans } from '../types';
+import { SubscriptionPlan } from '../types';
 import { SubscriptionManagementModel } from '../types';
 import { id } from 'ethers/lib/utils.js';
 
@@ -111,7 +111,7 @@ const useSubscriptionManagement = () => {
             checkErrorMessage(error.message);
         }
     }, []);
-    const getSubscriptionModels = useCallback(async (): Promise<SubscriptionPlans[]> => {
+    const getSubscriptionModels = useCallback(async (): Promise<SubscriptionPlan[]> => {
         if (getDataFromSB) {
             try {
                 const result = await getDataFromSB(TABLE);
@@ -130,33 +130,63 @@ const useSubscriptionManagement = () => {
             } catch (error: any) {
                 checkErrorMessage(error.message);
 
-                return [] as SubscriptionPlans[];
+                return [] as SubscriptionPlan[];
             }
         } else {
-            return [] as SubscriptionPlans[];
+            return [] as SubscriptionPlan[];
         }
     }, []);
     const getSubscriptionsByAddress = useCallback(async (subscriber: string): Promise<SubscriptionManagementModel[]> => {
-        if (!getDataFromSB) throw new Error('getData is not initialized');
-        try {
-            const result = await getDataFromSB(TABLE, { wallet: subscriber });
-            return result.map((sub: any) => ({
-                id: sub.id,
-                subscriptionType: sub.subscriptionType,
-                subscriptionPeriod: sub.subscriptionPeriod,
-                name: sub.name,
-                price: convertToDecimal(sub.price),
-                period: sub.period,
-                enabled: sub.enabled,
-                fees: convertToDecimal(sub.fees),
-                shopLimit: sub.shopLimit,
-            }));
-        } catch (error: any) {
-            checkErrorMessage(error.message);
+        if (!subscriber) {
+            return [];
+        }
 
+        try {
+            const wallet = encryptData(subscriber as string);
+
+            const response = await fetch(`/api/getAllSubsByWallet?wallet=${encodeURIComponent(wallet)}`);
+            if (!response.ok) {
+                const errorText = await response.text();
+                return [] as SubscriptionManagementModel[];
+            }
+
+            const result = await response.json();
+
+            const res = result.map((sub: any) => ({
+                subscriptionType: sub.plan?.subscription_type,
+                subscriptionPeriod: sub.plan?.subscription_period || null,
+                name: sub.plan?.name,
+                price: convertToDecimal(sub.plan?.price),
+                period: sub.plan?.period,
+                enabled: sub.plan?.enabled,
+                fees: convertToDecimal(sub.plan?.fees),
+                shopLimit: sub.plan?.shop_limit,
+                start: sub.start_date,
+                end: sub.end_date,
+                paymentTx: sub.payment_tx,
+                subscriptionTx: sub.subscription_tx,
+                budgetLeft: sub.budget_left,
+                monthlyBudget: sub.monthly_budget,
+                isPromoActive: sub.plan?.is_promo_active,
+                promoPrice: sub.plan?.promo_price,
+                promoFees: sub.plan?.promo_fees,
+                createdAt: sub.subscription_created_at,
+                promoterAddress: sub.promoter_address,
+                promoterWithdrawn: sub.promoter_withdrawn,
+                promoterWithdrawnTx: sub.promoter_withdrawn_tx,
+                subscriptionModel: {
+                    ...sub.plan
+                }
+            }));
+            console.log("🚀 ~ res ~ res:", res)
+            return res;
+
+        } catch (error: any) {
+            // checkErrorMessage(error.message);
             throw error;
         }
-    }, []);
+    }, [checkErrorMessage, convertToDecimal]);
+
     const getLastValidSubscription = useCallback(async (subscriber: string): Promise<SubscriptionManagementModel | null> => {
         if (!getDataFromSB) throw new Error('getData is not initialized');
         try {

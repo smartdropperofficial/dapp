@@ -26,7 +26,7 @@ const BasketItem = ({ id, el }: { id: any; el: any }) => {
                 if (subContext?.currentSubscription?.subscriptionModel?.shopLimit! > 0) {
                     if (
                         CanAddMoreItems(value) <
-                        subContext?.currentSubscription?.subscriptionModel?.shopLimit! - subContext?.currentSubscription?.totShopAmountPaid!
+                        subContext?.currentSubscription?.subscriptionModel?.shopLimit! - subContext?.currentSubscription?.monthlyBudget!
                     ) {
                         setQuantity(value); // Imposta il valore finale
                     } else {

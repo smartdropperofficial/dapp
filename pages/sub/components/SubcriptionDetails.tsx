@@ -156,7 +156,7 @@ function SubcriptionDetails({ subId }: { subId: number }) {
                                         </li>
                                         <li className="list-group-item d-flex justify-content-between">
                                             <strong>Shop spent:</strong>
-                                            <span className="text-end">${subscription?.totShopAmountPaid?.toFixed(2)}</span>
+                                            <span className="text-end">${subscription?.monthlyBudget?.toFixed(2)}</span>
                                         </li>
                                         <li className="list-group-item d-flex col-12">
                                             <div className="d-flex  align-items-center">
@@ -172,13 +172,13 @@ function SubcriptionDetails({ subId }: { subId: number }) {
                                                     pattern="[0-9]"
                                                     min={0}
                                                     max={subscription?.subscriptionModel?.shopLimit!}
-                                                //   disabled={subContext.currentSubscription?.subscriptionModel.shopLimit! === 0 || subContext.currentSubscription?.totShopAmountPaid! > subContext.currentSubscription?.subscriptionModel.shopLimit!}
+                                                //   disabled={subContext.currentSubscription?.subscriptionModel.shopLimit! === 0 || subContext.currentSubscription?.monthlyBudget! > subContext.currentSubscription?.subscriptionModel.shopLimit!}
                                                 />
                                                 <button
                                                     className="mx-1 rounded-5 p-1 px-4"
                                                     style={{ backgroundColor: '#ff9900', color: 'white', border: 'none' }}
                                                     onClick={changeTotShopAmountPaidHandleClick}
-                                                //   disabled={newTotShopAmountPaid === 0 ||    subContext.currentSubscription?.totShopAmountPaid! >  subContext.currentSubscription?.subscriptionModel.shopLimit!}
+                                                //   disabled={newTotShopAmountPaid === 0 ||    subContext.currentSubscription?.monthlyBudget! >  subContext.currentSubscription?.subscriptionModel.shopLimit!}
                                                 >
                                                     confirm
                                                 </button>

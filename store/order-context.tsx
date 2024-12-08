@@ -491,7 +491,7 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const checkoutHandler = (payload: CheckoutType) => {
         setCheckout({
             ...payload,
-            canpay: payload.items + subContext.currentSubscription?.totShopAmountPaid! <= subContext.currentSubscription?.subscriptionModel?.shopLimit!,
+            canpay: payload.items + subContext.currentSubscription?.monthlyBudget! <= subContext.currentSubscription?.subscriptionModel?.shopLimit!,
             total: payload.items + payload.zincFees + payload.shippingFees + payload.exchangeFees + payload.fees + payload.tax,
         });
     };

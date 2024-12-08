@@ -21,7 +21,7 @@ export interface PromoterModel {
     referralCode: string;
 }
 
-export interface SubscriptionPlans {
+export interface SubscriptionPlan {
     id: number;
     subscriptionType: SubscriptionType;
     subscriptionPeriod: SubscriptionPeriod;
@@ -57,7 +57,9 @@ export interface SubscriptionManagementModel {
     promoterAddress: string | null;
     start: string | null;
     end: string | null;
-    subscriptionType: number;
+    subscriptionType: SubscriptionType;
+    subscriptionPeriod: SubscriptionPeriod;
+    subscriptionModel: SubscriptionPlan;
     paymentTx: string | null;
     promoterWithdrawn: boolean | null;
     subscriptionTx: string | null;

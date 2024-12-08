@@ -226,7 +226,7 @@ const AddProducts = () => {
     };
     const checkShopLimit = (itemPrice: number): boolean => {
         if (subContext.currentSubscription && subContext.currentSubscription?.subscriptionModel?.shopLimit! > 0) {
-            if (subContext.currentSubscription?.totShopAmountPaid! + itemPrice >= subContext.currentSubscription?.subscriptionModel?.shopLimit!) {
+            if (subContext.currentSubscription?.monthlyBudget! + itemPrice >= subContext.currentSubscription?.subscriptionModel?.shopLimit!) {
                 return false;
             }
         }
@@ -234,7 +234,7 @@ const AddProducts = () => {
     };
     const amountLeft = (): string => {
         if (subContext?.currentSubscription?.subscriptionModel?.shopLimit! > 0) {
-            const tot = subContext?.currentSubscription?.subscriptionModel?.shopLimit! - subContext?.currentSubscription?.totShopAmountPaid! - basketTotal();
+            const tot = subContext?.currentSubscription?.subscriptionModel?.shopLimit! - subContext?.currentSubscription?.monthlyBudget! - basketTotal();
             // return tot.toFixed(2);
             return tot > 0 ? '$' + tot.toFixed(2) : '$0.00';
         } else {
@@ -261,7 +261,7 @@ const AddProducts = () => {
                             value={link}
                             disabled={
                                 subContext.currentSubscription?.subscriptionModel?.shopLimit !== 0 &&
-                                subContext.currentSubscription?.totShopAmountPaid! >= subContext.currentSubscription?.subscriptionModel?.shopLimit!
+                                subContext.currentSubscription?.monthlyBudget! >= subContext.currentSubscription?.subscriptionModel?.shopLimit!
                             }
                         />
                         <button
@@ -269,7 +269,7 @@ const AddProducts = () => {
                             onClick={addProduct}
                             disabled={
                                 subContext.currentSubscription?.subscriptionModel?.shopLimit !== 0 &&
-                                subContext.currentSubscription?.totShopAmountPaid! >= subContext.currentSubscription?.subscriptionModel?.shopLimit!
+                                subContext.currentSubscription?.monthlyBudget! >= subContext.currentSubscription?.subscriptionModel?.shopLimit!
                             }
                         >
                             Add Item

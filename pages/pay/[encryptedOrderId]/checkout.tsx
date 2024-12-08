@@ -574,7 +574,7 @@ const Checkout = () => {
                                                                                 <b>Spent:</b>
                                                                             </span>
                                                                             <span className="text-danger mx-2">
-                                                                                ${subsContext.currentSubscription?.totShopAmountPaid!.toFixed(2)}
+                                                                                ${subsContext.currentSubscription?.monthlyBudget!.toFixed(2)}
                                                                             </span>
                                                                         </li>
                                                                         <li className="m-0 text-center text-lg-start">

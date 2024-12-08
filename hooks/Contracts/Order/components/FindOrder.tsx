@@ -13,8 +13,8 @@ function FindOrder() {
     const [subscriptionId, setSubscriptionId] = useState('');
     const [newTotShopAmountPaid, setNewTotShopAmountPaid] = useState(0);
     const changeTotShopAmountPaidHandleClick = async () => {
-        // if( newTotShopAmountPaid + subscription?.totShopAmountPaid! <=  subscription?.totShopAmountPaid!
-        //     && newTotShopAmountPaid +subscription?.totShopAmountPaid! <= subscription?.subscriptionModel?.shopLimit!) {
+        // if( newTotShopAmountPaid + subscription?.monthlyBudget! <=  subscription?.monthlyBudget!
+        //     && newTotShopAmountPaid +subscription?.monthlyBudget! <= subscription?.subscriptionModel?.shopLimit!) {
         //     Swal.fire({
         //         icon: 'warning',
         //         title: 'Oops...',
@@ -140,7 +140,7 @@ function FindOrder() {
                                 </li>
                                 <li className="list-group-item d-flex justify-content-between">
                                     <strong>Shop spent:</strong>
-                                    <span className="text-end">${subscription?.totShopAmountPaid?.toFixed(2)}</span>
+                                    <span className="text-end">${subscription?.monthlyBudget?.toFixed(2)}</span>
                                 </li>
                                 <li className="list-group-item d-flex col-12">
                                     <div className="d-flex  align-items-center">
@@ -156,13 +156,13 @@ function FindOrder() {
                                             pattern="[0-9]"
                                             min={0}
                                             max={subscription?.subscriptionModel?.shopLimit!}
-                                            //   disabled={subContext.currentSubscription?.subscriptionModel.shopLimit! === 0 || subContext.currentSubscription?.totShopAmountPaid! > subContext.currentSubscription?.subscriptionModel.shopLimit!}
+                                        //   disabled={subContext.currentSubscription?.subscriptionModel.shopLimit! === 0 || subContext.currentSubscription?.monthlyBudget! > subContext.currentSubscription?.subscriptionModel.shopLimit!}
                                         />
                                         <button
                                             className="mx-1 rounded-5 p-1 px-4"
                                             style={{ backgroundColor: '#ff9900', color: 'white', border: 'none' }}
                                             onClick={changeTotShopAmountPaidHandleClick}
-                                            //   disabled={newTotShopAmountPaid === 0 ||    subContext.currentSubscription?.totShopAmountPaid! >  subContext.currentSubscription?.subscriptionModel.shopLimit!}
+                                        //   disabled={newTotShopAmountPaid === 0 ||    subContext.currentSubscription?.monthlyBudget! >  subContext.currentSubscription?.subscriptionModel.shopLimit!}
                                         >
                                             confirm
                                         </button>
