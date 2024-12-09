@@ -20,15 +20,17 @@ const BasketItem = ({ id, el }: { id: any; el: any }) => {
             setInputValue(value); // Aggiorna solo il valore di input temporaneo
 
             if (timeoutRef.current) clearTimeout(timeoutRef.current);
-            // console.log("🚀 ~ timeoutRef.current=setTimeout ~ subContext?.currentSubscription?.subscriptionModel?.shopLimit:", subContext?.currentSubscription?.subscriptionModel?.shopLimit)
 
             timeoutRef.current = setTimeout(() => {
+                console.log('🚀 ~ file: BasketItem.tsx ~ handleChange ~ subContext?.currentSubscription?.subscriptionModel?.shopLimit!', subContext?.currentSubscription?.subscriptionModel?.shopLimit!);
                 if (subContext?.currentSubscription?.subscriptionModel?.shopLimit! > 0) {
                     if (
                         CanAddMoreItems(value) <
                         subContext?.currentSubscription?.subscriptionModel?.shopLimit! - subContext?.currentSubscription?.totShopAmountPaid!
                     ) {
-                        setQuantity(value); // Imposta il valore finale
+                        setQuantity(value); // Imposta il valore finale 
+                        orderContext.editBasketQtyHandler(id, value)
+
                     } else {
                         Swal.fire({
                             title: 'Exceeded Monthly Amount Limit',
@@ -38,6 +40,8 @@ const BasketItem = ({ id, el }: { id: any; el: any }) => {
                         setInputValue(quantity); // Reimposta l'input a `quantity` corrente se il limite è superato
                     }
                 } else {
+                    console.log('🚀 ~ file: BasketItem.tsx ~ handleChange ~ value', value);
+                    orderContext.editBasketQtyHandler(id, value)
                     setQuantity(value); return;
 
                 }
@@ -70,6 +74,8 @@ const BasketItem = ({ id, el }: { id: any; el: any }) => {
         };
     }, []);
 
+
+
     return (
         <div className="row mt-3 d-flex col-12 justify-content-lg-center align-items-end  justify-content-center  flex-column ">
             <div className='d-flex align-items-center '>
@@ -84,7 +90,7 @@ const BasketItem = ({ id, el }: { id: any; el: any }) => {
                      : <i className="fa fa-minus cursor-pointer" aria-hidden="true" onClick={() => setQuantity(quantity - 1)}></i>
             
                  }  */}
-                    {quantity > 1 && <i className="fa fa-minus cursor-pointer" aria-hidden="true" onClick={() => setQuantity(quantity - 1)}></i>}
+                    {quantity > 1 && <i className="fa fa-minus cursor-pointer" aria-hidden="true" onClick={() => handleClick(quantity - 1)}></i>}
                     <input
                         type="number"
                         inputMode="numeric"
