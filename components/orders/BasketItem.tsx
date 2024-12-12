@@ -4,68 +4,109 @@ import { Fab } from '@mui/material';
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import Swal from 'sweetalert2';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import useSubscriptionModel from '@/hooks/Database/subscription/useSubscription';
 
 const BasketItem = ({ id, el }: { id: any; el: any }) => {
     const [quantity, setQuantity] = useState(el.quantity);
     const [inputValue, setInputValue] = useState(el.quantity); // Stato per l'input temporaneo
     const orderContext = useContext(OrderContext);
     const subContext = useContext(SubscriptionContext);
-
+    const [canshop, setCanShop] = useState(false);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null); // Ref per il timeout
+    const { getShopExpenses } = useSubscriptionModel();
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleBlur = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = parseInt(e.target.value, 10);
+
+        if (!isNaN(value) && value > 0) {
+            setInputValue(value); // Aggiorna solo il valore di input temporaneo
+            await updateHandler(value);
+
+            // if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
+            // timeoutRef.current = setTimeout(async () => {
+            //     await updateHandler(value);
+            // }, 1500);
+        } else {
+            return;
+        }
+    };
+    const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = parseInt(e.target.value, 10);
 
         if (!isNaN(value) && value > 0) {
             setInputValue(value); // Aggiorna solo il valore di input temporaneo
 
             if (timeoutRef.current) clearTimeout(timeoutRef.current);
-
-            timeoutRef.current = setTimeout(() => {
-                console.log('🚀 ~ file: BasketItem.tsx ~ handleChange ~ subContext?.currentSubscription?.subscriptionModel?.shopLimit!', subContext?.currentSubscription?.subscriptionModel?.shopLimit!);
-                if (subContext?.currentSubscription?.subscriptionModel?.shopLimit! > 0) {
-                    if (
-                        CanAddMoreItems(value) <
-                        subContext?.currentSubscription?.subscriptionModel?.shopLimit! - subContext?.currentSubscription?.totShopAmountPaid!
-                    ) {
-                        setQuantity(value); // Imposta il valore finale 
-                        orderContext.editBasketQtyHandler(id, value)
-
-                    } else {
-                        Swal.fire({
-                            title: 'Exceeded Monthly Amount Limit',
-                            text: 'This amount exceed maximum limit for this subscription level.',
-                            icon: 'error',
-                        });
-                        setInputValue(quantity); // Reimposta l'input a `quantity` corrente se il limite è superato
-                    }
-                } else {
-                    console.log('🚀 ~ file: BasketItem.tsx ~ handleChange ~ value', value);
-                    orderContext.editBasketQtyHandler(id, value)
-                    setQuantity(value); return;
-
-                }
-
-            }, 1500);
-        } else {
-            return
+            return;
         }
     };
 
-    // Esegui `editBasketQtyHandler` quando `quantity` viene aggiornato
-    const handleClick = (newQuantity: number) => {
-        setQuantity(newQuantity);
+    const handleClick = async (newQuantity: number) => {
+        await updateHandler(newQuantity);
+    };
+    // const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     const value = parseInt(e.target.value, 10);
+
+    //     if (!isNaN(value) && value > 0) {
+    //         if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
+    //         timeoutRef.current = setTimeout(async () => {
+    //             await updateHandler(value);
+    //         }, 1500);
+    //     }
+    // };
+
+    const updateHandler = async (newQuantity: number): Promise<boolean> => {
         if (newQuantity !== el.quantity) {
-            setInputValue(newQuantity);
-            orderContext.editBasketQtyHandler(id, newQuantity);
+            await fetchShopExpenses(newQuantity);
+
+            return true;
+        } else {
+            return false;
         }
     };
 
-    const CanAddMoreItems = (newQuantity: number): number => {
+    const cartTotal = (newQuantity: number): number => {
         return orderContext.items.reduce((total, item) => {
             return total + item.price! * newQuantity;
         }, 0);
     };
+    async function fetchShopExpenses(newQuantity: number) {
+        const res = await getShopExpenses(subContext?.currentSubscription?.id!);
+        const amount = cartTotal(newQuantity) + res;
+        setCanShop(amount <= subContext?.currentSubscription?.subscriptionModel.shopLimit!);
+
+        if (amount >= subContext?.currentSubscription?.subscriptionModel.shopLimit!) {
+            setCanShop(false);
+            Swal.fire({
+                title: 'Exceeded Monthly Amount Limit',
+                text: 'This amount exceed maximum limit for this subscription level.',
+                icon: 'error',
+            });
+            setInputValue(quantity);
+        } else {
+            setCanShop(true);
+            setInputValue(newQuantity);
+            setQuantity(newQuantity);
+        }
+        console.log('🚀 ~ fetchShopExpenses ~ inputValue:', inputValue);
+        console.log('🚀 ~ fetchShopExpenses ~ newQuantity:', newQuantity);
+    }
+    // useEffect(() => {
+    //     fetchShopExpenses(inputValue);
+    // }, [inputValue, getShopExpenses]);
+
+    useEffect(() => {
+        console.log('🚀 ~ useEffect ~ quantity:', quantity);
+
+        if (quantity && canshop) {
+            orderContext.editBasketQtyHandler(id, quantity);
+        } else {
+            Swal.fire({ title: 'Exceeded Monthly Amount Limit', text: 'This amount exceed maximum limit for this subscription level.', icon: 'error' });
+            return;
+        }
+    }, [canshop, quantity]);
 
     // Cleanup del timeout quando il componente si smonta
     useEffect(() => {
@@ -74,38 +115,38 @@ const BasketItem = ({ id, el }: { id: any; el: any }) => {
         };
     }, []);
 
-
-
     return (
         <div className="row mt-3 d-flex col-12 justify-content-lg-center align-items-end  justify-content-center  flex-column ">
-            <div className='d-flex align-items-center '>
-                <i className="fa fa-trash cursor-pointer mx-2" aria-hidden="true" onClick={() => orderContext.deleteAllItems()} > </i>
+            <div className="d-flex align-items-center ">
+                <i className="fa fa-trash cursor-pointer mx-2" aria-hidden="true" onClick={() => orderContext.deleteAllItems()}>
+                    {' '}
+                </i>
                 <div
                     className="d-flex  align-items-center justify-content-center px-1 col-8 col-lg-5 "
                     style={{ border: '3px solid #ff9900', borderRadius: '0px', outline: 'none', backgroundColor: 'white' }}
-
                 >
                     {/* {quantity < 2 ?
                      <i className="fa fa-trash cursor-pointer" aria-hidden="true" onClick={() => orderContext.deleteAllItems()} > </i>
                      : <i className="fa fa-minus cursor-pointer" aria-hidden="true" onClick={() => setQuantity(quantity - 1)}></i>
             
                  }  */}
-                    {quantity > 1 && <i className="fa fa-minus cursor-pointer" aria-hidden="true" onClick={() => handleClick(quantity - 1)}></i>}
+                    {quantity > 1 && <i className="fa fa-minus cursor-pointer" aria-hidden="true" onClick={() => handleClick(inputValue - 1)}></i>}
                     <input
                         type="number"
                         inputMode="numeric"
                         onChange={handleChange}
                         className="font-weight-bold bg-white mx-4 flex-column m-2 text-center "
-                        style={{ border: 'none', borderRadius: '5px', outline: 'none', width: '100px', }}
+                        style={{ border: 'none', borderRadius: '5px', outline: 'none', width: '100px' }}
                         value={inputValue}
                         min={0}
+                        onBlur={handleBlur}
                     />
-                    <i className="fa fa-plus" aria-hidden="true" onClick={() => handleClick(quantity + 1)}></i>
-
+                    <i className="fa fa-plus" aria-hidden="true" onClick={() => handleClick(inputValue + 1)}></i>
                 </div>
             </div>
-            <span className='mt-2' style={{ width: 'fit-content' }}>${(el?.quantity * el?.price).toFixed(2)}</span>
-
+            <span className="mt-2" style={{ width: 'fit-content' }}>
+                ${(el?.quantity * el?.price).toFixed(2)}
+            </span>
         </div>
     );
 };

@@ -8,6 +8,7 @@ import { SessionExt } from '@/types/SessionExt';
 import { useAccount } from 'wagmi';
 import usePromoterManagement from '@/hooks/Contracts/Subscription/customHooks/usePromoterManagement';
 import useSubscriptionPlansOnDB from '@/hooks/Database/subscription/useSubscriptionPlans';
+import { set } from 'date-fns';
 
 export const SubscriptionContext = createContext({
     currentSubscription: null as SubscriptionManagementModel | null,
@@ -20,16 +21,18 @@ export const SubscriptionContext = createContext({
     canPay: false as boolean,
     subscriptionsModels: [] as SubscriptionPlans[],
     promoter: null as PromoterModel | null,
-    setCurrentSubscriptionHandler: async (subscription: SubscriptionManagementModel | null) => {},
-    setSubscriptionModels: (models: SubscriptionPlans[]) => {},
-    setSelectedPackageHandler: (subscription: number | null) => {},
-    setSubscriptionIdHandler: (id: number) => {},
-    setPromoterReferralHandler: (referral: string | null | undefined) => {},
-    setIsReferralCodeAppliedHandler: (isApplied: boolean) => {},
-    setDebouncedReferralCodeHandler: (code: string) => {},
-    setCanPayHandler: (canpay: boolean) => {},
-    setAllSubscriptionsHandler: (subscriptions: SubscriptionManagementModel[]) => {},
-    setPromoterHandler: (promoter: PromoterModel | null) => {},
+    canShop: true as boolean,
+    setCurrentSubscriptionHandler: async (subscription: SubscriptionManagementModel | null) => { },
+    setSubscriptionModels: (models: SubscriptionPlans[]) => { },
+    setSelectedPackageHandler: (subscription: number | null) => { },
+    setSubscriptionIdHandler: (id: number) => { },
+    setPromoterReferralHandler: (referral: string | null | undefined) => { },
+    setIsReferralCodeAppliedHandler: (isApplied: boolean) => { },
+    setDebouncedReferralCodeHandler: (code: string) => { },
+    setCanPayHandler: (canpay: boolean) => { },
+    setAllSubscriptionsHandler: (subscriptions: SubscriptionManagementModel[]) => { },
+    setPromoterHandler: (promoter: PromoterModel | null) => { },
+    setCanShopHandler: (canshop: boolean) => { },
 });
 
 const SubscriptionContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -45,9 +48,11 @@ const SubscriptionContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const [selectedPackage, setSelectedPackage] = useState<SubscriptionPlans | null>(null);
     const [selectedPackageId, setSelectedPackageId] = useState<number>(3);
     const [promoterReferral, setPromoterReferral] = useState<string | null | undefined>('');
+
     const [isReferralCodeApplied, setIsReferralCodeApplied] = useState<boolean>(false);
     const [debouncedReferralCode, setDebouncedReferralCode] = useState('');
     const [canPay, setCanPay] = useState<boolean>(false);
+    const [canShop, setCanShop] = useState<boolean>(true);
     const { account, getSubscriptionModels } = useSubscriptionPlan();
     const { getPlansOnDB } = useSubscriptionPlansOnDB();
     const [subscriptionsPlans, setSubscriptionsPlans] = useState<SubscriptionPlans[]>([]);
@@ -55,6 +60,7 @@ const SubscriptionContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
         setAllSubscriptions(subscriptions);
     };
     const setCurrentSubscriptionHandler = async (subscription: SubscriptionManagementModel | null) => {
+        console.log("🚀 ~ setCurrentSubscriptionHandler ~ subscription:", subscription)
         setCurrentSubscription(subscription);
     };
     const setSelectedPackageHandler = (subscription: number | null) => {
@@ -85,6 +91,9 @@ const SubscriptionContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const setPromoterHandler = (promoter: PromoterModel | null) => {
         setPromoter(promoter);
     };
+    const setCanShopHandler = (canshop: boolean) => {
+        setCanShop(canshop);
+    };
 
     const store = {
         currentSubscription: currentSubscription,
@@ -97,6 +106,7 @@ const SubscriptionContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
         canPay: canPay,
         subscriptionsModels: subscriptionsPlans,
         promoter: promoter,
+        canShop: canShop,
         setCurrentSubscriptionHandler: setCurrentSubscriptionHandler,
         setSelectedPackageHandler: setSelectedPackageHandler, // Add setSelectedPackage property
         setSubscriptionIdHandler: setSubscriptionIdHandler, // Add setSubscriptionId property
@@ -106,7 +116,8 @@ const SubscriptionContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
         setCanPayHandler: setCanPayHandler, // Add setCanPay property
         setSubscriptionModels: setSubscriptionPlans, // Add setSubscriptionModels property
         setAllSubscriptionsHandler: setAllSubscriptionsHandler, // Add setAllSubscriptions property
-        setPromoterHandler: setPromoterHandler, // Add setPromoter property
+        setPromoterHandler: setPromoterHandler, // Add setPromoter property 
+        setCanShopHandler: setCanShopHandler, // Add setCanShop property    
     };
     useEffect(() => {
         if (currentSubscription !== null) {
@@ -132,8 +143,8 @@ const SubscriptionContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
                 console.log(
                     '🚀 ~ useEffect ~ currentSubscription?.totShopAmountPaid! >= currentSubscription?.subscriptionModel.shopLimit!:',
                     currentSubscription &&
-                        currentSubscription?.subscriptionModel?.shopLimit! > 0 &&
-                        currentSubscription?.totShopAmountPaid! < currentSubscription?.subscriptionModel?.shopLimit!
+                    currentSubscription?.subscriptionModel?.shopLimit! > 0 &&
+                    currentSubscription?.totShopAmountPaid! < currentSubscription?.subscriptionModel?.shopLimit!
                 );
 
                 setCanPay(true);
