@@ -90,21 +90,14 @@ const BasketItem = ({ id, el }: { id: any; el: any }) => {
             setInputValue(newQuantity);
             setQuantity(newQuantity);
         }
-        console.log('🚀 ~ fetchShopExpenses ~ inputValue:', inputValue);
-        console.log('🚀 ~ fetchShopExpenses ~ newQuantity:', newQuantity);
     }
     // useEffect(() => {
     //     fetchShopExpenses(inputValue);
     // }, [inputValue, getShopExpenses]);
 
     useEffect(() => {
-        console.log('🚀 ~ useEffect ~ quantity:', quantity);
-
         if (quantity && canshop) {
             orderContext.editBasketQtyHandler(id, quantity);
-        } else {
-            Swal.fire({ title: 'Exceeded Monthly Amount Limit', text: 'This amount exceed maximum limit for this subscription level.', icon: 'error' });
-            return;
         }
     }, [canshop, quantity]);
 
@@ -125,11 +118,6 @@ const BasketItem = ({ id, el }: { id: any; el: any }) => {
                     className="d-flex  align-items-center justify-content-center px-1 col-8 col-lg-5 "
                     style={{ border: '3px solid #ff9900', borderRadius: '0px', outline: 'none', backgroundColor: 'white' }}
                 >
-                    {/* {quantity < 2 ?
-                     <i className="fa fa-trash cursor-pointer" aria-hidden="true" onClick={() => orderContext.deleteAllItems()} > </i>
-                     : <i className="fa fa-minus cursor-pointer" aria-hidden="true" onClick={() => setQuantity(quantity - 1)}></i>
-            
-                 }  */}
                     {quantity > 1 && <i className="fa fa-minus cursor-pointer" aria-hidden="true" onClick={() => handleClick(inputValue - 1)}></i>}
                     <input
                         type="number"
