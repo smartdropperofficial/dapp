@@ -18,7 +18,7 @@ import Skeleton from 'react-loading-skeleton';
 import { useOrder } from '../controllers/useOrder';
 import { updateOrder } from '../controllers/OrderController';
 import { OrderSB } from '@/types/OrderSB';
-import { useRouter } from "next/router"
+import { useRouter } from 'next/router';
 import ModalOverlay from '../UI/ModalOverlay';
 import Loading from '../UI/Loading';
 
@@ -73,7 +73,9 @@ const OrderSummary: React.FC = () => {
         )}`;
         console.log(`[${formattedDate}] ${message}`);
     }
-
+    useEffect(() => {
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }, []);
     // Stato per il reCAPTCHA
     const [isCaptchaVerified, setIsCaptchaVerified] = useState(false);
 
@@ -97,14 +99,8 @@ const OrderSummary: React.FC = () => {
         const acceptobj = {
             blockchain: 'polygon',
             amount: Number(totalToPay?.toFixed(2)),
-            token:
-                process.env.NODE_ENV === 'development'
-                    ? (config_context.config?.coin_contract as `0x${string}`)
-                    : ('0xc2132d05d31c914a87c6611c10748aeb04b58e8f' as `0x${string}`),
-            receiver:
-                process.env.NODE_ENV === 'development'
-                    ? (config_context.config?.order_owner as `0x${string}`)
-                    : ('0x4790a1d817999dD302F4E58fe4663e7ee8934F90' as `0x${string}`),
+            token: config_context.config?.coin_contract as `0x${string}`,
+            receiver: config_context.config?.order_owner as `0x${string}`,
         };
 
         console.log(acceptobj);
@@ -181,8 +177,15 @@ const OrderSummary: React.FC = () => {
                 try {
                     const hasCreated = await createPreOrder();
                     console.log('🚀 ~ performPreOrderCreation ~ hasCreated.data.order_id:', hasCreated.data.order_id);
+                    console.log('🚀 ~ performPreOrderCreation ~ hasCreated.error:', hasCreated.error);
                     console.log('🚀 ~ placeOrderOnAmazon ~ hasCreated:', hasCreated);
-
+                    if (hasCreated.error) {
+                        return Swal.fire({
+                            title: 'Order creation failed! ',
+                            text: hasCreated.error,
+                            icon: 'error',
+                        });
+                    }
                     if (hasCreated.created) {
                         const updateDb: OrderSB = {
                             pre_order_payment_tx: paymentTx,
@@ -336,7 +339,7 @@ const OrderSummary: React.FC = () => {
                     <Alert variant="warning">
                         <Alert.Heading> Pre-order Payment Notice</Alert.Heading>
                         <p>
-                            Smart Dropper will start the <u>pre-order process. </u> &nbsp; It means that  you will <u>only be charged</u> for the{' '}
+                            Smart Dropper will start the <u>pre-order process. </u> &nbsp; It means that you will <u>only be charged</u> for the{' '}
                             <b>price of the merchandise</b>, excluding
                             <b> Shipping*</b> and <b>Local taxes**</b>.&nbsp; Once the payment is confirmed on Blockchain, our system will start the process of
                             tax calculation. <br />
@@ -357,8 +360,8 @@ const OrderSummary: React.FC = () => {
                             {/* Aggiunta del reCAPTCHA */}
                             <div className="mt-4">
                                 <ReCAPTCHA
-                                    sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}// Sostituisci con la tua Site Key
-                                    onChange={(value) => {
+                                    sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!} // Sostituisci con la tua Site Key
+                                    onChange={value => {
                                         if (value) {
                                             setIsCaptchaVerified(true);
                                             Swal.fire({
@@ -377,7 +380,9 @@ const OrderSummary: React.FC = () => {
                             </div>
                             <button
                                 disabled={ctx.basketTotal() === 0 || !isCaptchaVerified}
-                                className={`btn form-control  mt-2 col-12 col-xl-10 ${ctx.basketTotal() === 0 || !isCaptchaVerified ? 'btn-disabled' : 'btn-success'}`}
+                                className={`btn form-control  mt-2 col-12 col-xl-10 ${
+                                    ctx.basketTotal() === 0 || !isCaptchaVerified ? 'btn-disabled' : 'btn-success'
+                                }`}
                                 onClick={openPaymentDepayWidgetHandler}
                             >
                                 ${Number(totalToPay?.toFixed(2))}

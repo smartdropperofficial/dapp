@@ -226,7 +226,7 @@ const AddProducts = () => {
     };
     const checkShopLimit = (itemPrice: number): boolean => {
         if (subContext.currentSubscription && subContext.currentSubscription?.subscriptionModel?.shopLimit! > 0) {
-            if (subContext.currentSubscription?.totShopAmountPaid! + itemPrice >= subContext.currentSubscription?.subscriptionModel?.shopLimit!) {
+            if (subContext.currentSubscription?.monthlyBudget! + itemPrice >= subContext.currentSubscription?.subscriptionModel?.shopLimit!) {
                 return false;
             }
         }
@@ -234,7 +234,8 @@ const AddProducts = () => {
     };
     const amountLeft = (): string => {
         if (subContext?.currentSubscription?.subscriptionModel?.shopLimit! > 0) {
-            const tot = subContext?.currentSubscription?.subscriptionModel?.shopLimit! - subContext?.currentSubscription?.totShopAmountPaid! - basketTotal();
+            const tot = subContext?.currentSubscription?.monthlyBudget! - basketTotal();
+            console.log('🚀 ~ amountLeft ~ tot:', tot.toFixed(2));
             // return tot.toFixed(2);
             return tot > 0 ? '$' + tot.toFixed(2) : '$0.00';
         } else {
@@ -261,7 +262,7 @@ const AddProducts = () => {
                             value={link}
                             disabled={
                                 subContext.currentSubscription?.subscriptionModel?.shopLimit !== 0 &&
-                                subContext.currentSubscription?.totShopAmountPaid! >= subContext.currentSubscription?.subscriptionModel?.shopLimit!
+                                subContext.currentSubscription?.monthlyBudget! >= subContext.currentSubscription?.subscriptionModel?.shopLimit!
                             }
                         />
                         <button
@@ -269,7 +270,7 @@ const AddProducts = () => {
                             onClick={addProduct}
                             disabled={
                                 subContext.currentSubscription?.subscriptionModel?.shopLimit !== 0 &&
-                                subContext.currentSubscription?.totShopAmountPaid! >= subContext.currentSubscription?.subscriptionModel?.shopLimit!
+                                subContext.currentSubscription?.monthlyBudget! >= subContext.currentSubscription?.subscriptionModel?.shopLimit!
                             }
                         >
                             Add Item
@@ -282,7 +283,7 @@ const AddProducts = () => {
                                     <div className="mx-2 fs-5  m-0">
                                         <b> Monthly Shop budget left:</b>
                                     </div>
-                                    <div className="d-flex align-items-center  justify-content-end col-lg-3 col-12" >
+                                    <div className="d-flex align-items-center  justify-content-end col-lg-3 col-12">
                                         <label className="text-danger h4 " htmlFor="spent-limit"></label>
                                         <input
                                             disabled={true}

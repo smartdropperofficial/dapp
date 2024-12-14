@@ -61,12 +61,10 @@ export default async function auth(req: any, res: any) {
         secret: process.env.NEXTAUTH_SECRET!,
         callbacks: {
             async session({ session, token }: { session: any; token: any }) {
-
-                const userRole = await getUserByWalletAddress(token.sub) as any;
+                const userRole = (await getUserByWalletAddress(token.sub)) as any;
                 /* eslint-disable */
                 if (userRole && userRole?.email_verified) {
-
-                    // eslint-disable-next-line 
+                    // eslint-disable-next-line
                     token.user_id = userRole?.user_id;
                     token.email = userRole?.email;
                     // eslint-disable-next-line
@@ -79,7 +77,6 @@ export default async function auth(req: any, res: any) {
                     token.isAdmin = userRole?.is_admin;
                     // eslint-disable-next-liney
                     token.config_db = userRole?.config_db;
-
                 } else {
                     token.verified = false;
                 }

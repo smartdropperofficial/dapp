@@ -17,6 +17,7 @@ import { SessionExt } from '../../types/SessionExt';
 import { SendEmailOrderReceived } from '../controllers/EmailController';
 import { ConfigContext } from '@/store/config-context';
 import { useOrder } from '../controllers/useOrder';
+import { SubscriptionContext } from '@/store/subscription-context';
 // import { useOrder } from '@/components/controllers/useOrder';
 const NextStep: React.FC = () => {
     const orderCtx = useContext(OrderContext);
@@ -28,9 +29,14 @@ const NextStep: React.FC = () => {
     const signerAddress = useRef<string>('');
     const currentOrderId = useRef<string>('');
     const { createPreOrder } = useOrder();
+    const { canShop } = useContext(SubscriptionContext);
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [go, setGo] = useState<boolean>(true);
+
+    useEffect(() => {
+        console.log("🚀 ~ useEffect ~ canShop:", canShop)
+    }, [canShop])
 
     const nextStepHandler = async () => {
         switch (orderCtx.currentStep) {
@@ -152,7 +158,7 @@ const NextStep: React.FC = () => {
                 </button>
                 <button
                     className={`btn text-black ${orderCtx.currentStep === 6 && 'invisible'} d-flex align-items-center px-0`}
-                    disabled={orderCtx.currentStep === 6 || !go}
+                    disabled={orderCtx.currentStep === 6 || !go || (orderCtx.currentStep === 3 && canShop === false)}
                     onClick={nextStepHandler}
                 >
                     <strong className="me-3">NEXT </strong>{' '}

@@ -111,6 +111,7 @@ const Subscribe = () => {
                                         <table className="table table-striped table-bordered w-100" style={{ maxWidth: '100%' }}>
                                             <thead>
                                                 <tr>
+                                                    <th scope="col">Id</th>
                                                     <th scope="col">Plan</th>
                                                     <th scope="col">Period</th>
                                                     {/* <th scope="col">Price</th> */}
@@ -137,6 +138,7 @@ const Subscribe = () => {
                                                     ctx.allSubscriptions?.map((sub, index) => {
                                                         return (
                                                             <tr key={index}>
+                                                                <td>{sub?.id}</td>
                                                                 <td>{sub.subscriptionModel?.name}</td>
                                                                 <td>{getSubscriptionPeriod(sub?.subscriptionModel?.subscriptionPeriod!)}</td>
                                                                 {/* <td>${sub.subscriptionModel?.price.toFixed(2)}</td> */}
@@ -166,16 +168,16 @@ const Subscribe = () => {
                                                 <div className={`row  justify-content-evenly d-flex flex-column align-items-center rounded-2`}>
                                                     <div className="text-center col-8 col-xl-10  ">
                                                         {(isBestChoice && ctx.currentSubscription!) ||
-                                                        // && ctx.currentSubscription!.subscriptionModel.id! !== 3
-                                                        (isBestChoice && ctx.currentSubscription! === null) ? (
+                                                            // && ctx.currentSubscription!.subscriptionModel.id! !== 3
+                                                            (isBestChoice && ctx.currentSubscription! === null) ? (
                                                             <div className="circle mx-auto my-0 col-12 col-xl-10  mb-3"> {isBestChoice ? 1 : ''}</div>
                                                         ) : (
                                                             ''
                                                         )}
 
                                                         {(isBestChoice && ctx.currentSubscription!) ||
-                                                        //  && ctx.currentSubscription!.subscriptionModel.id! !== 3
-                                                        (isBestChoice && ctx.currentSubscription! === null) ? (
+                                                            //  && ctx.currentSubscription!.subscriptionModel.id! !== 3
+                                                            (isBestChoice && ctx.currentSubscription! === null) ? (
                                                             <>
                                                                 <div className="d-flex flex-column justify-content-center align-items-center">
                                                                     <div
@@ -230,30 +232,30 @@ const Subscribe = () => {
                                                                                         onChange={handleChangeReferralCode}
                                                                                         style={
                                                                                             ctx.promoterReferral === '' ||
-                                                                                            ctx.promoterReferral === undefined ||
-                                                                                            ctx.promoterReferral === null
+                                                                                                ctx.promoterReferral === undefined ||
+                                                                                                ctx.promoterReferral === null
                                                                                                 ? {
-                                                                                                      borderColor: '',
-                                                                                                      borderWidth: '',
-                                                                                                      backgroundColor: '',
-                                                                                                  }
+                                                                                                    borderColor: '',
+                                                                                                    borderWidth: '',
+                                                                                                    backgroundColor: '',
+                                                                                                }
                                                                                                 : loadingReferral
-                                                                                                ? {
-                                                                                                      borderColor: ctx.isReferralCodeApplied ? 'green' : 'red',
-                                                                                                      borderWidth: '4px',
-                                                                                                      backgroundColor: ctx.isReferralCodeApplied ? '' : 'red',
-                                                                                                  }
-                                                                                                : {
-                                                                                                      borderColor:
-                                                                                                          !ctx.isReferralCodeApplied && !loadingReferral
-                                                                                                              ? 'red'
-                                                                                                              : 'green',
-                                                                                                      borderWidth: '4px',
-                                                                                                      backgroundColor:
-                                                                                                          !ctx.isReferralCodeApplied && !loadingReferral
-                                                                                                              ? ''
-                                                                                                              : '#f8d7da',
-                                                                                                  }
+                                                                                                    ? {
+                                                                                                        borderColor: ctx.isReferralCodeApplied ? 'green' : 'red',
+                                                                                                        borderWidth: '4px',
+                                                                                                        backgroundColor: ctx.isReferralCodeApplied ? '' : 'red',
+                                                                                                    }
+                                                                                                    : {
+                                                                                                        borderColor:
+                                                                                                            !ctx.isReferralCodeApplied && !loadingReferral
+                                                                                                                ? 'red'
+                                                                                                                : 'green',
+                                                                                                        borderWidth: '4px',
+                                                                                                        backgroundColor:
+                                                                                                            !ctx.isReferralCodeApplied && !loadingReferral
+                                                                                                                ? ''
+                                                                                                                : '#f8d7da',
+                                                                                                    }
                                                                                         }
                                                                                     />
                                                                                 )}
@@ -264,16 +266,16 @@ const Subscribe = () => {
                                                                         {(ctx.promoterReferral === '' ||
                                                                             ctx.promoterReferral === undefined ||
                                                                             ctx.promoterReferral === null) &&
-                                                                        !loadingReferral
+                                                                            !loadingReferral
                                                                             ? ''
                                                                             : (ctx.promoterReferral !== '' ||
-                                                                                  ctx.promoterReferral !== undefined ||
-                                                                                  ctx.promoterReferral !== null) &&
-                                                                              loadingReferral
-                                                                            ? ''
-                                                                            : !loadingReferral && !ctx.isReferralCodeApplied
-                                                                            ? 'Referral code not valid!'
-                                                                            : 'Referral code valid!'}
+                                                                                ctx.promoterReferral !== undefined ||
+                                                                                ctx.promoterReferral !== null) &&
+                                                                                loadingReferral
+                                                                                ? ''
+                                                                                : !loadingReferral && !ctx.isReferralCodeApplied
+                                                                                    ? 'Referral code not valid!'
+                                                                                    : 'Referral code valid!'}
                                                                     </span>
                                                                     {ctx.selectedPackage?.id! > 0 ? (
                                                                         <div
@@ -301,7 +303,7 @@ const Subscribe = () => {
                                                                             </span>
                                                                         )}
 
-                                                                        {}
+                                                                        { }
                                                                         <PaySubscription
                                                                             Package={ctx.selectedPackage!}
                                                                             promoterReferralCode={ctx.debouncedReferralCode}

@@ -7,7 +7,6 @@ import { createDataOnSB, getDataFromSB, updateDataOnSB } from '../services/updat
 import { SubscriptionPlansSB } from '../types';
 import { SubscriptionManagementSB } from '../types';
 import { id } from 'ethers/lib/utils.js';
-
 const useSubscriptionModel = () => {
     const { config } = useContext(ConfigContext);
     const TABLE = 'subscription_plans';
@@ -136,6 +135,30 @@ const useSubscriptionModel = () => {
             return [] as SubscriptionPlansSB[];
         }
     }, []);
+    const getCanShop = useCallback(async (subscriptionId: string): Promise<boolean> => {
+
+        try {
+            const response = await fetch(`/api/canShop?subscriptionId=${subscriptionId}`);
+            const result = await response.json();
+            console.log("🚀 ~ getCanShop ~ result:", result)
+            return result.data ?? false;
+        } catch (error: any) {
+            console.log("🚀 ~ getCanShop ~ error:", error)
+            return false;
+        }
+
+    }, []);
+    const getShopExpenses = useCallback(async (subscriptionId: string): Promise<number> => {
+        try {
+            const response = await fetch(`/api/getShopExpenses?subscriptionId=${subscriptionId}`);
+            const result = await response.json();
+            return result.data.budget_left ?? 0;
+        } catch (error: any) {
+            console.log("🚀 ~ getCanShop ~ error:", error)
+            return 0;
+        }
+
+    }, []);
 
     return {
         getSubscriptionByPeriod,
@@ -145,5 +168,8 @@ const useSubscriptionModel = () => {
         changeSubscriptionPrice,
         changeSubscriptionTypeShopLimit,
         getSubscriptionModels,
+        getCanShop,
+        getShopExpenses
     };
 };
+export default useSubscriptionModel;

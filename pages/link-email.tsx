@@ -68,7 +68,7 @@ export default function LinkEmail() {
         if (session?.verified) {
             router.push('/');
         }
-    }, [session?.verified]);
+    }, []);
 
     useEffect(() => {
         if (!router.isReady) return;

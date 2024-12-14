@@ -66,7 +66,6 @@ export function formatDateTime(timestampSeconds?: number): string {
     return new Date(timestampMilliseconds).toLocaleString();
 }
 export function isDateExpired(dateString?: string): boolean {
-    alert(dateString);
     if (!dateString) {
         throw new Error('La data deve essere fornita');
     }
@@ -132,7 +131,7 @@ export const checkTxError = (error: any): boolean => {
 };
 export const getFormatedSubscriptionObject = (subscription: any): SubscriptionManagementModel => {
     return {
-        id: Number(subscription.id),
+        id: subscription.id,
         subscriber: subscription.subscriber,
         promoterAddress: subscription.promoterAddress,
         start: formatDateTime(Number(subscription.start)),
@@ -152,7 +151,7 @@ export const getFormatedSubscriptionObject = (subscription: any): SubscriptionMa
             shopLimit: Number(formatUnits(convertToDecimal(ethers.BigNumber.from(subscription.subscriptionModel.shopLimit)), 4)),
         },
         totAmountPaid: Number(formatUnits(subscription.totAmountPaid, 6)),
-        totShopAmountPaid: Number(convertToDecimal(subscription.totShopAmountPaid)),
+        monthlyBudget: Number(convertToDecimal(subscription.totShopAmountPaid) / 10 ** 4),
         paymentTx: subscription?.paymentTx,
         promoterProfit: Number(formatUnits(Number(ethers.BigNumber.from(subscription?.promoterProfit)), 6)),
         promoterWithdrawn: subscription.promoterWithdrawn,

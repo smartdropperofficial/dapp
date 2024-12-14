@@ -141,7 +141,7 @@ const Checkout = () => {
     useEffect(() => {
         setIsBestChoice(
             subsContext.selectedPackage?.subscriptionType === SubscriptionType.BUSINESS &&
-            subsContext.selectedPackage?.subscriptionPeriod === SubscriptionPeriod.ANNUAL
+                subsContext.selectedPackage?.subscriptionPeriod === SubscriptionPeriod.ANNUAL
         );
     }, [subsContext.selectedPackage]);
 
@@ -213,7 +213,6 @@ const Checkout = () => {
         let FeeAmountToPay;
         if (amountToPay?.subtotal) {
             FeeAmountToPay = amountToPay?.subtotal;
-
         } else {
         }
 
@@ -282,7 +281,7 @@ const Checkout = () => {
                 showCheckout.current.hasFetchedSC = true;
             }
         },
-        onError() { },
+        onError() {},
     });
 
     useEffect(() => {
@@ -331,15 +330,12 @@ const Checkout = () => {
                         exchangeFees!
                     ).toFixed(2)
                 ),
-                token: process.env.NODE_ENV === 'development'
-                    ? (configContext.config?.coin_contract as `0x${string}`)
-                    : '0xc2132d05d31c914a87c6611c10748aeb04b58e8f' as `0x${string}`,
-                receiver: process.env.NODE_ENV === 'development'
-                    ? (configContext.config?.order_owner as `0x${string}`)
-                    : '0x4790a1d817999dD302F4E58fe4663e7ee8934F90' as `0x${string}`,
+                token: configContext.config?.coin_contract as `0x${string}`,
+                receiver: configContext.config?.tax_wallet as `0x${string}`,
+
                 // fee: {
                 //     amount: fees!.toFixed(2),
-                //     receiver: process.env.NODE_ENV === 'development' 
+                //     receiver: process.env.NODE_ENV === 'development'
                 //         ? (configContext.config?.order_owner as `0x${string}`)
                 //         : (process.env.NEXT_PUBLIC_SMART_CONTRACT_COIN as `0x${string}`),
                 // },
@@ -369,8 +365,16 @@ const Checkout = () => {
                 },
                 before: async () => {
                     const currentOrder = await getOrder(orderId);
-                    const amountExpeted =
-                        Number(amountToPay?.subtotal?.toFixed(2)) + Number(amountToPay?.tax?.toFixed(2)) + zincFee + shippingFees! + exchangeFees!;
+                    const amountExpeted = Number(
+                        (
+                            Number(fees!.toFixed(2)) +
+                            // Number(amountToPay?.subtotal?.toFixed(2)) +
+                            Number(amountToPay?.tax?.toFixed(2)) +
+                            zincFee +
+                            shippingFees! +
+                            exchangeFees!
+                        ).toFixed(2)
+                    );
                     if (currentOrder?.status !== OrderStatus.WAITING_CONFIRMATION || acceptobj.amount !== Number(amountExpeted)) {
                         console.error(
                             `Depay - Payment - before : Amount expected:(${amountExpeted}) but the amount into the Widget has a different amount. acceptobj is (${acceptobj.amount}) `
@@ -412,7 +416,7 @@ const Checkout = () => {
     const processOrder = async () => {
         const updateDb: OrderSB = {
             status: OrderStatus.ORDER_CONFIRMED,
-            total_amount_paid: Number(amountToPay.total.toFixed(2)),
+            tax_amount_paid: Number(amountToPay.tax.toFixed(2)),
             tax_payment_tx: paymentTx,
             commission: Number(fees!.toFixed(2)),
         };
@@ -535,7 +539,7 @@ const Checkout = () => {
                                             </div>
                                         </section>
                                         <section id="subscription-package">
-                                            {subsContext.currentSubscription?.id! > -1 ? (
+                                            {subsContext.currentSubscription?.subscriptionModel.id! > -1 ? (
                                                 <>
                                                     <div style={{ borderStyle: 'dashed' }} className="px-5  border-2 rounded-3">
                                                         <div className="d-flex justify-content-between align-items-start flex-column  ">
@@ -554,7 +558,7 @@ const Checkout = () => {
                                                             <div className="mt-3  text-center text-lg-start">
                                                                 <b className="h5 "> Monthly Shop Limit - </b>
                                                                 {subsContext?.currentSubscription?.subscriptionModel?.subscriptionType ===
-                                                                    SubscriptionType.BUSINESS ? (
+                                                                SubscriptionType.BUSINESS ? (
                                                                     <b className="fs-5 text-success  p-2 rounded-2" style={{ backgroundColor: 'efefef' }}>
                                                                         {' '}
                                                                         UNLIMITED
@@ -574,7 +578,7 @@ const Checkout = () => {
                                                                                 <b>Spent:</b>
                                                                             </span>
                                                                             <span className="text-danger mx-2">
-                                                                                ${subsContext.currentSubscription?.totShopAmountPaid!.toFixed(2)}
+                                                                                ${subsContext.currentSubscription?.monthlyBudget!.toFixed(2)}
                                                                             </span>
                                                                         </li>
                                                                         <li className="m-0 text-center text-lg-start">
@@ -838,24 +842,24 @@ const Checkout = () => {
                                                                             onChange={handleChangeReferralCode}
                                                                             style={
                                                                                 subsContext.promoterReferral === '' ||
-                                                                                    subsContext.promoterReferral === undefined ||
-                                                                                    subsContext.promoterReferral === null
+                                                                                subsContext.promoterReferral === undefined ||
+                                                                                subsContext.promoterReferral === null
                                                                                     ? {
-                                                                                        borderColor: '',
-                                                                                        borderWidth: '',
-                                                                                        backgroundColor: '',
-                                                                                    }
+                                                                                          borderColor: '',
+                                                                                          borderWidth: '',
+                                                                                          backgroundColor: '',
+                                                                                      }
                                                                                     : {
-                                                                                        borderColor:
-                                                                                            !subsContext.isReferralCodeApplied && !loadingReferral
-                                                                                                ? 'red'
-                                                                                                : 'green',
-                                                                                        borderWidth: '4px',
-                                                                                        backgroundColor:
-                                                                                            !subsContext.isReferralCodeApplied && !loadingReferral
-                                                                                                ? '#f8d7da'
-                                                                                                : '#d4edda',
-                                                                                    }
+                                                                                          borderColor:
+                                                                                              !subsContext.isReferralCodeApplied && !loadingReferral
+                                                                                                  ? 'red'
+                                                                                                  : 'green',
+                                                                                          borderWidth: '4px',
+                                                                                          backgroundColor:
+                                                                                              !subsContext.isReferralCodeApplied && !loadingReferral
+                                                                                                  ? '#f8d7da'
+                                                                                                  : '#d4edda',
+                                                                                      }
                                                                             }
                                                                         />
                                                                     </div>
@@ -930,9 +934,9 @@ const Checkout = () => {
                                                         style={
                                                             !subsContext.canPay || subsContext.selectedPackage?.id! > FreeSubId
                                                                 ? {
-                                                                    color: '#ececec',
-                                                                    borderColor: '#ececec',
-                                                                }
+                                                                      color: '#ececec',
+                                                                      borderColor: '#ececec',
+                                                                  }
                                                                 : { color: '#ffa500' }
                                                         }
                                                     >
@@ -947,9 +951,9 @@ const Checkout = () => {
                                                         style={
                                                             subsContext.canPay === false
                                                                 ? {
-                                                                    color: '#ececec',
-                                                                    borderColor: '#ececec',
-                                                                }
+                                                                      color: '#ececec',
+                                                                      borderColor: '#ececec',
+                                                                  }
                                                                 : { color: '#000' }
                                                         }
                                                     >
@@ -959,8 +963,9 @@ const Checkout = () => {
                                                     </div>
                                                     <button
                                                         disabled={subsContext.canPay === false}
-                                                        className={`btn form-control  mt-2 col-12 col-xl-10 ${subsContext.canPay === false ? 'btn-disabled' : 'btn-success'
-                                                            }`}
+                                                        className={`btn form-control  mt-2 col-12 col-xl-10 ${
+                                                            subsContext.canPay === false ? 'btn-disabled' : 'btn-success'
+                                                        }`}
                                                         onClick={openPaymentDepayWidgetHandler}
                                                     >
                                                         $
@@ -1012,9 +1017,10 @@ const Checkout = () => {
                 </div>
             ) : (
                 // <Loading loadingText="Loading details" dark={true} />
-                <ModalOverlay show={true}>
-                    <Loading loadingText="Checking tax..." />
-                </ModalOverlay>
+                // <ModalOverlay show={true}>
+                //     {/* <Loading loadingText="Checking tax..." /> */}
+                // </ModalOverlay>
+                <></>
             )}
         </div>
     );

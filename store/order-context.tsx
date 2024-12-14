@@ -15,6 +15,7 @@ import { useSession } from 'next-auth/react';
 import { deleteBasketOnDB, getBasketOnDB, modifyBasketOnDB } from '@/utils/utils';
 import { error } from 'console';
 import Swal from 'sweetalert2';
+import { useAccount } from 'wagmi';
 
 type ShippingInfoType = {
     firstName: string;
@@ -83,7 +84,6 @@ interface OrderContextProps {
     setTableOrdersCurrentPage: React.Dispatch<React.SetStateAction<number>>;
     setOrderTablePagination: React.Dispatch<React.SetStateAction<number>>;
     setOrderTableFilter: React.Dispatch<React.SetStateAction<string>>;
-
 }
 
 export const OrderContext = createContext<OrderContextProps>(null as unknown as OrderContextProps);
@@ -125,7 +125,7 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const [TableOrdersCurrentPage, setTableOrdersCurrentPage] = useState<number>(1);
     const [OrderTablePagination, setOrderTablePagination] = useState<number>(5);
     const [OrderTableFilter, setOrderTableFilter] = useState<string>('');
-
+    const { address } = useAccount();
     const cleanItems = () => {
         items.splice(0, items.length);
         setItems([...items]); // Update the state with the modified array
@@ -322,7 +322,7 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
         }
     };
     const deleteAllItems = (): boolean => {
-        console.log("🚀 ~ deleteAllItems ~   session?.address!:", session?.address!)
+        console.log('🚀 ~ deleteAllItems ~   session?.address!:', session?.address!);
 
         deleteBasketOnDB(session?.address!)
             .then(res => {
@@ -491,28 +491,29 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const checkoutHandler = (payload: CheckoutType) => {
         setCheckout({
             ...payload,
-            canpay: payload.items + subContext.currentSubscription?.totShopAmountPaid! <= subContext.currentSubscription?.subscriptionModel?.shopLimit!,
+            canpay: payload.items + subContext.currentSubscription?.monthlyBudget! <= subContext.currentSubscription?.subscriptionModel?.shopLimit!,
             total: payload.items + payload.zincFees + payload.shippingFees + payload.exchangeFees + payload.fees + payload.tax,
         });
     };
     const setTermsAndConditions = () => {
         setTermsConditions(prev => !prev);
     };
+    const fetchBasketItems = async (wallet: string) => {
+        try {
+            const items: ContextProductInfo[] = await getBasketOnDB(wallet);
+            console.log('🚀 ~ fetchBasketItems ~ items:', items);
+            // if (items?.length > 0) {
+            //     setItems(items);
+            // }
+            setItems(items);
+        } catch (error) {
+            console.log('🚀 ~ useEffect ~ error:', error);
+        }
+    };
+    // useEffect(() => {
 
-    useEffect(() => {
-        const fetchBasketItems = async (wallet: string) => {
-            try {
-                const items: ContextProductInfo[] = await getBasketOnDB(wallet);
-                console.log("🚀 ~ fetchBasketItems ~ items:", items)
-                if (items?.length > 0) {
-                    setItems(items);
-                }
-            } catch (error) {
-                console.log('🚀 ~ useEffect ~ error:', error);
-            }
-        };
-        if (session?.address) fetchBasketItems(session?.address);
-    }, [session]);
+    //     if (session?.address) fetchBasketItems(session?.address);
+    // }, [session]);
 
     useEffect(() => {
         try {
@@ -549,6 +550,25 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
             }
         }
     }, [shippingInfo]);
+    useEffect(() => {
+        if (address) {
+            fetchBasketItems(address);
+        } else {
+            setItems([]);
+        }
+        shippingInfoHandler({
+            firstName: '',
+            lastName: '',
+            email: '',
+            addressLine1: '',
+            addressLine2: '',
+            zipCode: '',
+            city: '',
+            state: '',
+            phoneNumber: '',
+        });
+    }, [address]);
+
     return (
         <OrderContext.Provider
             value={{

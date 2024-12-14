@@ -14,7 +14,6 @@ import { updateDataOnSB } from '@/hooks/Database/services/update';
 const useSubscriptionManagement = () => {
     const { config, setAbiConfigHandler } = useContext(ConfigContext);
 
-
     // const contractAddress = config?.subscription_management_contract as `0x${string}`;
     const provider = useProvider();
     const { data: signer } = useSigner();
@@ -22,33 +21,22 @@ const useSubscriptionManagement = () => {
     const [contract, setContract] = useState<ethers.Contract | null>(null);
     const [pk, setPk] = useState<string | undefined>(undefined);
 
-
-
     useEffect(() => {
         const loadContract = async () => {
             if (signer && config?.subscription_management_contract) {
                 try {
-
                     const abi = await fetchAbiFromDatabase('subscription_management');
                     if (abi) {
-                        const contract = new ethers.Contract(
-                            config.subscription_management_contract as `0x${string}`,
-                            abi,
-                            signer
-                        );
+                        const contract = new ethers.Contract(config.subscription_management_contract as `0x${string}`, abi, signer);
                         setContract(contract);
                         setAbiConfigHandler({ subscriptionManagementAbi: abi });
-
                     }
-                } catch (error) {
-                }
+                } catch (error) {}
             }
         };
 
         loadContract();
     }, [signer, config?.subscription_management_contract]);
-
-
 
     const createSubscriptionOnBC = useCallback(
         async (
@@ -68,12 +56,12 @@ const useSubscriptionManagement = () => {
 
                 try {
                     const tx = await contract.subscribe(subscriptionTypeId, subscriber, paymentTx, PromoterAddress);
-                    console.log("🚀 ~ useSubscriptionManagement ~ tx:", tx)
+                    console.log('🚀 ~ useSubscriptionManagement ~ tx:', tx);
                     Swal.fire({
                         title: 'Subscription successful',
                         icon: 'success',
                     });
-                    console.log("🚀 ~ useSubscriptionManagement ~ tx:", tx)
+                    console.log('🚀 ~ useSubscriptionManagement ~ tx:', tx);
 
                     return true;
                 } catch (error: any) {
@@ -105,40 +93,15 @@ const useSubscriptionManagement = () => {
         [contract]
     );
     const getSubscriptionByIdOnBC = useCallback(
-        async (subscriptionId: number): Promise<any | null> => {
+        async (subscriptionId: string): Promise<any | null> => {
             if (contract) {
                 try {
                     const subscription = await contract.getSubscriptionById(subscriptionId);
-                    return getFormatedSubscriptionObject(subscription);
-
-                    // return {
-                    //     id: subscription.id,
-                    //     subscriber: subscription.subscriber,
-                    //     promoterAddress: subscription.promoterAddress,
-                    //     start: formatDateTime(subscription.start.toNumber()),
-                    //     end: formatDateTime(subscription.end.toNumber()),
-                    //     subscriptionModel: {
-                    //         id: subscription.subscriptionModel.id,
-                    //         subscriptionType: subscription.subscriptionModel.subscriptionType,
-                    //         subscriptionPeriod: subscription.subscriptionModel.subscriptionPeriod,
-                    //         name: subscription.subscriptionModel.name,
-                    //         price: convertToDecimal(subscription.subscriptionModel.price),
-                    //         promoPrice: convertToDecimal(subscription.subscriptionModel.promoPrice),
-                    //         period: subscription.subscriptionModel.period,
-                    //         enabled: subscription.subscriptionModel.enabled,
-                    //         fees: convertToDecimal(subscription.subscriptionModel.fees),
-                    //         promoFees: convertToDecimal(subscription.subscriptionModel.promoFees),
-                    //         isPromoActive: subscription.subscriptionModel.isPromoActive,
-                    //         shopLimit: convertToDecimal(subscription.subscriptionModel.shopLimit),
-                    //     },
-                    //     totAmountPaid: convertToDecimal(subscription.totAmountPaid),
-                    //     paymentTx: subscription?.paymentTx,
-                    //     promoterProfit: convertToDecimal(subscription?.promoterProfit),
-                    //     totShopAmountPaid: convertToDecimal(subscription.totShopAmountPaid),
-                    //     promoterWithdrawn: subscription.promoterWithdrawn,
-                    // };
+                    const data = getFormatedSubscriptionObject(subscription);
+                    console.log('🚀 ~ data:', data);
+                    return data;
                 } catch (error: any) {
-                    console.log("🚀 ~ error:", error)
+                    console.log('🚀 ~ error:', error);
                     return null;
                 }
             } else {
@@ -180,7 +143,7 @@ const useSubscriptionManagement = () => {
                     //     promoterWithdrawn: subscription.promoterWithdrawn,
                     // };
                 } catch (error: any) {
-                    console.log("🚀 ~ error:", error)
+                    console.log('🚀 ~ error:', error);
                     return null;
                 }
             } else {
@@ -211,10 +174,8 @@ const useSubscriptionManagement = () => {
             if (contract) {
                 try {
                     const subscriptions = await contract.getAllSubsByAddress(subscriber);
-                    console.log("🚀 ~ subscriptions:", subscriptions)
-                    return subscriptions.map((subscription: any) =>
-                        getFormatedSubscriptionObject(subscription)
-                    );
+                    console.log('🚀 ~ subscriptions:', subscriptions);
+                    return subscriptions.map((subscription: any) => getFormatedSubscriptionObject(subscription));
                 } catch (error: any) {
                     console.log('🚀 ~ error:', error);
                     checkErrorMessage(error.message);
@@ -245,7 +206,7 @@ const useSubscriptionManagement = () => {
     //                 // );
     //                 if (!subscription) {
     //                     return null as unknown as SubscriptionManagementModel;
-    //                 }  
+    //                 }
     //                 console.log("🚀 ~ subscription:",  Number(subscription.id))
     //                 console.log("🚀 ~ totShopAmountPaid:",  convertToDecimal(subscription.totShopAmountPaid))
 
@@ -271,7 +232,7 @@ const useSubscriptionManagement = () => {
     //                     },
     //                     totAmountPaid: convertToDecimal(subscription.totAmountPaid),
     //                     paymentTx: subscription?.paymentTx,
-    //                     promoterProfit: convertToDecimal(subscription?.promoterProfit), 
+    //                     promoterProfit: convertToDecimal(subscription?.promoterProfit),
     //                     totShopAmountPaid: convertToDecimal(subscription.totShopAmountPaid),
     //                     promoterWithdrawn: subscription.promoterWithdrawn,
     //                 };
@@ -294,50 +255,57 @@ const useSubscriptionManagement = () => {
                     const subscriptions = await contract.getAllValidSubscriptionsByWalletAddress(subscriber);
 
                     if (!subscriptions || subscriptions.length === 0) {
-                        console.log("Nessuna subscription valida trovata");
+                        console.log('Nessuna subscription valida trovata');
                         return undefined;
                     }
+                    const all = subscriptions.map((subscription: SubscriptionManagementModel) => getFormatedSubscriptionObject(subscription));
+                    console.log('🚀 ~ all:', all);
 
-                    const subscription = subscriptions.reduce(
-                        (maxSubscription: { subscriptionModel: { id: number } }, subscription: { subscriptionModel: { id: number } }) => {
-                            return subscription.subscriptionModel.id > maxSubscription.subscriptionModel.id ? subscription : maxSubscription;
-                        },
-                        subscriptions[0]
-                    );
+                    // const subscription = subscriptions.reduce(
+                    //     (latestSubscription: { subscriptionModel: { date: string | number | Date; }; }, currentSubscription: { subscriptionModel: { date: string | number | Date; }; }) => {
+                    //         const latestDate = formatDateTime(Number(latestSubscription.subscriptionModel.date));
+                    //         const currentDate = formatDateTime(Number(currentSubscription.subscriptionModel.date));
+                    //         return currentDate > latestDate ? currentSubscription : latestSubscription;
+                    //     },
+                    //     subscriptions[0]
+                    // );
+                    // console.log("🚀 ~ subscription:", subscription)
 
+                    const result = all[all.length - 1];
+                    console.log('🚀 ~ result:', result);
+                    return result;
+                    // return {
+                    //     id: subscription.id,
+                    //     subscriber: subscription.subscriber,
+                    //     start: formatDateTime(subscription.start.toNumber()),
+                    //     end: formatDateTime(subscription.end.toNumber()),
+                    //     subscriptionModel: {
+                    //         id: subscription.subscriptionModel.id,
+                    //         subscriptionType: subscription.subscriptionModel.subscriptionType,
+                    //         subscriptionPeriod: subscription.subscriptionModel.subscriptionPeriod,
+                    //         name: subscription.subscriptionModel.name,
+                    //         //price: subscription.subscriptionModel.price,
+                    //         price: Number(formatUnits(subscription.subscriptionModel.price, 6)),
+                    //         // promoPrice: convertToDecimal(subscription.subscriptionModel.promoPrice),
+                    //         // promoPrice: formatUnits(Number(ethers.BigNumber.from(convertToDecimal(subscription.subscriptionModel.promoPrice))), 4),
+                    //         promoPrice: Number(formatUnits(subscription?.subscriptionModel.promoPrice, 6)),
 
-                    return {
-                        id: subscription.id,
-                        subscriber: subscription.subscriber,
-                        start: formatDateTime(subscription.start.toNumber()),
-                        end: formatDateTime(subscription.end.toNumber()),
-                        subscriptionModel: {
-                            id: subscription.subscriptionModel.id,
-                            subscriptionType: subscription.subscriptionModel.subscriptionType,
-                            subscriptionPeriod: subscription.subscriptionModel.subscriptionPeriod,
-                            name: subscription.subscriptionModel.name,
-                            //price: subscription.subscriptionModel.price,
-                            price: Number(formatUnits(subscription.subscriptionModel.price, 6)),
-                            // promoPrice: convertToDecimal(subscription.subscriptionModel.promoPrice),
-                            // promoPrice: formatUnits(Number(ethers.BigNumber.from(convertToDecimal(subscription.subscriptionModel.promoPrice))), 4), 
-                            promoPrice: Number(formatUnits(subscription?.subscriptionModel.promoPrice, 6)),
+                    //         period: subscription.subscriptionModel.period,
+                    //         enabled: subscription.subscriptionModel.enabled,
+                    //         fees: subscription.subscriptionModel.fees,
+                    //         promoFees: convertToDecimal(subscription.subscriptionModel.promoFees),
+                    //         isPromoActive: subscription.subscriptionModel.isPromoActive,
+                    //         shopLimit: convertToDecimal(subscription.subscriptionModel.shopLimit),
+                    //     },
+                    //     totAmountPaid: convertToDecimal(subscription.totAmountPaid),
+                    //     paymentTx: subscription?.paymentTx,
+                    //     //promoterProfit: convertToDecimal(subscription?.promoterProfit),
 
-                            period: subscription.subscriptionModel.period,
-                            enabled: subscription.subscriptionModel.enabled,
-                            fees: subscription.subscriptionModel.fees,
-                            promoFees: convertToDecimal(subscription.subscriptionModel.promoFees),
-                            isPromoActive: subscription.subscriptionModel.isPromoActive,
-                            shopLimit: convertToDecimal(subscription.subscriptionModel.shopLimit),
-                        },
-                        totAmountPaid: convertToDecimal(subscription.totAmountPaid),
-                        paymentTx: subscription?.paymentTx,
-                        //promoterProfit: convertToDecimal(subscription?.promoterProfit),
+                    //     promoterProfit: formatUnits(Number(ethers.BigNumber.from(subscription?.promoterProfit)), 6),
+                    //     totShopAmountPaid: Number(formatUnits((subscription.totShopAmountPaid, 6))),
 
-                        promoterProfit: formatUnits(Number(ethers.BigNumber.from(subscription?.promoterProfit)), 6),
-                        totShopAmountPaid: Number(formatUnits((subscription.totShopAmountPaid, 6))),
-
-                        promoterWithdrawn: subscription.promoterWithdrawn
-                    } as any;
+                    //     promoterWithdrawn: subscription.promoterWithdrawn
+                    // } as any;
                 } catch (error: any) {
                     console.log('Errore in getLastValidSubscription:', error);
                     checkErrorMessage(error.message);
@@ -380,7 +348,7 @@ const useSubscriptionManagement = () => {
                     //     totShopAmountPaid: convertToDecimal(subscription.totShopAmountPaid),
 
                     //     promoterWithdrawn: subscription.promoterWithdrawn,
-                    // }));  
+                    // }));
                     return subscriptions.map((subscription: any) => getFormatedSubscriptionObject(subscription));
 
                     // return subscriptions.map((subscription: any) => ({
@@ -396,7 +364,7 @@ const useSubscriptionManagement = () => {
                     //         //price: subscription.subscriptionModel.price,
                     //         price: Number(formatUnits(subscription.subscriptionModel.price, 6)),
                     //         // promoPrice: convertToDecimal(subscription.subscriptionModel.promoPrice),
-                    //         // promoPrice: formatUnits(Number(ethers.BigNumber.from(convertToDecimal(subscription.subscriptionModel.promoPrice))), 4), 
+                    //         // promoPrice: formatUnits(Number(ethers.BigNumber.from(convertToDecimal(subscription.subscriptionModel.promoPrice))), 4),
                     //         promoPrice: Number(formatUnits(subscription?.subscriptionModel.promoPrice, 6)),
 
                     //         period: subscription.subscriptionModel.period,
@@ -459,7 +427,7 @@ const useSubscriptionManagement = () => {
                     //     promoterWithdrawn: subscription.promoterWithdrawn,
                     // };
                 } catch (error: any) {
-                    console.log("🚀 ~ error:", error)
+                    console.log('🚀 ~ error:', error);
                     checkErrorMessage(error.message);
                     return null as unknown as SubscriptionManagementModel;
                 }
@@ -470,7 +438,7 @@ const useSubscriptionManagement = () => {
         [contract]
     );
     const changeTotShopAmountPaidOnBC = useCallback(
-        async (subId: number, newAmount: number) => {
+        async (subId: string, newAmount: number) => {
             if (contract && provider) {
                 try {
                     // Ottieni le tariffe del gas dal provider
@@ -486,11 +454,11 @@ const useSubscriptionManagement = () => {
                     // Invia la transazione con le tariffe del gas adeguate
                     const tx = await contract.changeTotShopAmountPaid(subId, newAmount, transactionOptions);
                     await tx.wait();
-                    console.log("🚀 ~ tx:", tx);
+                    console.log('🚀 ~ tx:', tx);
 
                     Swal.fire({ title: 'Change successful', icon: 'success' });
                 } catch (error: any) {
-                    console.log("🚀 ~ error:", error);
+                    console.log('🚀 ~ error:', error);
                     checkErrorMessage(error.message);
                     throw error;
                 }
@@ -511,12 +479,12 @@ const useSubscriptionManagement = () => {
     //         //     } catch (error: any) {
     //         //         console.log("🚀 ~ error:", error)
     //         //     }
-    //         // }  
+    //         // }
     //         if (contract && pk) {
     //             console.log("🚀 ~ process.env.SUBSCRIPTION_WALLET_ONWER_PKEY:", pk!)
     //             try {
     //                 // Creazione del provider e del wallet utilizzando la chiave privata
-    //                 // const ownerProvider = new ethers.providers.InfuraProvider('mainnet', process.env.REACT_APP_INFURA_PROJECT_ID);  
+    //                 // const ownerProvider = new ethers.providers.InfuraProvider('mainnet', process.env.REACT_APP_INFURA_PROJECT_ID);
     //                 const providerUrl = process.env.NODE_ENV === 'development'
     //                     ? 'http://localhost:8545'
     //                     : `https://mainnet.infura.io/v3/${process.env.REACT_APP_INFURA_PROJECT_ID}`;
@@ -631,7 +599,7 @@ const useSubscriptionManagement = () => {
                 // Invia la transazione con le tariffe del gas adeguate
                 const tx = await contract.withdrawlAllCoinFunds(transactionOptions);
                 const receipt = await tx.wait();
-                console.log("🚀 ~ withdrawlAllCoinFunds ~ receipt:", receipt)
+                console.log('🚀 ~ withdrawlAllCoinFunds ~ receipt:', receipt);
                 Swal.fire({ title: 'Withdrawal successful', icon: 'success' });
                 return true;
             } catch (error: any) {
@@ -642,20 +610,23 @@ const useSubscriptionManagement = () => {
             return false;
         }
     }, [contract]);
-    const changeCoinContractAddressOnBC = useCallback(async (newAddress: string) => {
-        if (contract) {
-            try {
-                const tx = await contract.changeCoinContract(newAddress);
-                await tx.wait();
-                console.log("🚀 ~ changeCoinContractAddressOnBC ~ tx:", tx)
+    const changeCoinContractAddressOnBC = useCallback(
+        async (newAddress: string) => {
+            if (contract) {
+                try {
+                    const tx = await contract.changeCoinContract(newAddress);
+                    await tx.wait();
+                    console.log('🚀 ~ changeCoinContractAddressOnBC ~ tx:', tx);
 
-                Swal.fire({ title: 'Change successful', icon: 'success' });
-            } catch (error: any) {
-                checkErrorMessage(error.message);
-                throw error;
+                    Swal.fire({ title: 'Change successful', icon: 'success' });
+                } catch (error: any) {
+                    checkErrorMessage(error.message);
+                    throw error;
+                }
             }
-        }
-    }, [contract]);
+        },
+        [contract]
+    );
     // const withdrawlEthFunds = useCallback(async (): Promise<boolean> => {
     //     if (contract) {
     //         try {
@@ -688,69 +659,70 @@ const useSubscriptionManagement = () => {
     //         return false;
     //     }
     // }, [contract]);
-    const changePromoterProfitOnBC = useCallback(async (subId: number, newAmount: number) => {
-        if (contract) {
-            try {
-                const tx = await contract.changePromoterProfit(subId, newAmount);
-                await tx.wait();
-                Swal.fire({ title: 'Change successful', icon: 'success' });
-            } catch (error: any) {
-                checkErrorMessage(error.message);
-                throw error;
+    const changePromoterProfitOnBC = useCallback(
+        async (subId: number, newAmount: number) => {
+            if (contract) {
+                try {
+                    const tx = await contract.changePromoterProfit(subId, newAmount);
+                    await tx.wait();
+                    Swal.fire({ title: 'Change successful', icon: 'success' });
+                } catch (error: any) {
+                    checkErrorMessage(error.message);
+                    throw error;
+                }
             }
-        }
-    }, [contract]);
+        },
+        [contract]
+    );
     const withdrawPromoterProfitOnBC = useCallback(async (): Promise<boolean> => {
         if (contract && provider) {
             try {
                 // Ottieni le tariffe del gas dal provider
                 const gasPrice = await provider.getFeeData();
-                console.log("🚀 withdrawPromoterProfit ~ gasPrice:", gasPrice);
+                console.log('🚀 withdrawPromoterProfit ~ gasPrice:', gasPrice);
                 const estimatedGas = await contract.estimateGas.withdrawPromoterProfit();
-                console.log("🚀 withdrawPromoterProfit ~ estimatedGas:", estimatedGas)
+                console.log('🚀 withdrawPromoterProfit ~ estimatedGas:', estimatedGas);
 
                 const finalGasLimit = Math.floor((estimatedGas.toNumber() * 110) / 100);
-                console.log("🚀 withdrawPromoterProfit ~ finalGasLimit:", finalGasLimit);
+                console.log('🚀 withdrawPromoterProfit ~ finalGasLimit:', finalGasLimit);
 
                 const maxFeePerGas = ethers.BigNumber.from(gasPrice.maxFeePerGas);
                 const maxPriorityFeePerGas = ethers.BigNumber.from(gasPrice.maxPriorityFeePerGas);
                 const gasLimit = ethers.BigNumber.from(finalGasLimit);
 
                 // Creazione e invio della transazione
-                const TxResult = await contract.withdrawPromoterProfit(
-
-                    {
-                        maxFeePerGas: maxFeePerGas,
-                        maxPriorityFeePerGas: maxPriorityFeePerGas,
-                        gasLimit: gasLimit,
-                    }
-                );
+                const TxResult = await contract.withdrawPromoterProfit({
+                    maxFeePerGas: maxFeePerGas,
+                    maxPriorityFeePerGas: maxPriorityFeePerGas,
+                    gasLimit: gasLimit,
+                });
                 const receipt = await TxResult.wait();
-                console.log("🚀 withdrawPromoterProfit ~ receipt:", receipt.transactionHash);
+                console.log('🚀 withdrawPromoterProfit ~ receipt:', receipt.transactionHash);
 
-                updateDataOnSB("subscription", { promoter_withdrawn_tx: receipt.transactionHash }, { promoter_withdrawn: false }).then((result: { data: any; error: any; }) => {
-
-                    if (!result) return;
-                    if (result.error || !result.data) {
-                        throw new Error(`Errore nell'aggiornamento dei dati: ${result.error.message}`)
-                    }
-
-                }).catch((error: { message: any; }) => {
-                    throw new Error(`Errore nell'aggiornamento dei dati: ${error.message}`)
-                });
-                updateDataOnSB("subscription", { promoter_withdrawn: true }, { promoter_withdrawn_tx: receipt.transactionHash }).then((result: { data: any; error: any; }) => {
-                    if (!result) return;
-                    if (result.error) {
-                        throw new Error(`Errore nell'aggiornamento dei dati: ${result.error.message}`)
-                    }
-                }).catch((error: { message: any; }) => {
-                    throw new Error(`Errore nell'aggiornamento dei dati: ${error.message}`)
-                });
+                updateDataOnSB('subscription', { promoter_withdrawn_tx: receipt.transactionHash }, { promoter_withdrawn: false })
+                    .then((result: { data: any; error: any }) => {
+                        if (!result) return;
+                        if (result.error || !result.data) {
+                            throw new Error(`Errore nell'aggiornamento dei dati: ${result.error.message}`);
+                        }
+                    })
+                    .catch((error: { message: any }) => {
+                        throw new Error(`Errore nell'aggiornamento dei dati: ${error.message}`);
+                    });
+                updateDataOnSB('subscription', { promoter_withdrawn: true }, { promoter_withdrawn_tx: receipt.transactionHash })
+                    .then((result: { data: any; error: any }) => {
+                        if (!result) return;
+                        if (result.error) {
+                            throw new Error(`Errore nell'aggiornamento dei dati: ${result.error.message}`);
+                        }
+                    })
+                    .catch((error: { message: any }) => {
+                        throw new Error(`Errore nell'aggiornamento dei dati: ${error.message}`);
+                    });
                 return true;
             } catch (error: any) {
                 if (checkTxError(error)) {
                     return true;
-
                 } else {
                     return false;
                 }
@@ -775,7 +747,7 @@ const useSubscriptionManagement = () => {
         withdrawPromoterProfitOnBC,
         getSubscriptionByPaymentTxOnBC,
         withdrawlAllCoinFundsOnBC,
-        changeCoinContractAddressOnBC
+        changeCoinContractAddressOnBC,
     };
 };
 

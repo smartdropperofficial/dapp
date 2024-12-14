@@ -34,18 +34,17 @@ export interface SubscriptionPlans {
     promoFees: number;
     isPromoActive: boolean;
     shopLimit: number;
-
 }
 
 export interface SubscriptionManagementModel {
-    id?: number;
+    id?: string;
     subscriber?: string;
     promoterAddress?: string;
     start?: string;
     end?: string;
     subscriptionModel: SubscriptionPlans;
     totAmountPaid?: number;
-    totShopAmountPaid?: number;
+    monthlyBudget?: number;
     paymentTx?: string;
     promoterProfit?: number;
     promoterWithdrawn?: boolean;

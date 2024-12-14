@@ -20,6 +20,8 @@ type ConfigType = {
     promoterAbi: string;
     subscriptionPlanAbi: string;
     subscriptionManagementAbi: string;
+    pre_order_wallet: string;
+    tax_wallet: string;
 };
 type AbiConfig = {
     orderAbi: string;
@@ -67,6 +69,8 @@ const ConfigContextProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         promoterAbi: '',
         subscriptionPlanAbi: '',
         subscriptionManagementAbi: '',
+        pre_order_wallet: '',
+        tax_wallet: '',
     });
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [configAbi, setConfigAbi] = useState<Partial<AbiConfig> | null>({

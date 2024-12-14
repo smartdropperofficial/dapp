@@ -140,7 +140,7 @@ function FindOrder() {
                                 </li>
                                 <li className="list-group-item d-flex justify-content-between">
                                     <strong>Shop spent:</strong>
-                                    <span className="text-end">${subscription?.totShopAmountPaid?.toFixed(2)}</span>
+                                    <span className="text-end">${subscription?.monthlyBudget?.toFixed(2)}</span>
                                 </li>
                                 <li className="list-group-item d-flex col-12">
                                     <div className="d-flex  align-items-center">

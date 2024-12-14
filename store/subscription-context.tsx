@@ -22,17 +22,17 @@ export const SubscriptionContext = createContext({
     subscriptionsModels: [] as SubscriptionPlans[],
     promoter: null as PromoterModel | null,
     canShop: true as boolean,
-    setCurrentSubscriptionHandler: async (subscription: SubscriptionManagementModel | null) => { },
-    setSubscriptionModels: (models: SubscriptionPlans[]) => { },
-    setSelectedPackageHandler: (subscription: number | null) => { },
-    setSubscriptionIdHandler: (id: number) => { },
-    setPromoterReferralHandler: (referral: string | null | undefined) => { },
-    setIsReferralCodeAppliedHandler: (isApplied: boolean) => { },
-    setDebouncedReferralCodeHandler: (code: string) => { },
-    setCanPayHandler: (canpay: boolean) => { },
-    setAllSubscriptionsHandler: (subscriptions: SubscriptionManagementModel[]) => { },
-    setPromoterHandler: (promoter: PromoterModel | null) => { },
-    setCanShopHandler: (canshop: boolean) => { },
+    setCurrentSubscriptionHandler: async (subscription: SubscriptionManagementModel | null) => {},
+    setSubscriptionModels: (models: SubscriptionPlans[]) => {},
+    setSelectedPackageHandler: (subscription: number | null) => {},
+    setSubscriptionIdHandler: (id: number) => {},
+    setPromoterReferralHandler: (referral: string | null | undefined) => {},
+    setIsReferralCodeAppliedHandler: (isApplied: boolean) => {},
+    setDebouncedReferralCodeHandler: (code: string) => {},
+    setCanPayHandler: (canpay: boolean) => {},
+    setAllSubscriptionsHandler: (subscriptions: SubscriptionManagementModel[]) => {},
+    setPromoterHandler: (promoter: PromoterModel | null) => {},
+    setCanShopHandler: (canshop: boolean) => {},
 });
 
 const SubscriptionContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -60,7 +60,7 @@ const SubscriptionContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
         setAllSubscriptions(subscriptions);
     };
     const setCurrentSubscriptionHandler = async (subscription: SubscriptionManagementModel | null) => {
-        console.log("🚀 ~ setCurrentSubscriptionHandler ~ subscription:", subscription)
+        console.log('🚀 ~ setCurrentSubscriptionHandler ~ subscription:', subscription);
         setCurrentSubscription(subscription);
     };
     const setSelectedPackageHandler = (subscription: number | null) => {
@@ -116,8 +116,8 @@ const SubscriptionContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
         setCanPayHandler: setCanPayHandler, // Add setCanPay property
         setSubscriptionModels: setSubscriptionPlans, // Add setSubscriptionModels property
         setAllSubscriptionsHandler: setAllSubscriptionsHandler, // Add setAllSubscriptions property
-        setPromoterHandler: setPromoterHandler, // Add setPromoter property 
-        setCanShopHandler: setCanShopHandler, // Add setCanShop property    
+        setPromoterHandler: setPromoterHandler, // Add setPromoter property
+        setCanShopHandler: setCanShopHandler, // Add setCanShop property
     };
     useEffect(() => {
         if (currentSubscription !== null) {
@@ -127,24 +127,24 @@ const SubscriptionContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
             } else if (
                 currentSubscription && // se c'è un abbonamento attivo
                 currentSubscription?.subscriptionModel?.shopLimit! > 0 && // se c'è un limite impostato per lo shop
-                currentSubscription?.totShopAmountPaid! >= currentSubscription?.subscriptionModel?.shopLimit! // se il limite è stato raggiunto
+                currentSubscription?.monthlyBudget! >= currentSubscription?.subscriptionModel?.shopLimit! // se il limite è stato raggiunto
             ) {
                 console.log(
                     '🚀 ~ useEffect ~ currentSubscription?.totShopAmountPaid! >= currentSubscription?.subscriptionModel.shopLimit!:',
-                    currentSubscription?.totShopAmountPaid! >= currentSubscription?.subscriptionModel?.shopLimit!
+                    currentSubscription?.monthlyBudget! >= currentSubscription?.subscriptionModel?.shopLimit!
                 );
 
                 setCanPay(false);
             } else if (
                 currentSubscription &&
                 currentSubscription?.subscriptionModel?.shopLimit! > 0 &&
-                currentSubscription?.totShopAmountPaid! < currentSubscription?.subscriptionModel?.shopLimit!
+                currentSubscription?.monthlyBudget! < currentSubscription?.subscriptionModel?.shopLimit!
             ) {
                 console.log(
                     '🚀 ~ useEffect ~ currentSubscription?.totShopAmountPaid! >= currentSubscription?.subscriptionModel.shopLimit!:',
                     currentSubscription &&
-                    currentSubscription?.subscriptionModel?.shopLimit! > 0 &&
-                    currentSubscription?.totShopAmountPaid! < currentSubscription?.subscriptionModel?.shopLimit!
+                        currentSubscription?.subscriptionModel?.shopLimit! > 0 &&
+                        currentSubscription?.monthlyBudget! < currentSubscription?.subscriptionModel?.shopLimit!
                 );
 
                 setCanPay(true);
@@ -174,6 +174,7 @@ const SubscriptionContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
             getLastValidSubscription(session?.address).then(data => {
                 if (data !== null && data?.subscriber === session?.address && address) {
                     getSubscriptionById(data?.id!).then(sub => {
+                        console.log('🚀 ~ getSubscriptionById ~ data:', data);
                         setCurrentSubscription(sub!);
                     });
                 } else {

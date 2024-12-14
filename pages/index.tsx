@@ -16,14 +16,33 @@ import AmazonImg from '../public/assets/amazon-logo.png';
 import Basket from '@/components/orders/Basket';
 import { withAuth } from '@/withAuth';
 import AmazonConditions from '@/components/steps/AmazonConditions';
-
+import useSubscriptionModel from '@/hooks/Database/subscription/useSubscription';
+import { SubscriptionContext } from '@/store/subscription-context';
 export default function Home() {
     const { currentStep: step } = useContext(OrderContext);
-
+    const subscrpitionContext = useContext(SubscriptionContext);
+    const { currentSubscription, setCanShopHandler } = useContext(SubscriptionContext);
+    const { getCanShop } = useSubscriptionModel();
     useEffect(() => {
         const middleOfPage = window.innerHeight / 2;
         window.scrollTo({ top: middleOfPage, behavior: 'smooth' });
     }, []);
+
+    useEffect(() => {
+        const checkCanShop = async () => {
+            if (currentSubscription && currentSubscription.id!) {
+                console.log('🚀 ~ checkCanShop ~  currentSubscription.id:', currentSubscription.id);
+
+                const res = await getCanShop(currentSubscription?.id!);
+                console.log('🚀 ~ useEffect ~ getCanShop:', res);
+                setCanShopHandler(res);
+            } else {
+                console.log('🚀 ~ useEffect ~ nessuna subscription trovata:', currentSubscription);
+            }
+        };
+        checkCanShop();
+    }, [getCanShop, currentSubscription]);
+
     const stepContent = () => {
         switch (step) {
             case 1:
@@ -47,7 +66,7 @@ export default function Home() {
         if (retailer === RETAILERS.AMAZON) {
             return (
                 <div className="card-title text-center">
-                    <Image src={AmazonImg} alt="SmartShopper Background" width={200} height={100} />
+                    <Image src={AmazonImg} alt="SmartDropper Background" width={200} height={100} />
                     <Image src="/icons/usa.png" alt="usa icon " width={40} height={40} />
                     <h1>
                         Order on <b> Amazon US</b> using Crypto with just a few clicks.
@@ -57,7 +76,7 @@ export default function Home() {
         } else if (retailer === RETAILERS.EBAY) {
             return (
                 <div className="card-title text-center">
-                    <Image src={EbayImg} alt="SmartShopper Background" width={200} height={100} />
+                    <Image src={EbayImg} alt="SmartDropper Background" width={200} height={100} />
                     <Image src="/icons/usa.png" alt="usa icon " width={40} height={40} />
                     <h1>
                         Order on <b> Ebay </b> using Crypto with just a few clicks.
@@ -70,16 +89,16 @@ export default function Home() {
     return (
         <>
             <Head>
-                <meta property="og:title" content="SmartShopper | Shop on Amazon using Crypto" />
+                <meta property="og:title" content="SmartDropper | Shop on Amazon using Crypto" />
                 <meta
                     property="og:description"
-                    content="Smartshopper is the first decentralized platform that allows users to buy on Amazon by just using their DeFi Wallet, like Metamask or TrustWallet."
+                    content="SmartDropper is the first decentralized platform that allows users to buy on Amazon by just using their DeFi Wallet, like Metamask or TrustWallet."
                 />
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content="https://app.smartshopperpay.com/" />
-                <meta property="og:site_name" content="SmartShopper" />
+                <meta property="og:url" content="https://app.SmartDropperpay.com/" />
+                <meta property="og:site_name" content="SmartDropper" />
 
-                <link rel="canonical" href="https://app.smartshopperpay.com/" />
+                <link rel="canonical" href="https://app.SmartDropperpay.com/" />
 
                 <meta property="og:image" content="/assets/meta/index.png" />
                 <meta property="og:image:height" content="1000" />
@@ -90,19 +109,19 @@ export default function Home() {
                 <meta property="og:image:width" content="200" />
 
                 <meta name="twitter:card" content="summary" />
-                <meta name="twitter:site" content="@smartshopper" />
-                <meta name="twitter:title" content="SmartShopper | Shop on Amazon using Crypto" />
+                <meta name="twitter:site" content="@SmartDropper" />
+                <meta name="twitter:title" content="SmartDropper | Shop on Amazon using Crypto" />
                 <meta
                     name="twitter:description"
-                    content="Smartshopper is the first decentralized platform that allows users to buy on Amazon by just using their DeFi Wallet, like Metamask or TrustWallet."
+                    content="SmartDropper is the first decentralized platform that allows users to buy on Amazon by just using their DeFi Wallet, like Metamask or TrustWallet."
                 />
                 <meta name="twitter:creator" content="@deforceagency" />
                 <meta name="twitter:image" content="/assets/meta/index.png" />
 
-                <title>SmartShopper | Shop on Amazon using Crypto</title>
+                <title>SmartDropper | Shop on Amazon using Crypto</title>
                 <meta
                     name="description"
-                    content="Smartshopper is the first decentralized platform that allows users to buy on Amazon by just using their DeFi Wallet, like Metamask or TrustWallet."
+                    content="SmartDropper is the first decentralized platform that allows users to buy on Amazon by just using their DeFi Wallet, like Metamask or TrustWallet."
                 />
             </Head>
 

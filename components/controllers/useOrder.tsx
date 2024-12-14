@@ -1,5 +1,5 @@
 // useOrder.ts
-import { useContext, useState } from 'react';
+import { useCallback, useContext, useState } from 'react';
 import { OrderStatus } from '../../types/Order';
 import { OrderSB, ProductSB } from '../../types/OrderSB';
 import { encryptData } from '../../utils/utils';
@@ -8,8 +8,13 @@ import { useSession } from 'next-auth/react';
 import { SessionExt } from '@/types/SessionExt';
 import { OrderContext } from '../../store/order-context';
 import { ConfigContext } from '@/store/config-context';
+import useSubscriptionModel from '@/hooks/Database/subscription/useSubscription';
+import { SubscriptionContext } from '@/store/subscription-context';
 
 export const useOrder = () => {
+    const { getCanShop } = useSubscriptionModel();
+    const { currentSubscription, setCanShopHandler, canShop } = useContext(SubscriptionContext);
+
     const { data: session } = useSession() as { data: SessionExt | null };
     const orderCtx = useContext(OrderContext);
     const configCtx = useContext(ConfigContext);
@@ -91,29 +96,43 @@ export const useOrder = () => {
             return null;
         }
     };
-    const createPreOrder = async (): Promise<any> => {
-        try {
-            const order = generatePreOrderObject();
-            console.log('🚀 ~ createOrder ~ order:', order);
-            const encryptedOrder = encryptData(JSON.stringify(order));
-            console.log('🚀 ~ createOrder ~ encryptedOrder:', encryptedOrder);
+    const createPreOrder = useCallback(async (): Promise<any> => {
+        if (setCanShopHandler && getCanShop && SubscriptionContext && currentSubscription) {
+            const res = await getCanShop(currentSubscription?.id!);
+            console.log("🚀 ~ createPreOrder ~ getCanShop:", res);
+            setCanShopHandler(res);
 
-            const createOrderResponse = await fetch('/api/createPreOrder', {
-                method: 'POST',
-                body: encryptedOrder,
-                headers: { 'Content-Type': 'plain/text' },
-            });
+            if (canShop) {
+                console.log("🚀 ~ createPreOrder ~ canShop:", canShop)
+                try {
 
-            switch (createOrderResponse.status) {
-                case 201:
-                    return { data: await createOrderResponse.json(), created: true };
-                default:
-                    return { data: await createOrderResponse.json(), created: false };
+                    const order = generatePreOrderObject();
+                    console.log('🚀 ~ createOrder ~ order:', order);
+                    const encryptedOrder = encryptData(JSON.stringify(order));
+                    console.log('🚀 ~ createOrder ~ encryptedOrder:', encryptedOrder);
+
+                    const createOrderResponse = await fetch('/api/createPreOrder', {
+                        method: 'POST',
+                        body: encryptedOrder,
+                        headers: { 'Content-Type': 'plain/text' },
+                    });
+
+                    switch (createOrderResponse.status) {
+                        case 201:
+                            return { data: await createOrderResponse.json(), created: true };
+                        default:
+                            return { data: await createOrderResponse.json(), created: false };
+                    }
+                } catch {
+                    return null;
+                }
             }
-        } catch {
-            return null;
+            else {
+                return { error: "This amount exceed maximum limit for this subscription level.", created: false };
+            }
         }
-    };
+
+    }, [getCanShop, setCanShopHandler, SubscriptionContext, currentSubscription]);
 
     const createOrderOnAmazon = async (orderId: string) => {
         console.log('🚀 ~ createOrderOnAmazon ~ orderId:', orderId);

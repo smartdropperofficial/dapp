@@ -6,7 +6,11 @@ import { Card } from 'react-bootstrap';
 import Skeleton from 'react-loading-skeleton';
 
 function SubcriptionDetails({ subId }: { subId: number }) {
-    const { changeTotShopAmountPaidOnBC: changeTotShopAmountPaid, getSubscriptionByIdOnBC: getSubscriptionById, updateSubscriptionFeeOnBC } = useSubscriptionManagement();
+    const {
+        changeTotShopAmountPaidOnBC: changeTotShopAmountPaid,
+        getSubscriptionByIdOnBC: getSubscriptionById,
+        updateSubscriptionFeeOnBC,
+    } = useSubscriptionManagement();
     const [subscription, setSubscription] = useState<SubscriptionManagementModel | null>(null); // Fix this
     const [newTotShopAmountPaid, setNewTotShopAmountPaid] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
@@ -46,7 +50,7 @@ function SubcriptionDetails({ subId }: { subId: number }) {
     const handleFeesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newFees = Number(e.target.value);
 
-        setSubscription((prev) => {
+        setSubscription(prev => {
             if (prev && prev.subscriptionModel) {
                 const updatedSubscriptionModel: SubscriptionPlans = {
                     ...prev.subscriptionModel,
@@ -62,22 +66,16 @@ function SubcriptionDetails({ subId }: { subId: number }) {
         });
     };
 
-    const setPromoterPercentageHandler = async (id: number, fees: number) => {
+    const setPromoterPercentageHandler = async (id: string, fees: number) => {
         // console.log('setPromoterPercentageHandler', id, fees);
         await updateSubscriptionFeeOnBC(id, fees);
-    }
-
-
-
+    };
 
     // Controlla se il valore della percentuale è invariato o non valido
-    const isPercentageUnchanged =
-        subscription?.subscriptionModel?.fees === subscription?.subscriptionModel?.fees;
+    const isPercentageUnchanged = subscription?.subscriptionModel?.fees === subscription?.subscriptionModel?.fees;
 
     const isPercentageInvalid =
-        subscription?.subscriptionModel?.fees === undefined ||
-        subscription?.subscriptionModel?.fees < 0 ||
-        subscription?.subscriptionModel?.fees > 20;
+        subscription?.subscriptionModel?.fees === undefined || subscription?.subscriptionModel?.fees < 0 || subscription?.subscriptionModel?.fees > 20;
 
     useEffect(() => {
         if (subscription) {
@@ -131,12 +129,7 @@ function SubcriptionDetails({ subId }: { subId: number }) {
                                         <button
                                             className="mx-1 rounded-5 p-1 px-4"
                                             style={{ backgroundColor: '#ff9900', color: 'white', border: 'none' }}
-                                            onClick={() =>
-                                                setPromoterPercentageHandler(
-                                                    subscription.id!,
-                                                    subscription.subscriptionModel.fees
-                                                )
-                                            }
+                                            onClick={() => setPromoterPercentageHandler(subscription.id!, subscription.subscriptionModel.fees)}
                                         >
                                             Confirm
                                         </button>
@@ -156,7 +149,7 @@ function SubcriptionDetails({ subId }: { subId: number }) {
                                         </li>
                                         <li className="list-group-item d-flex justify-content-between">
                                             <strong>Shop spent:</strong>
-                                            <span className="text-end">${subscription?.totShopAmountPaid?.toFixed(2)}</span>
+                                            <span className="text-end">${subscription?.monthlyBudget?.toFixed(2)}</span>
                                         </li>
                                         <li className="list-group-item d-flex col-12">
                                             <div className="d-flex  align-items-center">
@@ -172,13 +165,13 @@ function SubcriptionDetails({ subId }: { subId: number }) {
                                                     pattern="[0-9]"
                                                     min={0}
                                                     max={subscription?.subscriptionModel?.shopLimit!}
-                                                //   disabled={subContext.currentSubscription?.subscriptionModel.shopLimit! === 0 || subContext.currentSubscription?.totShopAmountPaid! > subContext.currentSubscription?.subscriptionModel.shopLimit!}
+                                                    //   disabled={subContext.currentSubscription?.subscriptionModel.shopLimit! === 0 || subContext.currentSubscription?.totShopAmountPaid! > subContext.currentSubscription?.subscriptionModel.shopLimit!}
                                                 />
                                                 <button
                                                     className="mx-1 rounded-5 p-1 px-4"
                                                     style={{ backgroundColor: '#ff9900', color: 'white', border: 'none' }}
                                                     onClick={changeTotShopAmountPaidHandleClick}
-                                                //   disabled={newTotShopAmountPaid === 0 ||    subContext.currentSubscription?.totShopAmountPaid! >  subContext.currentSubscription?.subscriptionModel.shopLimit!}
+                                                    //   disabled={newTotShopAmountPaid === 0 ||    subContext.currentSubscription?.totShopAmountPaid! >  subContext.currentSubscription?.subscriptionModel.shopLimit!}
                                                 >
                                                     confirm
                                                 </button>
