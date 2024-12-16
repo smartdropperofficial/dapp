@@ -18,7 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 const { data, error } = await supabase
                     .from('orders') // Assicurati che 'orders' sia il nome corretto della tua tabella
                     .update(order)
-                    .eq('id', orderId);
+                    .eq('order_id', orderId);
 
                 if (error) {
                     console.error("Errore durante l'aggiornamento dell'ordine:", error);

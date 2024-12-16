@@ -499,6 +499,8 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
         setTermsConditions(prev => !prev);
     };
     const fetchBasketItems = async (wallet: string) => {
+        console.log('🚀 ~ fetchBasketItems ~ items:');
+
         try {
             const items: ContextProductInfo[] = await getBasketOnDB(wallet);
             console.log('🚀 ~ fetchBasketItems ~ items:', items);
@@ -540,6 +542,9 @@ export const OrderContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
     //     };
     //     syncBasketWithDB();
     // }, [items, session]);
+    useEffect(() => {
+        if (checkout) console.log('🚀 ~ useEffect ~ checkout:', checkout);
+    }, [checkout]);
 
     useEffect(() => {
         if (process.env.NODE_ENV === 'development') {

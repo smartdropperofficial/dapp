@@ -147,7 +147,7 @@ export const createOrderOnAmazon = async (orderCtx: any, configCtx: any, orderId
         // return null;
     }
 };
-export const createOrderOnWeb3 = async (subId: number, orderId: string | null, buyer: string): Promise<boolean> => {
+export const createOrderOnWeb3 = async (orderId: string | null, buyer: string, subId?: string): Promise<boolean> => {
     const { data: order, error } = await supabase.from('orders').select('*').eq('order_id', orderId).single();
     try {
     } catch (error) {
@@ -156,12 +156,18 @@ export const createOrderOnWeb3 = async (subId: number, orderId: string | null, b
     try {
         //order.orderId, order.subtotalAmount, order.commision, order.shippingFees, order.buyer
         const OrderSBObj = { ...order } as OrderSB;
-        const orderObj = { subId: subId, orderId: OrderSBObj.order_id, subtotalAmount: OrderSBObj.subtotal_amount, commision: OrderSBObj.commission, shippingFees: OrderSBObj.shipping_amount, buyer: OrderSBObj.wallet_address };
-        console.log("🚀 ~ createOrderOnWeb3 ~ orderObj:", orderObj)
-        console.log("🚀 ~ createOrderOnWeb3 ~ stringify orderObj:", JSON.stringify(orderObj))
+        const orderObj = {
+            subId: subId,
+            orderId: OrderSBObj.order_id,
+            subtotalAmount: OrderSBObj.subtotal_amount,
+            commision: OrderSBObj.commission,
+            shippingFees: OrderSBObj.shipping_amount,
+            buyer: OrderSBObj.wallet_address,
+        };
+        console.log('🚀 ~ createOrderOnWeb3 ~ orderObj:', orderObj);
+        console.log('🚀 ~ createOrderOnWeb3 ~ stringify orderObj:', JSON.stringify(orderObj));
         const encryptedOrder = encryptData(JSON.stringify(orderObj));
-        console.log("🚀 ~ createOrderOnWeb3 ~ encryptedOrder:", encryptedOrder)
-
+        console.log('🚀 ~ createOrderOnWeb3 ~ encryptedOrder:', encryptedOrder);
 
         const response = await fetch('/api/createOrderOnWeb3', {
             method: 'POST',

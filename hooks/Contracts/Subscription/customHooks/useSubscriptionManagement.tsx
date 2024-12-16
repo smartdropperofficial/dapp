@@ -12,7 +12,7 @@ import { formatUnits } from 'ethers/lib/utils.js';
 import { updateDataOnSB } from '@/hooks/Database/services/update';
 
 const useSubscriptionManagement = () => {
-    const { config, setAbiConfigHandler } = useContext(ConfigContext);
+    const { config, setAbiConfigHandler: setAbiConfigHandler } = useContext(ConfigContext);
 
     // const contractAddress = config?.subscription_management_contract as `0x${string}`;
     const provider = useProvider();

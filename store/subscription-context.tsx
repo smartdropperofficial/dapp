@@ -160,14 +160,13 @@ const SubscriptionContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
         }
     }, [selectedPackageId, currentSubscription]);
 
-    //    useEffect(() => {
-    //        if(getSubscriptionById) {
-    //         getSubscriptionById(Number(currentSubscription?.id)).then((res) => {
-    //             setCurrentSubscription(res);
-    //         });
-    //     }
-
-    //    }, [currentSubscription])
+    useEffect(() => {
+        if (currentSubscription) {
+            console.log('🚀 ~ useEffect ~ currentSubscription:', currentSubscription);
+        } else {
+            console.log('🚀 ~ useEffect ~ currentSubscription:', currentSubscription);
+        }
+    }, [currentSubscription]);
 
     useEffect(() => {
         if (session?.address && address && getLastValidSubscription !== null && getSubscriptionById !== null) {
@@ -183,30 +182,6 @@ const SubscriptionContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
             });
         }
     }, [getLastValidSubscription, getSubscriptionById, session?.address, address]);
-
-    // useEffect(() => {
-    //     async function getData() {
-    //         if (getPromoterOnBC && address) {
-    //             try {
-    //                 const data: PromoterModel | null = await getPromoterOnBC(address);
-    //                 if (data) {
-    //                     console.log('🚀 ~ data:', data);
-    //                     if (data.referralCode && data.isActive) {
-    //                         setPromoterHandler(data);
-    //                     } else if (!data.isActive) {
-    //                     }
-    //                 } else {
-    //                     setPromoterHandler(null);
-    //                 }
-    //             } catch (error) {
-    //             } finally {
-    //             }
-    //         }
-    //     }
-    //     if ((session?.address && address, getPromoterOnBC)) {
-    //         getData();
-    //     }
-    // }, [session?.address, address, getPromoterOnBC]);
 
     useEffect(() => {
         const fetchSubscriptions = async () => {
@@ -226,25 +201,6 @@ const SubscriptionContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
             fetchSubscriptions();
         }
     }, [getSubscriptionModels]);
-    // useEffect(() => {
-    //     const fetchSubscriptions = async () => {
-    //         if (getPlansOnDB && subscriptionsPlans.length === 0) {
-    //             try {
-    //                 const result = await getPlansOnDB();
-    //                 console.log('🚀 ~ fetchSubscriptions ~ result:', result);
-    //                 setTimeout(() => {
-    //                     setSubscriptionPlans(result!);
-    //                 }, 3000);
-    //             } catch (error) {
-    //                 console.error(error);
-    //             } finally {
-    //             }
-    //         }
-    //     };
-    //     if (subscriptionsPlans.length === 0) {
-    //         fetchSubscriptions();
-    //     }
-    // }, [getPlansOnDB]);
 
     useEffect(() => {
         setSelectedPackage(subscriptionsPlans[selectedPackageId!]);

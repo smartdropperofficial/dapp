@@ -62,13 +62,12 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
     //     }
     // };
     useEffect(() => {
-        console.log(showReCaptchaBtn)
-    }, [showReCaptchaBtn])
-
+        console.log(showReCaptchaBtn);
+    }, [showReCaptchaBtn]);
 
     return (
         <>
-            <div className="d-flex flex-column justify-content-between align-items-between">
+            <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
                 <div className={`menu-resp ${showMenuResp && 'active'}`}>
                     <div className="btn-close-menu sticky-top px-2 " onClick={() => setShowMenuResp(false)}></div>
                     <div className="container">
@@ -117,8 +116,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                                             {session && session.isPromoter === true && (
                                                 <Link href="/referral" legacyBehavior>
                                                     <a
-                                                        className={`d-flex align-items-center  ${session && session.isPromoter === true ? 'text-black' : ''
-                                                            }`}
+                                                        className={`d-flex align-items-center  ${session && session.isPromoter === true ? 'text-black' : ''}`}
                                                         onClick={() => {
                                                             setShowMenuResp(false);
                                                         }}
@@ -198,14 +196,14 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                                         </li>
                                         <li className="d-none d-xl-inline-block">
                                             <Link href="/subscribe" legacyBehavior>
-                                                <a className={`${isMounted && router.asPath !== '/subscribe' && 'text-black'}`} onClick={() => { }}>
+                                                <a className={`${isMounted && router.asPath !== '/subscribe' && 'text-black'}`} onClick={() => {}}>
                                                     Subscribe
                                                 </a>
                                             </Link>
                                         </li>
                                         <li className="d-none d-xl-inline-block">
                                             <Link href="/my-orders" legacyBehavior>
-                                                <a className={`${isMounted && router.asPath !== '/my-orders' && 'text-black  text-center'}`} onClick={() => { }}>
+                                                <a className={`${isMounted && router.asPath !== '/my-orders' && 'text-black  text-center'}`} onClick={() => {}}>
                                                     My Orders
                                                 </a>
                                             </Link>
@@ -236,10 +234,10 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                                         </li> */}
                                         <li>
                                             {!isConnected && !isCaptchaVerified && (
-                                                <div >
+                                                <div>
                                                     <ReCAPTCHA
                                                         sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
-                                                        onChange={(value) => {
+                                                        onChange={value => {
                                                             if (value) {
                                                                 setIsCaptchaVerified(true);
                                                                 Swal.fire({
@@ -257,29 +255,26 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                                                     />
                                                 </div>
                                             )}
-                                            {!isConnected && isCaptchaVerified && (
-                                                <ConnectButton showBalance={{ smallScreen: false, largeScreen: false }} />
-                                            )}
-                                            {isConnected && (
-                                                <ConnectButton showBalance={{ smallScreen: false, largeScreen: false }} />
-                                            )}
+                                            {!isConnected && isCaptchaVerified && <ConnectButton showBalance={{ smallScreen: false, largeScreen: false }} />}
+                                            {isConnected && <ConnectButton showBalance={{ smallScreen: false, largeScreen: false }} />}
                                         </li>
-
 
                                         <li className="d-none d-xl-inline-block">
                                             <Link href="/settings" legacyBehavior>
-                                                <a className={`${isMounted && router.asPath !== '/Settings' && 'text-black  text-center'}`} onClick={() => { }}>
+                                                <a className={`${isMounted && router.asPath !== '/Settings' && 'text-black  text-center'}`} onClick={() => {}}>
                                                     Settings
                                                 </a>
                                             </Link>
                                         </li>
-                                        <li className="d-none d-xl-inline-block fw-bold"> {session && session.isPromoter === true && (
-                                            <Link href="/referral" legacyBehavior>
-                                                <a className={`${isMounted} p-1`} style={{ borderStyle: 'dotted' }}>
-                                                    Referral
-                                                </a>
-                                            </Link>
-                                        )}
+                                        <li className="d-none d-xl-inline-block fw-bold">
+                                            {' '}
+                                            {session && session.isPromoter === true && (
+                                                <Link href="/referral" legacyBehavior>
+                                                    <a className={`${isMounted} p-1`} style={{ borderStyle: 'dotted' }}>
+                                                        Referral
+                                                    </a>
+                                                </Link>
+                                            )}
                                         </li>
                                         <li className="ms-3 d-xl-none">
                                             <button className="btn p-0 open-menu d-xl-none" onClick={() => setShowMenuResp(true)}>

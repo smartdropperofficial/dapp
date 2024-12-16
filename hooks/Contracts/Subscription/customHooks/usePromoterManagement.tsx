@@ -10,7 +10,7 @@ import { ConfigContext } from '@/store/config-context';
 import { formatUnits } from 'ethers/lib/utils.js';
 
 const usePromoterManagement = () => {
-    const { config,setAbiConfigHandler } = useContext(ConfigContext);
+    const {  config, setAbiConfigHandler: setAbiConfigHandler } = useContext(ConfigContext);
 
     // const contractAddress = process.env.NEXT_PUBLIC_PROMOTER_MANAGER_ADDRESS as `0x${string}`;
     const contractAddress = config?.promoter_contract as `0x${string}`;
@@ -26,16 +26,11 @@ const usePromoterManagement = () => {
                 try {
                     const abi = await fetchAbiFromDatabase('promoter');
                     if (abi) {
-                        const contract = new ethers.Contract(
-                            config.promoter_contract as `0x${string}`,
-                            abi,
-                            signer
-                        );
+                        const contract = new ethers.Contract(config.promoter_contract as `0x${string}`, abi, signer);
                         setContract(contract);
-                       setAbiConfigHandler({ promoterAbi: abi });
+                        setAbiConfigHandler({ promoterAbi: abi });
                     }
-                } catch (error) {
-                }
+                } catch (error) {}
             }
         };
 
@@ -43,11 +38,11 @@ const usePromoterManagement = () => {
     }, [signer, config?.subscription_management_contract]);
 
     const getFormatedPromoterObject = (promoter: any): any => {
-        console.log("🚀 ~ getFormatedPromoterObject ~ promoter:", promoter);
+        console.log('🚀 ~ getFormatedPromoterObject ~ promoter:', promoter);
 
         // Controlli per assicurarsi che percentage e profit siano definiti
         if (!promoter || !promoter.percentage || !promoter.profit) {
-            throw new Error("Invalid promoter object: missing percentage or profit");
+            throw new Error('Invalid promoter object: missing percentage or profit');
         }
 
         const result = {
@@ -56,19 +51,18 @@ const usePromoterManagement = () => {
             promoterAddress: promoter.promoterAddress,
             profit: formatUnits(ethers.BigNumber.from(promoter.profit), 6),
             referralCode: promoter.referralCode,
-        }
+        };
 
-        console.log("🚀 ~ getFormatedPromoterObject ~ result:", result);
+        console.log('🚀 ~ getFormatedPromoterObject ~ result:', result);
         return result;
-    }
+    };
     const getPromotersOnBC = useCallback(async (): Promise<PromoterModel[]> => {
         if (contract) {
             try {
                 const result = await contract.getPromoters();
                 const res = result.map((promoter: any) => getFormatedPromoterObject(promoter));
-                console.log("🚀 ~ getPromotersOnBC ~ res:", result)
+                console.log('🚀 ~ getPromotersOnBC ~ res:', result);
                 return res;
-
             } catch (error) {
                 console.error('Error fetching promoters:', error);
                 return [] as PromoterModel[];
@@ -108,7 +102,6 @@ const usePromoterManagement = () => {
                     const result = await contract.getPromoter(promoterAddress);
                     console.log('🚀 ~ result -result?.profit:', Number(result?.profit));
                     return getFormatedPromoterObject(result);
-
                 } catch (error: any) {
                     // console.log('🚀 ~ error:', error);
                     return null;
@@ -147,58 +140,55 @@ const usePromoterManagement = () => {
     );
     const addPromoterOnBC = useCallback(
         async (promoterAddress: string, referral: string): Promise<PromoterModel | null> => {
-            console.log("🚀 ~ promoterAddress:", promoterAddress);
+            console.log('🚀 ~ promoterAddress:', promoterAddress);
 
             if (contract) {
-                console.log("🚀 ~ referralCode:", referral);
+                console.log('🚀 ~ referralCode:', referral);
                 try {
                     const gasPrice = await provider.getFeeData();
-                    console.log("🚀 promoterAddress ~ gasPrice:", gasPrice);
+                    console.log('🚀 promoterAddress ~ gasPrice:', gasPrice);
 
                     const estimatedGas = await contract.estimateGas.addPromoter(promoterAddress, referral);
-                    console.log("🚀 promoterAddress ~ estimatedGas:", estimatedGas);
+                    console.log('🚀 promoterAddress ~ estimatedGas:', estimatedGas);
 
                     const finalGasLimit = Math.floor((estimatedGas.toNumber() * 110) / 100);
-                    console.log("🚀 promoterAddress ~ finalGasLimit:", finalGasLimit);
+                    console.log('🚀 promoterAddress ~ finalGasLimit:', finalGasLimit);
 
                     if (!gasPrice.maxFeePerGas || !gasPrice.maxPriorityFeePerGas) {
-                        throw new Error("Gas price data is missing");
+                        throw new Error('Gas price data is missing');
                     }
 
                     const maxFeePerGas = ethers.BigNumber.from(gasPrice.maxFeePerGas);
                     const maxPriorityFeePerGas = ethers.BigNumber.from(gasPrice.maxPriorityFeePerGas);
                     const gasLimit = ethers.BigNumber.from(finalGasLimit);
 
-                    console.log("🚀 ~ maxFeePerGas:", maxFeePerGas.toString());
-                    console.log("🚀 ~ maxPriorityFeePerGas:", maxPriorityFeePerGas.toString());
-                    console.log("🚀 ~ gasLimit:", gasLimit.toString());
+                    console.log('🚀 ~ maxFeePerGas:', maxFeePerGas.toString());
+                    console.log('🚀 ~ maxPriorityFeePerGas:', maxPriorityFeePerGas.toString());
+                    console.log('🚀 ~ gasLimit:', gasLimit.toString());
 
-                    const result = await contract.addPromoter(
-                        promoterAddress, referral,
-                        {
-                            maxFeePerGas: maxFeePerGas,
-                            maxPriorityFeePerGas: maxPriorityFeePerGas,
-                            gasLimit: gasLimit,
-                        }
-                    );
-                    console.log("🚀promoterAddress ~ tx:", result.hash);
+                    const result = await contract.addPromoter(promoterAddress, referral, {
+                        maxFeePerGas: maxFeePerGas,
+                        maxPriorityFeePerGas: maxPriorityFeePerGas,
+                        gasLimit: gasLimit,
+                    });
+                    console.log('🚀promoterAddress ~ tx:', result.hash);
                     const receipt = await result.wait();
-                    console.log("🚀 ~ receipt:", receipt);
+                    console.log('🚀 ~ receipt:', receipt);
 
                     // Verifica la presenza di eventi nel receipt
                     if (!receipt.events) {
-                        console.warn("No events found in receipt");
+                        console.warn('No events found in receipt');
                     }
 
                     // Aggiungi log dettagliati per gli eventi trovati
-                    console.log("🚀 ~ receipt.events:", receipt.events);
+                    console.log('🚀 ~ receipt.events:', receipt.events);
 
                     // Estrai i dati necessari dagli eventi dei log
                     const promoterAddedEvent = receipt.events?.find((event: any) => event.event === 'PromoterAdded');
                     const referralCodeAddedEvent = receipt.events?.find((event: any) => event.event === 'ReferralCodeAdded');
 
                     if (!promoterAddedEvent || !referralCodeAddedEvent) {
-                        throw new Error("PromoterAdded or ReferralCodeAdded event not found");
+                        throw new Error('PromoterAdded or ReferralCodeAdded event not found');
                     }
 
                     const promoter = {
@@ -211,7 +201,7 @@ const usePromoterManagement = () => {
 
                     return getFormatedPromoterObject(promoter);
                 } catch (error: any) {
-                    console.error("Errore nella transazione:", error);
+                    console.error('Errore nella transazione:', error);
                     checkTxError(error);
                     return null;
                 }
@@ -223,57 +213,53 @@ const usePromoterManagement = () => {
     );
     const registerAsPromoterOnBC = useCallback(
         async (referral: string): Promise<PromoterModel | null> => {
-
             if (contract) {
-                console.log("🚀 ~ referralCode:", referral);
+                console.log('🚀 ~ referralCode:', referral);
                 try {
                     const gasPrice = await provider.getFeeData();
-                    console.log("🚀 promoterAddress ~ gasPrice:", gasPrice);
+                    console.log('🚀 promoterAddress ~ gasPrice:', gasPrice);
 
                     const estimatedGas = await contract.estimateGas.registerAsPromoter(referral);
-                    console.log("🚀 promoterAddress ~ estimatedGas:", estimatedGas);
+                    console.log('🚀 promoterAddress ~ estimatedGas:', estimatedGas);
 
                     const finalGasLimit = Math.floor((estimatedGas.toNumber() * 110) / 100);
-                    console.log("🚀 promoterAddress ~ finalGasLimit:", finalGasLimit);
+                    console.log('🚀 promoterAddress ~ finalGasLimit:', finalGasLimit);
 
                     if (!gasPrice.maxFeePerGas || !gasPrice.maxPriorityFeePerGas) {
-                        throw new Error("Gas price data is missing");
+                        throw new Error('Gas price data is missing');
                     }
 
                     const maxFeePerGas = ethers.BigNumber.from(gasPrice.maxFeePerGas);
                     const maxPriorityFeePerGas = ethers.BigNumber.from(gasPrice.maxPriorityFeePerGas);
                     const gasLimit = ethers.BigNumber.from(finalGasLimit);
 
-                    console.log("🚀 ~ maxFeePerGas:", maxFeePerGas.toString());
-                    console.log("🚀 ~ maxPriorityFeePerGas:", maxPriorityFeePerGas.toString());
-                    console.log("🚀 ~ gasLimit:", gasLimit.toString());
+                    console.log('🚀 ~ maxFeePerGas:', maxFeePerGas.toString());
+                    console.log('🚀 ~ maxPriorityFeePerGas:', maxPriorityFeePerGas.toString());
+                    console.log('🚀 ~ gasLimit:', gasLimit.toString());
 
-                    const result = await contract.registerAsPromoter(
-                        referral,
-                        {
-                            maxFeePerGas: maxFeePerGas,
-                            maxPriorityFeePerGas: maxPriorityFeePerGas,
-                            gasLimit: gasLimit,
-                        }
-                    );
-                    console.log("🚀promoterAddress ~ tx:", result.hash);
+                    const result = await contract.registerAsPromoter(referral, {
+                        maxFeePerGas: maxFeePerGas,
+                        maxPriorityFeePerGas: maxPriorityFeePerGas,
+                        gasLimit: gasLimit,
+                    });
+                    console.log('🚀promoterAddress ~ tx:', result.hash);
                     const receipt = await result.wait();
-                    console.log("🚀 ~ receipt:", receipt);
+                    console.log('🚀 ~ receipt:', receipt);
 
                     // Verifica la presenza di eventi nel receipt
                     if (!receipt.events) {
-                        console.warn("No events found in receipt");
+                        console.warn('No events found in receipt');
                     }
 
                     // Aggiungi log dettagliati per gli eventi trovati
-                    console.log("🚀 ~ receipt.events:", receipt.events);
+                    console.log('🚀 ~ receipt.events:', receipt.events);
 
                     // Estrai i dati necessari dagli eventi dei log
                     const promoterAddedEvent = receipt.events?.find((event: any) => event.event === 'PromoterAdded');
                     const referralCodeAddedEvent = receipt.events?.find((event: any) => event.event === 'ReferralCodeAdded');
 
                     if (!promoterAddedEvent || !referralCodeAddedEvent) {
-                        throw new Error("PromoterAdded or ReferralCodeAdded event not found");
+                        throw new Error('PromoterAdded or ReferralCodeAdded event not found');
                     }
 
                     const promoter = {
@@ -286,7 +272,7 @@ const usePromoterManagement = () => {
 
                     return getFormatedPromoterObject(promoter);
                 } catch (error: any) {
-                    console.error("Errore nella transazione:", error);
+                    console.error('Errore nella transazione:', error);
                     checkTxError(error);
                     return null;
                 }
@@ -318,7 +304,7 @@ const usePromoterManagement = () => {
     );
     const setPromoterPercentageOnBC = useCallback(
         async (promoterAddress: string, percentage: number) => {
-            console.log("🚀 ~ setPromoterPercentage - useCallback - percentage:", percentage)
+            console.log('🚀 ~ setPromoterPercentage - useCallback - percentage:', percentage);
             if (contract) {
                 try {
                     // Ottieni le tariffe del gas dal provider
@@ -411,8 +397,7 @@ const usePromoterManagement = () => {
         setPromoterPercentageOnBC,
         setPromoterProfitOnBC,
         promoterWithdrawalProfitsOnBC,
-        registerAsPromoterOnBC
-
+        registerAsPromoterOnBC,
     };
 };
 

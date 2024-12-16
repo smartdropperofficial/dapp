@@ -15,12 +15,9 @@ export const encryptData = (data: string) => {
     return encodeURIComponent(ciphertext.toString());
 };
 export const decryptData = (data: string) => {
-    console.log('🚀 ~ decryptData ~ data:', data);
     try {
         const decodedStr = decodeURIComponent(data);
-        console.log('🚀 ~ decryptData ~ decodedStr:', decodedStr);
         const res = AES.decrypt(decodedStr, process.env.NEXT_PUBLIC_API_ENCRYPTER!).toString(enc.Utf8);
-        console.log('🚀 ~ decryptData ~ res:', res);
         return res;
     } catch (error) {
         console.log('🚀 ~ decryptData ~ error:', error);
@@ -222,7 +219,6 @@ export async function getUserByWalletAddress(walletAddress: string) {
             .single();
 
         if (error || !userWallet) {
-            console.log('🚀 ~ getUserByWalletAddress ~ errore:', error);
             return null;
         }
 
@@ -235,7 +231,6 @@ export async function getUserByWalletAddress(walletAddress: string) {
             address: walletAddress,
         };
     } catch (error) {
-        console.error('Errore in getUserByWalletAddress:', error);
         return null;
     }
 }
@@ -257,14 +252,11 @@ export const modifyBasketOnDB = async (wallet: string, items: any) => {
             .select();
 
         if (editError) {
-            console.log('🚀 ~ modifyBasketOnDB ~ editError:', editError);
             return;
         }
 
         // Se nessun record è stato aggiornato (editData è vuoto), inserisci un nuovo record
         if (editData.length === 0) {
-            console.log('Nessun record trovato, creando un nuovo record nel database...');
-
             const { data: addData, error: addError } = await supabase
                 .from('basket')
                 .insert([
@@ -316,6 +308,7 @@ export const getBasketOnDB = async (wallet: string): Promise<ContextProductInfo[
             return [];
         }
         const products = typeof basket[0]?.products === 'string' ? JSON.parse(basket[0]?.products) : basket[0]?.products;
+        console.log('🚀 ~ getBasketOnDB ~ products:', products);
 
         return products as ContextProductInfo[];
     } catch (error) {

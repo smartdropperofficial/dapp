@@ -5,16 +5,16 @@ import WithdrawlProfit from './WithdrawlProfit';
 import { SessionExt } from '../../../../types/SessionExt';
 import { useSession } from 'next-auth/react';
 import { ConfigContext } from '@/store/config-context';
-import { useBalance, useContractReads } from "wagmi";
+import { useBalance, useContractReads } from 'wagmi';
 import ModalOverlay from '@/components/UI/ModalOverlay';
 import Spinner from 'react-bootstrap/Spinner';
 function GetFunds() {
-    const configContext = useContext(ConfigContext)
+    const configContext = useContext(ConfigContext);
 
     const { data: session }: { data: SessionExt | null } = useSession() as { data: SessionExt | null };
     const [currentCoinAddress, setCurrentCoinAddress] = useState<string | null>();
     const [coinAddress, setCoinAddress] = useState<string | null>('');
-    const [funds, setFunds] = useState(''); // Fix this  
+    const [funds, setFunds] = useState(''); // Fix this
     const [isloading, setIsLoading] = useState(false);
 
     const { changeCoinContractAddressOnBC } = useSubscriptionManagement();
@@ -42,21 +42,20 @@ function GetFunds() {
             await changeCoinContractAddressOnBC(coinAddress!);
             setIsLoading(false);
         } catch (error) {
-            console.log("🚀 ~ changeCoinHandler ~ error:", error)
+            console.log('🚀 ~ changeCoinHandler ~ error:', error);
         } finally {
             setIsLoading(false);
         }
-    }
+    };
     useEffect(() => {
         if (configContext) {
-            setCurrentCoinAddress(configContext.config?.coin_contract!);
+            setCurrentCoinAddress(configContext.configuration?.coin_contract!);
         }
-    }, [configContext])
-
+    }, [configContext]);
 
     const { data: balanceData } = useBalance({
-        address: configContext.config?.subscription_management_contract as `0x${string}`,
-        token: configContext.config?.coin_contract as `0x${string}`,
+        address: configContext.configuration?.subscription_management_contract as `0x${string}`,
+        token: configContext.configuration?.coin_contract as `0x${string}`,
     });
     // useContractReads({
     //     contracts: [
@@ -84,28 +83,26 @@ function GetFunds() {
         }
     }, [balanceData]);
 
-
     return (
         <div className="d-flex justify-content-between align-items-center flex-column ">
             <Table striped bordered hover responsive className=" overflow-y-scroll ">
                 <thead>
                     <tr>
-                        <th className='text-center'>Contract Funds</th>
-                        <th className='text-center'>Contract</th>
+                        <th className="text-center">Contract Funds</th>
+                        <th className="text-center">Contract</th>
                     </tr>
-
                 </thead>
                 <tbody>
                     <tr>
-                        <td className='text-center'>{Number(funds).toFixed(2)}</td>
-                        <td className='text-center'>{currentCoinAddress}</td>
+                        <td className="text-center">{Number(funds).toFixed(2)}</td>
+                        <td className="text-center">{currentCoinAddress}</td>
                     </tr>
                 </tbody>
             </Table>
-            <div className='d-flex mb-5 w-75'>
+            <div className="d-flex mb-5 w-75">
                 <Form.Group as={Col} controlId="cryptoAddress" className="my-2">
                     <Form.Label>{coinAddress}</Form.Label>
-                    <div className='d-flex flex-column'>
+                    <div className="d-flex flex-column">
                         <Form.Select
                             value={coinAddress!}
                             onChange={e => setCoinAddress(e.target.value.trim())}
@@ -121,7 +118,9 @@ function GetFunds() {
                                 </option>
                             ))}
                         </Form.Select>
-                        <Button onClick={changeCoinHandler} disabled={isloading}>{isloading ? 'loading...' : 'Change'}</Button>
+                        <Button onClick={changeCoinHandler} disabled={isloading}>
+                            {isloading ? 'loading...' : 'Change'}
+                        </Button>
                     </div>
                 </Form.Group>
             </div>

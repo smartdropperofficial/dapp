@@ -99,13 +99,12 @@ export const useOrder = () => {
     const createPreOrder = useCallback(async (): Promise<any> => {
         if (setCanShopHandler && getCanShop && SubscriptionContext && currentSubscription) {
             const res = await getCanShop(currentSubscription?.id!);
-            console.log("🚀 ~ createPreOrder ~ getCanShop:", res);
+            console.log('🚀 ~ createPreOrder ~ getCanShop:', res);
             setCanShopHandler(res);
 
             if (canShop) {
-                console.log("🚀 ~ createPreOrder ~ canShop:", canShop)
+                console.log('🚀 ~ createPreOrder ~ canShop:', canShop);
                 try {
-
                     const order = generatePreOrderObject();
                     console.log('🚀 ~ createOrder ~ order:', order);
                     const encryptedOrder = encryptData(JSON.stringify(order));
@@ -126,12 +125,10 @@ export const useOrder = () => {
                 } catch {
                     return null;
                 }
-            }
-            else {
-                return { error: "This amount exceed maximum limit for this subscription level.", created: false };
+            } else {
+                return { error: 'This amount exceed maximum limit for this subscription level.', created: false };
             }
         }
-
     }, [getCanShop, setCanShopHandler, SubscriptionContext, currentSubscription]);
 
     const createOrderOnAmazon = async (orderId: string) => {
@@ -140,9 +137,9 @@ export const useOrder = () => {
         try {
             const order = generateTaxAmazonOrderObject(orderId);
             console.log('🚀 ~ createOrderOnAmazon ~ order:', order);
-            console.log('🚀 ~ createOrderOnAmazon ~ ctx.config.amazon_api:', configCtx?.config?.amazon_api);
+            console.log('🚀 ~ createOrderOnAmazon ~ ctx.config.amazon_api:', configCtx?.configuration?.amazon_api);
             const data = {
-                amazon_api: configCtx?.config?.amazon_api,
+                amazon_api: configCtx?.configuration?.amazon_api,
                 order,
             };
             const encryptedOrder = encryptData(JSON.stringify(data));

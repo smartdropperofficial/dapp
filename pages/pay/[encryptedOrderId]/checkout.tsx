@@ -33,8 +33,10 @@ import { ConfigContext } from '@/store/config-context';
 import { OrderContext } from '@/store/order-context';
 import CoinbaseButton from '@/components/UI/CoinbaseButton';
 import Skeleton from 'react-loading-skeleton';
+import useConfiguration from '@/hooks/Database/subscription/useConfiguration';
 const Checkout = () => {
     const { getExchangeTax } = useOrderManagement();
+    const { getTaxOwnerWallet } = useConfiguration();
     const subsContext = useContext(SubscriptionContext);
     const orderContext = useContext(OrderContext);
     const configContext = useContext(ConfigContext);
@@ -157,7 +159,7 @@ const Checkout = () => {
             }
 
             if (Object.keys(amazonAmountToPay).length !== 0) {
-                console.log('🚀 ~ fetchOrderPrice ~ amazonAmountToPay:', amazonAmountToPay);
+                // console.log('🚀 ~ fetchOrderPrice ~ amazonAmountToPay:', amazonAmountToPay);
 
                 setAmountToPay(amazonAmountToPay);
             } else {
@@ -167,9 +169,11 @@ const Checkout = () => {
                 });
                 router.push('/my-orders');
             }
-        } catch {
+        } catch (error: any) {
+            console.log('🚀 ~ fetchOrderPrice ~ error:', error);
             Swal.fire({
                 title: 'Error: Amazon is not responding. Check your connection or try again in an hour.',
+                text: error.message,
                 icon: 'error',
             });
             router.push('/my-orders');
@@ -365,6 +369,18 @@ const Checkout = () => {
                 },
                 before: async () => {
                     const currentOrder = await getOrder(orderId);
+                    console.log('🚀 ~ before: ~ currentOrder:', currentOrder);
+                    await getTaxOwnerWallet().then(wallet => {
+                        if (wallet !== acceptobj.receiver) {
+                            Swal.fire({
+                                title: 'Signer is different from the order wallet, please connect the right wallet!',
+                                text: wallet,
+                                icon: 'error',
+                            });
+                            throw new Error('Wallet is different from the order wallet.');
+                            // router.push('/my-orders');
+                        }
+                    });
                     const amountExpeted = Number(
                         (
                             Number(fees!.toFixed(2)) +
@@ -375,6 +391,7 @@ const Checkout = () => {
                             exchangeFees!
                         ).toFixed(2)
                     );
+
                     if (currentOrder?.status !== OrderStatus.WAITING_CONFIRMATION || acceptobj.amount !== Number(amountExpeted)) {
                         console.error(
                             `Depay - Payment - before : Amount expected:(${amountExpeted}) but the amount into the Widget has a different amount. acceptobj is (${acceptobj.amount}) `
@@ -427,7 +444,7 @@ const Checkout = () => {
         if (hasUpdated) {
             const tmpEnc = encryptData(orderId);
             console.log('🚀 ~ checkout -  processOrder - createOrderOnWeb3: - STARTED');
-            if (await createOrderOnWeb3(Number(subsContext.currentSubscription), orderId, session?.address!)) {
+            if (await createOrderOnWeb3(orderId, session?.address!, subsContext.currentSubscription?.id!)) {
                 console.log('🚀 ~ processOrder ~ createOrderOnWeb3: - SUCCESS');
             }
 
@@ -449,15 +466,15 @@ const Checkout = () => {
     }, [loadingPaymentTx]);
 
     useEffect(() => {
-        console.log(
-            '🚀 ~ useEffect ~ fees && amountToPay && sspCommissions && exchangeFees && zincFee && shippingFees:',
-            fees,
-            amountToPay,
-            sspCommissions,
-            exchangeFees,
-            zincFee,
-            shippingFees
-        );
+        // console.log(
+        //     '🚀 ~ useEffect ~ fees && amountToPay && sspCommissions && exchangeFees && zincFee && shippingFees:',
+        //     fees,
+        //     amountToPay,
+        //     sspCommissions,
+        //     exchangeFees,
+        //     zincFee,
+        //     shippingFees
+        // );
         if (
             (fees !== null || fees !== undefined) &&
             amountToPay &&
@@ -489,6 +506,22 @@ const Checkout = () => {
     const RenderPricesSkeleton = () => {
         return <Skeleton height={20} count={6} />;
     };
+    // useEffect(() => {
+    //     if (getTaxOwnerWallet && configContext.config?.tax_wallet) {
+    //         getTaxOwnerWallet().then(data => {
+    //             if (data !== configContext.config?.tax_wallet) {
+    //                 Swal.fire({
+    //                     title: 'Signer is different from the order wallet, please connect the right wallet!',
+    //                     text: data,
+    //                     icon: 'error',
+    //                 });
+    //                 console.log('🚀 ~ useEffect ~ getTaxOwnerWallet:', data);
+    //                 // router.push('/my-orders');
+    //             }
+    //         });
+    //     }
+    // }, [getTaxOwnerWallet, configContext]);
+
     return (
         <div>
             {waitForSub ? (
@@ -675,7 +708,7 @@ const Checkout = () => {
                                                 })}
                                             </div>
                                         </div>
-                                        <ModalOverlay show={orderStep !== null}>
+                                        <ModalOverlay show={orderStep === OrderSteps.WAITING_CONFIRMATION}>
                                             <div className="d-flex flex-column justify-content-center my-3 rounded  ">
                                                 <img src={'/Loading-Blockchain.gif'} alt="" height={200} className="rounded-4" />
                                             </div>

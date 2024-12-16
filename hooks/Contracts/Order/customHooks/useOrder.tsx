@@ -6,9 +6,8 @@ import Swal from 'sweetalert2';
 import { Order } from '../types';
 import { ConfigContext } from '@/store/config-context';
 import { convertToDecimal, fetchAbiFromDatabase } from '@/utils/utils';
-
 const useOrderManagement = () => {
-    const { config, setAbiConfigHandler } = useContext(ConfigContext);
+    const { config, setAbiConfigHandler: setAbiConfigHandler } = useContext(ConfigContext);
 
     const contractAddress = config?.order_contract as `0x${string}`;
     const { data: signer } = useSigner();
@@ -150,6 +149,7 @@ const useOrderManagement = () => {
             try {
                 const exchangeTaxRate = await contract.getExchangeTax();
                 const tax = Number(exchangeTaxRate);
+                console.log('🚀 ~ getExchangeTax ~ tax:', tax);
                 return tax;
             } catch (error: any) {
                 return 0;
