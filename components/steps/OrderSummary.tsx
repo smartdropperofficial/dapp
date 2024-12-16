@@ -33,6 +33,7 @@ const OrderSummary: React.FC = () => {
     const [orderIsProcessing, setOrderIsProcessing] = useState(false);
     const [orderHasBeenProcessed, setOrderHasBeenProcessed] = useState(false);
     const { address } = useAccount();
+    const [isDepayLoaded, setIsDepayLoaded] = useState(false);
     const config_context = useContext(ConfigContext);
     const order_context = useContext(OrderContext);
     const { getExchangeTax } = useOrderManagement();
@@ -40,7 +41,7 @@ const OrderSummary: React.FC = () => {
     const [exchangeFees, setExchangesFees] = useState<number>();
     const [totalToPay, setTotalToPay] = useState<number>();
     const { createPreOrder } = useOrder();
-
+    const [ismouted, setIsMouted] = useState(false);
     const { data: session }: { data: SessionExt | null } = useSession() as { data: SessionExt | null };
     const basketTotalFromDb = useCallback(async (): Promise<number> => {
         if (session?.address) {
@@ -105,69 +106,135 @@ const OrderSummary: React.FC = () => {
 
         console.log(acceptobj);
 
-        // Utilizza DePayWidgets per avviare il pagamento
-        await DePayWidgets.Payment({
-            accept: [acceptobj],
-            currency: 'USD',
+        if (typeof DePayWidgets !== 'undefined') {
+            await DePayWidgets.Payment({
+                accept: [acceptobj],
+                currency: 'USD',
 
-            style: {
-                colors: {
-                    primary: '#ff9900',
-                    text: '#000',
-                    buttonText: '#fff',
-                    icons: '#ff9900',
+                style: {
+                    colors: {
+                        primary: '#ff9900',
+                        text: '#000',
+                        buttonText: '#fff',
+                        icons: '#ff9900',
+                    },
+                    fontFamily: '"Montserrat", sans-serif!important',
+                    css: `
+                        @import url("https://fonts.googleapis.com/css2?family=Cardo:wght@400;700&display=swap");
+                        .ReactDialogBackground {
+                            background: rgba(0,0,0,0.8);
+                        }
+                    `,
                 },
-                fontFamily: '"Montserrat", sans-serif!important',
-                css: `
-                    @import url("https://fonts.googleapis.com/css2?family=Cardo:wght@400;700&display=swap");
-                    .ReactDialogBackground {
-                        background: rgba(0,0,0,0.8);
-                    }
-                `,
-            },
-            before: async () => {
-                const amountFromDb = await basketTotalFromDb();
+                before: async () => {
+                    const amountFromDb = await basketTotalFromDb();
 
-                if (amountFromDb.toFixed(2) !== ctx.basketTotal().toFixed(2)) {
-                    console.error(
-                        `Depay - Pre-Order Payment - before: Amount expected: (${amountFromDb.toFixed(
-                            2
-                        )}) but the amount in the widget is different. acceptobj amount is (${acceptobj.amount})`
-                    );
+                    if (amountFromDb.toFixed(2) !== ctx.basketTotal().toFixed(2)) {
+                        console.error(
+                            `Depay - Pre-Order Payment - before: Amount expected: (${amountFromDb.toFixed(
+                                2
+                            )}) but the amount in the widget is different. acceptobj amount is (${acceptobj.amount})`
+                        );
+                        Swal.fire({
+                            title: 'Error during the payment.',
+                            icon: 'error',
+                            text: 'Amount expected is different from the amount in the widget.',
+                        });
+                        return false;
+                    }
+                },
+                succeeded: (transaction: any) => {
+                    if (!succeededCalled.current) {
+                        config_context.setIsLoading(true);
+                        succeededCalled.current = true;
+                        console.log('succeeded called with transaction.id:', transaction.id);
+                        setPaymentTx(transaction.id);
+                        logWithMilliseconds('succeeded setPaymentTx');
+                    } else {
+                        console.warn('succeeded callback called multiple times. Ignoring subsequent calls.');
+                    }
+                },
+                failed: (transaction: any) => {
                     Swal.fire({
-                        title: 'Error during the payment.',
+                        title: 'Error during the payment, please try again or contact support.',
                         icon: 'error',
-                        text: 'Amount expected is different from the amount in the widget.',
                     });
-                    return false;
-                }
-            },
-            succeeded: (transaction: any) => {
-                if (!succeededCalled.current) {
-                    config_context.setIsLoading(true);
-                    succeededCalled.current = true;
-                    console.log('succeeded called with transaction.id:', transaction.id);
-                    setPaymentTx(transaction.id);
-                    logWithMilliseconds('succeeded setPaymentTx');
-                } else {
-                    console.warn('succeeded callback called multiple times. Ignoring subsequent calls.');
-                }
-            },
-            failed: (transaction: any) => {
-                Swal.fire({
-                    title: 'Error during the payment, please try again or contact support.',
-                    icon: 'error',
-                });
-                console.error('Payment failed:', transaction);
-            },
-            error: (error: any) => {
-                Swal.fire({
-                    title: 'Error during the payment, please try again or contact support.',
-                    icon: 'error',
-                });
-                console.error('Payment error:', error);
-            },
-        });
+                    console.error('Payment failed:', transaction);
+                },
+                error: (error: any) => {
+                    Swal.fire({
+                        title: 'Error during the payment, please try again or contact support.',
+                        icon: 'error',
+                    });
+                    console.error('Payment error:', error);
+                },
+            });
+        } else {
+            console.error('DePayWidgets is not loaded from the CDN.');
+            setIsDepayLoaded(false);
+        }
+        // await DePayWidgets.Payment({
+        //     accept: [acceptobj],
+        //     currency: 'USD',
+
+        //     style: {
+        //         colors: {
+        //             primary: '#ff9900',
+        //             text: '#000',
+        //             buttonText: '#fff',
+        //             icons: '#ff9900',
+        //         },
+        //         fontFamily: '"Montserrat", sans-serif!important',
+        //         css: `
+        //             @import url("https://fonts.googleapis.com/css2?family=Cardo:wght@400;700&display=swap");
+        //             .ReactDialogBackground {
+        //                 background: rgba(0,0,0,0.8);
+        //             }
+        //         `,
+        //     },
+        //     before: async () => {
+        //         const amountFromDb = await basketTotalFromDb();
+
+        //         if (amountFromDb.toFixed(2) !== ctx.basketTotal().toFixed(2)) {
+        //             console.error(
+        //                 `Depay - Pre-Order Payment - before: Amount expected: (${amountFromDb.toFixed(
+        //                     2
+        //                 )}) but the amount in the widget is different. acceptobj amount is (${acceptobj.amount})`
+        //             );
+        //             Swal.fire({
+        //                 title: 'Error during the payment.',
+        //                 icon: 'error',
+        //                 text: 'Amount expected is different from the amount in the widget.',
+        //             });
+        //             return false;
+        //         }
+        //     },
+        //     succeeded: (transaction: any) => {
+        //         if (!succeededCalled.current) {
+        //             config_context.setIsLoading(true);
+        //             succeededCalled.current = true;
+        //             console.log('succeeded called with transaction.id:', transaction.id);
+        //             setPaymentTx(transaction.id);
+        //             logWithMilliseconds('succeeded setPaymentTx');
+        //         } else {
+        //             console.warn('succeeded callback called multiple times. Ignoring subsequent calls.');
+        //         }
+        //     },
+        //     failed: (transaction: any) => {
+        //         Swal.fire({
+        //             title: 'Error during the payment, please try again or contact support.',
+        //             icon: 'error',
+        //         });
+        //         console.error('Payment failed:', transaction);
+        //     },
+        //     error: (error: any) => {
+        //         Swal.fire({
+        //             title: 'Error during the payment, please try again or contact support.',
+        //             icon: 'error',
+        //         });
+        //         console.error('Payment error:', error);
+        //     },
+        // });
     };
 
     const performPreOrderCreation = async () => {
@@ -239,6 +306,17 @@ const OrderSummary: React.FC = () => {
             setTotalToPay(ctx.basketTotal() + exchangeFees!);
         }
     }, [exchangeFees, ctx]);
+    useEffect(() => {
+        if (typeof DePayWidgets !== 'undefined') {
+            setIsDepayLoaded(true);
+        } else {
+            setIsDepayLoaded(false);
+        }
+    }, [ismouted]);
+
+    useEffect(() => {
+        setIsMouted(true);
+    }, []);
 
     return (
         <div>
@@ -350,48 +428,57 @@ const OrderSummary: React.FC = () => {
                 </div>
 
                 <div id="pre-order-payment-button" className="mt-5 d-flex flex-column align-items-center col-12">
-                    <h4>
-                        {' '}
-                        <b> Pay pre-order</b>
-                        <br />
-                    </h4>
-                    {totalToPay !== undefined && totalToPay > 0 ? (
-                        <>
-                            {/* Aggiunta del reCAPTCHA */}
-                            <div className="mt-4">
-                                <ReCAPTCHA
-                                    sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!} // Sostituisci con la tua Site Key
-                                    onChange={value => {
-                                        if (value) {
-                                            setIsCaptchaVerified(true);
-                                            Swal.fire({
-                                                title: 'Captcha verified!',
-                                                icon: 'success',
-                                            });
-                                        } else {
-                                            setIsCaptchaVerified(false);
-                                            Swal.fire({
-                                                title: 'Captcha verification error!',
-                                                icon: 'error',
-                                            });
-                                        }
-                                    }}
-                                />
-                            </div>
-                            <button
-                                disabled={ctx.basketTotal() === 0 || !isCaptchaVerified}
-                                className={`btn form-control  mt-2 col-12 col-xl-10 ${
-                                    ctx.basketTotal() === 0 || !isCaptchaVerified ? 'btn-disabled' : 'btn-success'
-                                }`}
-                                onClick={openPaymentDepayWidgetHandler}
-                            >
-                                ${Number(totalToPay?.toFixed(2))}
-                            </button>
-                        </>
+                    {isDepayLoaded ? (
+                        <section>
+                            <h4>
+                                {' '}
+                                <b> Pay pre-order</b>
+                                <br />
+                            </h4>
+                            {totalToPay !== undefined && totalToPay > 0 ? (
+                                <>
+                                    {/* Aggiunta del reCAPTCHA */}
+                                    <div className="mt-4">
+                                        <ReCAPTCHA
+                                            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!} // Sostituisci con la tua Site Key
+                                            onChange={value => {
+                                                if (value) {
+                                                    setIsCaptchaVerified(true);
+                                                    Swal.fire({
+                                                        title: 'Captcha verified!',
+                                                        icon: 'success',
+                                                    });
+                                                } else {
+                                                    setIsCaptchaVerified(false);
+                                                    Swal.fire({
+                                                        title: 'Captcha verification error!',
+                                                        icon: 'error',
+                                                    });
+                                                }
+                                            }}
+                                        />
+                                    </div>
+                                    <button
+                                        disabled={ctx.basketTotal() === 0 || !isCaptchaVerified}
+                                        className={`btn form-control  mt-2 col-12 col-xl-10 ${
+                                            ctx.basketTotal() === 0 || !isCaptchaVerified ? 'btn-disabled' : 'btn-success'
+                                        }`}
+                                        onClick={openPaymentDepayWidgetHandler}
+                                    >
+                                        ${Number(totalToPay?.toFixed(2))}
+                                    </button>
+                                </>
+                            ) : (
+                                <div className="col-6">
+                                    <Skeleton height={20} count={2} />
+                                </div>
+                            )}
+                        </section>
                     ) : (
-                        <div className="col-6">
-                            <Skeleton height={20} count={2} />
-                        </div>
+                        <section className="text-center text-danger">
+                            <h5>We are upgrading our order system</h5>
+                            <p>Please, come back later!</p>
+                        </section>
                     )}
 
                     <div className="col-6"></div>
