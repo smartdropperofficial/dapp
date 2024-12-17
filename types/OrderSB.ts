@@ -29,12 +29,14 @@ export interface OrderSB {
     currency?: string;
     retailer?: string;
     ticket_id?: string; // Aggiunta dei ticket di supporto
-    pre_order_amount?: number;
+    pre_order_amount_paid?: number;
     preorder_withdrawn_tx?: string;
     order_taxes_withdrawn_tx?: string;
     error?: string;
     modified_at?: string;
     tax_amount_paid?: number;
+    pre_order_wallet?: string;
+    tax_wallet?: string;
 }
 
 export interface TicketSB {

@@ -97,24 +97,37 @@ export const useOrder = () => {
         }
     };
     const createPreOrder = useCallback(async (): Promise<any> => {
-        if (setCanShopHandler && getCanShop && SubscriptionContext && currentSubscription) {
-            const res = await getCanShop(currentSubscription?.id!);
-            console.log('🚀 ~ createPreOrder ~ getCanShop:', res);
-            setCanShopHandler(res);
+        if (setCanShopHandler && getCanShop && SubscriptionContext) {
+            if (currentSubscription?.id!) {
+                console.log('🚀 ~ createPreOrder ~ currentSubscription?.id!:', currentSubscription?.id!);
+                const res = await getCanShop(currentSubscription?.id!);
+                console.log('🚀 ~ createPreOrder ~ getCanShop:', res);
+                console.log('🚀 ~ createPreOrder ~ setting setCanShopHandler : start');
+                setCanShopHandler(res);
+                console.log('🚀 ~ createPreOrder ~ setting setCanShopHandler : End');
+            } else {
+                console.log('🚀 ~ createPreOrder ~ setting setCanShopHandler : true - non Subscription Found!');
+                setCanShopHandler(true);
+            }
 
             if (canShop) {
                 console.log('🚀 ~ createPreOrder ~ canShop:', canShop);
                 try {
+                    console.log('🚀 ~ createPreOrder ~ generatePreOrderObject: start');
                     const order = generatePreOrderObject();
-                    console.log('🚀 ~ createOrder ~ order:', order);
-                    const encryptedOrder = encryptData(JSON.stringify(order));
-                    console.log('🚀 ~ createOrder ~ encryptedOrder:', encryptedOrder);
+                    console.log('🚀 ~ createPreOrder ~ generatePreOrderObject: end');
 
+                    console.log('🚀 ~ createOrder ~ order:', order);
+                    console.log('🚀 ~ createOrder ~ encryptData:start');
+                    const encryptedOrder = encryptData(JSON.stringify(order));
+                    console.log('🚀 ~ createOrder ~ encryptData:end');
+                    console.log('🚀 ~ createOrder ~ /api/createPreOrder: start');
                     const createOrderResponse = await fetch('/api/createPreOrder', {
                         method: 'POST',
                         body: encryptedOrder,
                         headers: { 'Content-Type': 'plain/text' },
                     });
+                    console.log('🚀 ~ createOrder ~ /api/createPreOrder: end');
 
                     switch (createOrderResponse.status) {
                         case 201:
@@ -137,9 +150,9 @@ export const useOrder = () => {
         try {
             const order = generateTaxAmazonOrderObject(orderId);
             console.log('🚀 ~ createOrderOnAmazon ~ order:', order);
-            console.log('🚀 ~ createOrderOnAmazon ~ ctx.config.amazon_api:', configCtx?.configuration?.amazon_api);
+            console.log('🚀 ~ createOrderOnAmazon ~ ctx.config.amazon_api:', configCtx?.config?.amazon_api);
             const data = {
-                amazon_api: configCtx?.configuration?.amazon_api,
+                amazon_api: configCtx?.config?.amazon_api,
                 order,
             };
             const encryptedOrder = encryptData(JSON.stringify(data));
@@ -254,7 +267,7 @@ export const useOrder = () => {
             return {
                 wallet_address: session?.address!,
                 country: 'US',
-                status: OrderStatus.WAITING_TAX,
+                status: OrderStatus.CREATED,
                 email: session?.email!,
                 currency: 'USD',
                 retailer: orderCtx.retailer,

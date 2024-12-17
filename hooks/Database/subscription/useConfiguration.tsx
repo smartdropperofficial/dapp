@@ -4,7 +4,7 @@ const useConfiguration = () => {
         const data = await fetch('/api/getConfiguration');
         try {
             const resp = await data.json();
-            return resp.order_owner;
+            return resp.pre_order_wallet;
         } catch (error) {
             return '';
         }

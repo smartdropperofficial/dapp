@@ -24,9 +24,12 @@ import Loading from '../UI/Loading';
 
 // Importa ReCAPTCHA
 import ReCAPTCHA from 'react-google-recaptcha';
+import useConfiguration from '@/hooks/Database/subscription/useConfiguration';
 
 const OrderSummary: React.FC = () => {
     const router = useRouter();
+    const { getPreOrderOwner } = useConfiguration();
+
     const succeededCalled = useRef(false);
     const isCreatingOrder = useRef(false);
     const [paymentTx, setPaymentTx] = useState<`0x${string}`>();
@@ -51,29 +54,44 @@ const OrderSummary: React.FC = () => {
         return 0;
     }, [session?.address]);
     const ctx = useContext(OrderContext);
+    // const { isLoading: loadingPaymentTx } = useWaitForTransaction({
+    //     chainId: 137,
+    //     confirmations: 5,
+    //     hash: paymentTx,
+    //     enabled: !!paymentTx && !isCreatingOrder.current,
+    //     onSuccess() {
+    //         logWithMilliseconds('loadingPaymentTx onSuccess ');
+    //         if (!isCreatingOrder.current) {
+    //             isCreatingOrder.current = true;
+    //             performPreOrderCreation();
+    //         } else {
+    //             console.warn('onSuccess called multiple times. Ignoring subsequent calls.');
+    //         }
+    //     },
+    // });
+
     const { isLoading: loadingPaymentTx } = useWaitForTransaction({
         chainId: 137,
         confirmations: 5,
         hash: paymentTx,
-        enabled: !!paymentTx && !isCreatingOrder.current,
         onSuccess() {
-            logWithMilliseconds('loadingPaymentTx onSuccess ');
-            if (!isCreatingOrder.current) {
-                isCreatingOrder.current = true;
-                performPreOrderCreation();
-            }
+            console.log('🚀 ~ onSuccess ~ paymentTx:', paymentTx);
+
+            isCreatingOrder.current = true;
+            performPreOrderCreation();
         },
     });
-    function logWithMilliseconds(message: string) {
-        const now = new Date();
-        const formattedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(
-            now.getHours()
-        ).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}.${String(now.getMilliseconds()).padStart(
-            3,
-            '0'
-        )}`;
-        console.log(`[${formattedDate}] ${message}`);
-    }
+
+    // function logWithMilliseconds(message: string) {
+    //     const now = new Date();
+    //     const formattedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(
+    //         now.getHours()
+    //     ).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}.${String(now.getMilliseconds()).padStart(
+    //         3,
+    //         '0'
+    //     )}`;
+    //     console.log(`[${formattedDate}] ${message}`);
+    // }
     useEffect(() => {
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }, []);
@@ -101,7 +119,7 @@ const OrderSummary: React.FC = () => {
             blockchain: 'polygon',
             amount: Number(totalToPay?.toFixed(2)),
             token: config_context.config?.coin_contract as `0x${string}`,
-            receiver: config_context.config?.order_owner as `0x${string}`,
+            receiver: config_context.config?.pre_order_wallet as `0x${string}`,
         };
 
         console.log(acceptobj);
@@ -128,7 +146,15 @@ const OrderSummary: React.FC = () => {
                 },
                 before: async () => {
                     const amountFromDb = await basketTotalFromDb();
-
+                    await getPreOrderOwner().then(wallet => {
+                        if (wallet !== acceptobj.receiver) {
+                            Swal.fire({
+                                title: 'Signer is different from the order wallet, please connect the right wallet!',
+                                text: wallet,
+                                icon: 'error',
+                            });
+                        }
+                    });
                     if (amountFromDb.toFixed(2) !== ctx.basketTotal().toFixed(2)) {
                         console.error(
                             `Depay - Pre-Order Payment - before: Amount expected: (${amountFromDb.toFixed(
@@ -144,15 +170,17 @@ const OrderSummary: React.FC = () => {
                     }
                 },
                 succeeded: (transaction: any) => {
-                    if (!succeededCalled.current) {
-                        config_context.setIsLoading(true);
-                        succeededCalled.current = true;
-                        console.log('succeeded called with transaction.id:', transaction.id);
-                        setPaymentTx(transaction.id);
-                        logWithMilliseconds('succeeded setPaymentTx');
-                    } else {
-                        console.warn('succeeded callback called multiple times. Ignoring subsequent calls.');
-                    }
+                    // if (!succeededCalled.current) {
+                    //     config_context.setIsLoading(true);
+                    //     succeededCalled.current = true;
+                    //     console.log('succeeded called with transaction.id:', transaction.id);
+                    //     setPaymentTx(transaction.id);
+                    //     logWithMilliseconds('succeeded setPaymentTx');
+                    // } else {
+                    //     console.warn('succeeded callback called multiple times. Ignoring subsequent calls.');
+                    // }
+                    setPaymentTx(transaction.id);
+                    config_context.setIsLoading(true);
                 },
                 failed: (transaction: any) => {
                     Swal.fire({
@@ -238,54 +266,71 @@ const OrderSummary: React.FC = () => {
     };
 
     const performPreOrderCreation = async () => {
-        if (!orderIsProcessing && !orderHasBeenProcessed) {
-            if (paymentTx && /^0x[a-fA-F0-9]{64}$/.test(paymentTx)) {
-                setOrderIsProcessing(true);
-                try {
-                    const hasCreated = await createPreOrder();
-                    console.log('🚀 ~ performPreOrderCreation ~ hasCreated.data.order_id:', hasCreated.data.order_id);
-                    console.log('🚀 ~ performPreOrderCreation ~ hasCreated.error:', hasCreated.error);
-                    console.log('🚀 ~ placeOrderOnAmazon ~ hasCreated:', hasCreated);
-                    if (hasCreated.error) {
-                        return Swal.fire({
-                            title: 'Order creation failed! ',
-                            text: hasCreated.error,
-                            icon: 'error',
-                        });
-                    }
-                    if (hasCreated.created) {
-                        const updateDb: OrderSB = {
-                            pre_order_payment_tx: paymentTx,
-                            pre_order_amount: Number(ctx.basketTotal().toFixed(2)),
-                        };
-                        const hasUpdated = await updateOrder(hasCreated.data.order_id, updateDb);
+        // if (!orderIsProcessing && !orderHasBeenProcessed) {
+        console.log('🚀 ~ performPreOrderCreation ~ paymentTx:', paymentTx);
+        console.log('🚀 ~ performPreOrderCreation ~ paymentTx && /^0x[a-fA-F0-9]{64}$/.test(paymentTx):', paymentTx && /^0x[a-fA-F0-9]{64}$/.test(paymentTx));
 
-                        if (hasUpdated) {
-                            if (process.env.NODE_ENV === 'production') {
-                                order_context.deleteAllItems();
-                            }
-                            const encryptedOrderId = encryptData(hasCreated.data.order_id);
-                            setOrderIsProcessing(false);
-                            setOrderHasBeenProcessed(true);
+        if (paymentTx && /^0x[a-fA-F0-9]{64}$/.test(paymentTx)) {
+            try {
+                console.log('🚀 ~ performPreOrderCreation ~ createPreOrder: start');
+                const hasCreated = await createPreOrder().then(data => {
+                    console.log('🚀 ~ performPreOrderCreation ~ createPreOrder: data:', data);
+                    return data;
+                });
 
-                            router.push(`/order/${encryptedOrderId}/preorder-thank-you`);
-                        }
-                    } else {
-                        config_context.setIsLoading(false);
+                console.log('🚀 ~ performPreOrderCreation ~ createPreOrder: end');
 
-                        Swal.fire({
-                            title: 'Order creation failed! Please, contact support on Telegram Channel',
-                            text: 'We received your payment but there were some issues creating the order on the blockchain.',
-                            icon: 'error',
-                        });
-
-                        return false;
-                    }
-                } catch (error) {
+                console.log('🚀 ~ performPreOrderCreation ~ hasCreated.data.order_id:', hasCreated.data.order_id);
+                console.log('🚀 ~ performPreOrderCreation ~ hasCreated.error:', hasCreated.error);
+                console.log('🚀 ~ placeOrderOnAmazon ~ hasCreated:', hasCreated);
+                if (hasCreated.error || !hasCreated) {
                     config_context.setIsLoading(false);
+
+                    return Swal.fire({
+                        title: 'Order creation failed! ',
+                        text: 'We received your payment but there were some issues creating the order on the blockchain. Please, contact support on Telegram Channel',
+                        icon: 'error',
+                    });
                 }
+                if (hasCreated.created) {
+                    const updateDb: OrderSB = {
+                        pre_order_payment_tx: paymentTx,
+                        pre_order_amount_paid: Number(ctx.basketTotal().toFixed(2)),
+                    };
+                    const hasUpdated = await updateOrder(hasCreated.data.order_id, updateDb);
+
+                    if (hasUpdated) {
+                        if (process.env.NODE_ENV === 'production') {
+                            order_context.deleteAllItems();
+                        }
+                        const encryptedOrderId = encryptData(hasCreated.data.order_id);
+                        setOrderIsProcessing(false);
+                        setOrderHasBeenProcessed(true);
+
+                        router.push(`/order/${encryptedOrderId}/preorder-thank-you`);
+                    }
+                } else {
+                    config_context.setIsLoading(false);
+
+                    Swal.fire({
+                        title: 'Order creation failed! ',
+                        text: 'We received your payment but there were some issues creating the order on the blockchain. Please, contact support on Telegram Channel',
+                        icon: 'error',
+                    });
+
+                    return false;
+                }
+            } catch (error) {
+                config_context.setIsLoading(false);
             }
+        } else {
+            Swal.fire({
+                title: 'Error during the payment, please try again or contact support.',
+                icon: 'error',
+            });
+            config_context.setIsLoading(false);
         }
+        // }
     };
 
     useEffect(() => {
@@ -416,21 +461,30 @@ const OrderSummary: React.FC = () => {
                 <div className="mt-5">
                     <Alert variant="warning">
                         <Alert.Heading> Pre-order Payment Notice</Alert.Heading>
-                        <p>
-                            Smart Dropper will start the <u>pre-order process. </u> &nbsp; It means that you will <u>only be charged</u> for the{' '}
-                            <b>price of the merchandise</b>, excluding
-                            <b> Shipping*</b> and <b>Local taxes**</b>.&nbsp; Once the payment is confirmed on Blockchain, our system will start the process of
-                            tax calculation. <br />
-                            <span>We will send you an email with the details of the taxes required to finalize the shipment</span>
-                            <u> (it could take few hours)</u>
-                        </p>
+                        <ul>
+                            <li>
+                                Smart Dropper will start the <u>pre-order process. </u> &nbsp; It means that you will <u>only be charged</u> for the{' '}
+                                <b>price of the merchandise</b>, excluding
+                                <b> Shipping*</b> and <b>Local taxes**</b>.&nbsp; Once the payment is confirmed on Blockchain, our system will start the process
+                                of tax calculation. <br />
+                                <span>We will send you an email with the details of the taxes required to finalize the shipment</span>
+                                <u> (it could take few hours)</u>
+                            </li>
+                        </ul>
+                    </Alert>
+                    <Alert variant="warning">
+                        <ul>
+                            <li>
+                                <b className="mt-5">Stablecoins are not always pegged 1:1. The actual amount can vary based on the current on-chain price! </b>
+                            </li>
+                        </ul>
                     </Alert>
                 </div>
 
                 <div id="pre-order-payment-button" className="mt-5 d-flex flex-column align-items-center col-12">
                     {isDepayLoaded ? (
                         <section>
-                            <h4>
+                            <h4 className="text-center">
                                 {' '}
                                 <b> Pay pre-order</b>
                                 <br />
