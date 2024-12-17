@@ -60,6 +60,13 @@ export default async function auth(req: any, res: any) {
         },
         secret: process.env.NEXTAUTH_SECRET!,
         callbacks: {
+            // async jwt({ token, trigger, session }) {
+            //     if (trigger === 'update' && session?.verified) {
+            //         // Note, that `session` can be any arbitrary object, remember to validate it!
+            //         token.verified = session.verified;
+            //     }
+            //     return token;
+            // },
             async session({ session, token }: { session: any; token: any }) {
                 const userRole = (await getUserByWalletAddress(token.sub)) as any;
                 /* eslint-disable */

@@ -259,13 +259,13 @@ const Layout: React.FC<{ children: React.ReactNode }> = props => {
                                             {isConnected && <ConnectButton showBalance={{ smallScreen: false, largeScreen: false }} />}
                                         </li>
 
-                                        <li className="d-none d-xl-inline-block">
+                                        {/* <li className="d-none d-xl-inline-block">
                                             <Link href="/settings" legacyBehavior>
                                                 <a className={`${isMounted && router.asPath !== '/Settings' && 'text-black  text-center'}`} onClick={() => {}}>
                                                     Settings
                                                 </a>
                                             </Link>
-                                        </li>
+                                        </li> */}
                                         <li className="d-none d-xl-inline-block fw-bold">
                                             {' '}
                                             {session && session.isPromoter === true && (

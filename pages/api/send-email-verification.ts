@@ -11,6 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Genera un token di verifica
     const token = uuidv4();
+    console.log('🚀 ~ handler ~ send-email-verification.ts', token);
 
     // Salva il token, l'email e il wallet in una tabella temporanea
     const { error } = await supabase.from('email_verification_tokens').insert([{ email, wallet_address: walletAddress, token }]);
@@ -28,6 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const url = `${process.env.NEXTAUTH_URL}/link-email?token=${token}`;
     const obj = { email: email, url: url };
+    console.log('🚀 ~ handler ~ url:', url);
 
     try {
         const response = await fetch(`${process.env.MAILER_WEBHOOK}/send-login-email`, {

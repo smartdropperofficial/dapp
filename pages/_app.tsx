@@ -24,7 +24,7 @@ import SessionGuard from './SessionGuard';
 const isDev = process.env.NODE_ENV === 'development';
 
 const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
-const CHAINS = isDev ? [hardhat, polygon] : [polygon];
+const CHAINS = isDev ? [hardhat, polygon] : [polygon, hardhat];
 // const CHAINS = [hardhat];
 
 const { provider, chains } = configureChains(CHAINS, [alchemyProvider({ apiKey: alchemyId! }), publicProvider()]);

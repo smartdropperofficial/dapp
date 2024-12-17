@@ -222,7 +222,7 @@ export async function getUserByWalletAddress(walletAddress: string) {
             return null;
         }
 
-        //   console.log("🚀 ~ getUserByWalletAddress ~ userWallet:", userWallet);
+        //  console.log('🚀 ~ getUserByWalletAddress ~ userWallet:', userW  allet);
 
         const user = userWallet.user;
 
@@ -255,7 +255,6 @@ export const modifyBasketOnDB = async (wallet: string, items: any) => {
             return;
         }
 
-        // Se nessun record è stato aggiornato (editData è vuoto), inserisci un nuovo record
         if (editData.length === 0) {
             const { data: addData, error: addError } = await supabase
                 .from('basket')

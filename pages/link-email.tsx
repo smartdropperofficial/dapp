@@ -67,7 +67,7 @@ export default function LinkEmail() {
         if (session?.verified) {
             router.push('/');
         }
-    }, []);
+    }, [session]);
 
     useEffect(() => {
         if (!router.isReady) return;
@@ -84,15 +84,16 @@ export default function LinkEmail() {
     useEffect(() => {
         console.log('🚀 ~ useEffect ~ session:', session);
         console.log('🚀 ~ useEffect ~ token:', token);
-        if (token && session && session.verified === false) {
+        if (token && session && session.verified === false && verifying === false) {
+            setVerifying(true);
+
             console.log('🚀 ~ useEffect ~ token:', token);
             verifyEmail(token);
         }
     }, [token, session]);
 
     const verifyEmail = async (token: string) => {
-        setVerifying(true);
-        const res = await fetch('/api/verify-email', {
+        const res: any = await fetch('/api/verify-email', {
             method: 'POST',
             body: JSON.stringify({ token }),
             headers: {
@@ -100,17 +101,23 @@ export default function LinkEmail() {
             },
         });
         if (res.ok) {
+            console.log('🚀 ~ verifyEmail ~ Aggiornamento (verify-email) riuscito :');
+            console.log('🚀 ~ verifyEmail ~ res:', await res.json());
+            console.log('🚀 ~ verifyEmail ~ update session: start');
             const updateSession = await update({ verified: true });
+
+            console.log('🚀 ~ verifyEmail ~ update session: end');
+
             setVerifying(false);
             console.log('🚀 ~ verifyEmail ~ updateSession:', updateSession);
             Swal.fire({ icon: 'success', title: 'Mail has been verified!' }).then(() => {
-                router.push('/');
+                // router.reload();
             });
         } else {
+            console.log('🚀 ~ verifyEmail ~ Aggiornamento (verify-email) NON riuscito :');
+
             setVerifying(false);
-            Swal.fire({ icon: 'error', text: res.status.toString(), title: 'Errr on revifying mail.' }).then(() => {
-                router.push('/');
-            });
+            Swal.fire({ icon: 'error', text: res.error, title: 'Cannot verify Email.' });
         }
 
         setToken('');
