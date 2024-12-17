@@ -96,6 +96,7 @@ export default async function auth(req: any, res: any) {
                 session.is_promoter_active = token?.is_promoter_active;
                 session.isAdmin = token?.isAdmin; // Add user email to session
                 session.config_db = token?.config_db; // Add user email to session
+                console.log('🚀 ~ session ~ session:', session);
 
                 return session;
             },

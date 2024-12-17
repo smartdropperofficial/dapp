@@ -221,8 +221,7 @@ export async function getUserByWalletAddress(walletAddress: string) {
         if (error || !userWallet) {
             return null;
         }
-
-        //  console.log('🚀 ~ getUserByWalletAddress ~ userWallet:', userW  allet);
+        console.log('🚀 ~ getUserByWalletAddress ~ userWallet:', userWallet);
 
         const user = userWallet.user;
 
