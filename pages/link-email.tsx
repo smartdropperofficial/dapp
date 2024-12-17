@@ -36,8 +36,7 @@ export default function LinkEmail() {
             if (res.ok) {
                 Swal.fire({ icon: 'success', title: 'Mail has been sent. Check your mail box!' });
             } else {
-                alert('Errore durante l’invio dell’email di verifica.');
-                Swal.fire({ icon: 'error', title: 'Mail has been sent. Check your mail box!' });
+                Swal.fire({ icon: 'error', title: 'Mail has NOT been sent. Contact Support' });
             }
         } catch (error) {
         } finally {
