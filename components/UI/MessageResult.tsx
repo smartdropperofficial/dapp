@@ -59,10 +59,7 @@ function MessageResult({ orderId, ticket }: MessageResultProps) {
         const AddMessageToDB = async (newMsg: MessageSB) => {
             // Controlla se il messaggio esiste già nel database
             const existingMessage = messages.find(
-                (msg) =>
-                    msg.content === newMsg.content &&
-                    msg.msg_timestamp === newMsg.msg_timestamp &&
-                    msg.sender === newMsg.sender
+                msg => msg.content === newMsg.content && msg.msg_timestamp === newMsg.msg_timestamp && msg.sender === newMsg.sender
             );
 
             if (!existingMessage) {
@@ -97,11 +94,7 @@ function MessageResult({ orderId, ticket }: MessageResultProps) {
 
     return (
         <div className="h-100 w-100 ">
-            <div
-                className="h-100 col-12 d-flex flex-column h-100 overflow-y-scroll overflow-x-hidden"
-                style={{ maxHeight: '300px' }}
-                ref={scrollableDivRef}
-            >
+            <div className="h-100 col-12 d-flex flex-column h-100 overflow-y-scroll overflow-x-hidden" style={{ maxHeight: '300px' }} ref={scrollableDivRef}>
                 {messages?.map((msg: MessageSB) => (
                     <MessageBubble
                         key={msg?.id}
@@ -111,7 +104,7 @@ function MessageResult({ orderId, ticket }: MessageResultProps) {
                         status={msg?.status}
                         read={msg?.read}
                         isSentByLoggedInUser={msg.sender === session?.address}
-                        order_id={msg.order_id}
+                        // order_id={msg.order_id}
                     />
                 ))}
             </div>

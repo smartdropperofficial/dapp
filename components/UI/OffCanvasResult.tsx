@@ -46,18 +46,18 @@ function OffCanvasResult({ show, setShow, orderId, ticket }: OffCanvasResultProp
         }
     }, [ticket]);
 
-    const handleSendMessage = (content: string) => {
-        const newMsg: MessageSB = {
-            sender: session?.address || '',
-            content: content,
-            email: session?.email,
-            msg_timestamp: new Date().toISOString(),
-            status: 'sent',
-            ticket_id: ticket?.id || '', // Usa il ticketId appena creato
-            read: false,
-        };
-        setNewMessage(newMsg);
-    };
+    // const handleSendMessage = (content: string) => {
+    //     const newMsg: MessageSB = {
+    //         sender: session?.address || '',
+    //         content: content,
+    //         email: session?.email,
+    //         msg_timestamp: new Date().toISOString(),
+    //         status: 'sent',
+    //         ticket_id: ticket?.id || '', // Usa il ticketId appena creato
+    //         read: false,
+    //     };
+    //     setNewMessage(newMsg);
+    // };
 
     useEffect(() => {
         const AddMessageToDB = async (newMsg: MessageSB) => {

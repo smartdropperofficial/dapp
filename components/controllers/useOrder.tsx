@@ -71,31 +71,31 @@ export const useOrder = () => {
         }
     };
 
-    const createOrder = async (orderId: string): Promise<any> => {
-        console.log('🚀 ~ createOrder ~ orderId:', orderId);
-        console.log('🚀 ~ createOrder ~ orderCtx:', orderCtx);
-        try {
-            const order = generateOrderObject();
-            console.log('🚀 ~ createOrder ~ order:', order);
-            const encryptedOrder = encryptData(JSON.stringify(order));
-            console.log('🚀 ~ createOrder ~ encryptedOrder:', encryptedOrder);
+    // const createOrder = async (orderId: string): Promise<any> => {
+    //     console.log('🚀 ~ createOrder ~ orderId:', orderId);
+    //     console.log('🚀 ~ createOrder ~ orderCtx:', orderCtx);
+    //     try {
+    //         const order = generateOrderObject();
+    //         console.log('🚀 ~ createOrder ~ order:', order);
+    //         const encryptedOrder = encryptData(JSON.stringify(order));
+    //         console.log('🚀 ~ createOrder ~ encryptedOrder:', encryptedOrder);
 
-            const createOrderResponse = await fetch('/api/createOrder', {
-                method: 'POST',
-                body: encryptedOrder,
-                headers: { 'Content-Type': 'plain/text' },
-            });
+    //         const createOrderResponse = await fetch('/api/createOrder', {
+    //             method: 'POST',
+    //             body: encryptedOrder,
+    //             headers: { 'Content-Type': 'plain/text' },
+    //         });
 
-            switch (createOrderResponse.status) {
-                case 201:
-                    return { data: await createOrderResponse.json(), created: true };
-                default:
-                    return { data: await createOrderResponse.json(), created: false };
-            }
-        } catch {
-            return null;
-        }
-    };
+    //         switch (createOrderResponse.status) {
+    //             case 201:
+    //                 return { data: await createOrderResponse.json(), created: true };
+    //             default:
+    //                 return { data: await createOrderResponse.json(), created: false };
+    //         }
+    //     } catch {
+    //         return null;
+    //     }
+    // };
     const createPreOrder = useCallback(async (): Promise<any> => {
         if (setCanShopHandler && getCanShop && SubscriptionContext) {
             if (currentSubscription?.id!) {
@@ -144,42 +144,42 @@ export const useOrder = () => {
         }
     }, [getCanShop, setCanShopHandler, SubscriptionContext, currentSubscription]);
 
-    const createOrderOnAmazon = async (orderId: string) => {
-        console.log('🚀 ~ createOrderOnAmazon ~ orderId:', orderId);
-        console.log('🚀 ~ createOrderOnAmazon ~ orderCtx:', orderCtx);
-        try {
-            const order = generateTaxAmazonOrderObject(orderId);
-            console.log('🚀 ~ createOrderOnAmazon ~ order:', order);
-            console.log('🚀 ~ createOrderOnAmazon ~ ctx.config.amazon_api:', configCtx?.config?.amazon_api);
-            const data = {
-                amazon_api: configCtx?.config?.amazon_api,
-                order,
-            };
-            const encryptedOrder = encryptData(JSON.stringify(data));
-            console.log('🚀 ~ createOrderOnAmazon ~ encryptedOrder:', encryptedOrder);
+    // const createOrderOnAmazon = async (orderId: string) => {
+    //     console.log('🚀 ~ createOrderOnAmazon ~ orderId:', orderId);
+    //     console.log('🚀 ~ createOrderOnAmazon ~ orderCtx:', orderCtx);
+    //     try {
+    //         const order = generateTaxAmazonOrderObject(orderId);
+    //         console.log('🚀 ~ createOrderOnAmazon ~ order:', order);
+    //         console.log('🚀 ~ createOrderOnAmazon ~ ctx.config.amazon_api:', configCtx?.config?.amazon_api);
+    //         const data = {
+    //             amazon_api: configCtx?.config?.amazon_api,
+    //             order,
+    //         };
+    //         const encryptedOrder = encryptData(JSON.stringify(data));
+    //         console.log('🚀 ~ createOrderOnAmazon ~ encryptedOrder:', encryptedOrder);
 
-            const createOrderResponse = await fetch('/api/createOrderOnAmazon', {
-                method: 'POST',
-                body: encryptedOrder,
-                headers: { 'Content-Type': 'plain/text' },
-            });
-            const response = await createOrderResponse.json();
-            console.log('🚀 ~ createOrderOnAmazon ~ response:', response);
+    //         const createOrderResponse = await fetch('/api/createOrderOnAmazon', {
+    //             method: 'POST',
+    //             body: encryptedOrder,
+    //             headers: { 'Content-Type': 'plain/text' },
+    //         });
+    //         const response = await createOrderResponse.json();
+    //         console.log('🚀 ~ createOrderOnAmazon ~ response:', response);
 
-            switch (createOrderResponse.status) {
-                case 201:
-                    return { data: response.request_id, error: null };
-                case 400:
-                    return { data: null, error: response.error };
-                case 401:
-                    return { data: null, error: response.error };
-                default:
-                    return { data: null, error: response.error };
-            }
-        } catch (e) {
-            return { data: null, error: e };
-        }
-    };
+    //         switch (createOrderResponse.status) {
+    //             case 201:
+    //                 return { data: response.request_id, error: null };
+    //             case 400:
+    //                 return { data: null, error: response.error };
+    //             case 401:
+    //                 return { data: null, error: response.error };
+    //             default:
+    //                 return { data: null, error: response.error };
+    //         }
+    //     } catch (e) {
+    //         return { data: null, error: e };
+    //     }
+    // };
 
     const createOrderOnWeb3 = async (subId: number, orderId: string | null, buyer: string): Promise<boolean> => {
         try {
@@ -229,7 +229,7 @@ export const useOrder = () => {
                 wallet_address: session?.address!,
                 country: 'US',
                 status: OrderStatus.CREATED,
-                order_id: orderId,
+                //   order_id: orderId,
                 email: session?.email!,
                 currency: 'USD',
                 retailer: orderCtx.retailer,
@@ -271,6 +271,7 @@ export const useOrder = () => {
                 email: session?.email!,
                 currency: 'USD',
                 retailer: orderCtx.retailer,
+                subscription_id: currentSubscription?.id!,
                 shipping_info: {
                     first_name: orderCtx.shippingInfo.firstName,
                     last_name: orderCtx.shippingInfo.lastName,
@@ -300,51 +301,51 @@ export const useOrder = () => {
         }
     };
 
-    const generateTaxAmazonOrderObject = (orderId: string): any => {
-        try {
-            return {
-                orderId: `${orderId}-tax`,
-                products: orderCtx.items.map((product: any) => {
-                    return {
-                        product_id: product.asin,
-                        quantity: product.quantity,
-                        seller_selection_criteria: {
-                            prime: true,
-                            handling_days_max: 10,
-                            condition_in: ['New'],
-                        },
-                    };
-                }),
-                // max_price: 0,
-                // ctx.items.reduce((totalCost: number, item: { price: number; quantity: number }) => {
-                //      return totalCost + item.price * item.quantity;
-                // }, 0) * 100,
+    // const generateTaxAmazonOrderObject = (orderId: string): any => {
+    //     try {
+    //         return {
+    //             orderId: `${orderId}-tax`,
+    //             products: orderCtx.items.map((product: any) => {
+    //                 return {
+    //                     product_id: product.asin,
+    //                     quantity: product.quantity,
+    //                     seller_selection_criteria: {
+    //                         prime: true,
+    //                         handling_days_max: 10,
+    //                         condition_in: ['New'],
+    //                     },
+    //                 };
+    //             }),
+    //             // max_price: 0,
+    //             // ctx.items.reduce((totalCost: number, item: { price: number; quantity: number }) => {
+    //             //      return totalCost + item.price * item.quantity;
+    //             // }, 0) * 100,
 
-                shipping_address: {
-                    firstName: orderCtx.shippingInfo.firstName,
-                    lastName: orderCtx.shippingInfo.lastName,
-                    addressLine1: orderCtx.shippingInfo.addressLine1,
-                    addressLine2: orderCtx.shippingInfo.addressLine2,
-                    zipCode: orderCtx.shippingInfo.zipCode,
-                    city: orderCtx.shippingInfo.city,
-                    state: orderCtx.shippingInfo.state,
-                    country: 'US',
-                    phoneNumber: orderCtx.shippingInfo.phoneNumber,
-                },
-            };
-        } catch (error) {
-            console.log('🚀 ~ generateTaxAmzonOrderObject ~ error:', error);
-        }
-    };
+    //             shipping_address: {
+    //                 firstName: orderCtx.shippingInfo.firstName,
+    //                 lastName: orderCtx.shippingInfo.lastName,
+    //                 addressLine1: orderCtx.shippingInfo.addressLine1,
+    //                 addressLine2: orderCtx.shippingInfo.addressLine2,
+    //                 zipCode: orderCtx.shippingInfo.zipCode,
+    //                 city: orderCtx.shippingInfo.city,
+    //                 state: orderCtx.shippingInfo.state,
+    //                 country: 'US',
+    //                 phoneNumber: orderCtx.shippingInfo.phoneNumber,
+    //             },
+    //         };
+    //     } catch (error) {
+    //         console.log('🚀 ~ generateTaxAmzonOrderObject ~ error:', error);
+    //     }
+    // };
     return {
         getOrder,
         getOrderStatusFromAmazon,
         updateOrder,
-        createOrder,
+        // createOrder,
         createPreOrder,
-        createOrderOnAmazon,
+        // createOrderOnAmazon,
         createOrderOnWeb3,
         generateOrderObject,
-        generateTaxAmazonOrderObject,
+        // generateTaxAmazonOrderObject,
     };
 };

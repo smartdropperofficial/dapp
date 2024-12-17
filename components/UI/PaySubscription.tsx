@@ -164,11 +164,11 @@ const PaySubscription: React.FC<{
         const acceptobj = {
             blockchain: 'polygon',
             amount: price! - Number(calcPercentage(price, promoter?.percentage!)),
-            token: configContext.configuration?.coin_contract! as `0x${string}`,
-            receiver: configContext.configuration?.subscription_owner! as `0x${string}`,
+            token: configContext.config?.coin_contract! as `0x${string}`,
+            receiver: configContext.config?.subscription_owner! as `0x${string}`,
             fee: {
                 amount: Number(calcPercentage(price, promoter?.percentage!)),
-                receiver: configContext.configuration?.subscription_management_contract! as `0x${string}`,
+                receiver: configContext.config?.subscription_management_contract! as `0x${string}`,
             },
         };
         console.log(acceptobj);

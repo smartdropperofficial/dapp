@@ -28,6 +28,7 @@ const MessagesList: React.FC<MessagesListProps> = ({ messages, loggedInAddress, 
                     timestamp={mgs.msg_timestamp}
                     status={mgs.status}
                     isSentByLoggedInUser={mgs.sender === loggedInAddress}
+                    read={mgs.read}
                 />
             ))}
         </div>

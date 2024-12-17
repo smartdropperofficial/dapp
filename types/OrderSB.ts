@@ -37,6 +37,7 @@ export interface OrderSB {
     tax_amount_paid?: number;
     pre_order_wallet?: string;
     tax_wallet?: string;
+    subscription_id?: string;
 }
 
 export interface TicketSB {

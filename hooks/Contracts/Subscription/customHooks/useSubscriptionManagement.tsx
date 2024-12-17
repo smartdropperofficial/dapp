@@ -270,7 +270,7 @@ const useSubscriptionManagement = () => {
                     //     subscriptions[0]
                     // );
                     // console.log("🚀 ~ subscription:", subscription)
-
+                    //TODO da sistemare l'ordinmento delle subscription per data
                     const result = all[all.length - 1];
                     console.log('🚀 ~ result:', result);
                     return result;
@@ -323,32 +323,6 @@ const useSubscriptionManagement = () => {
                 try {
                     const subscriptions = await contract.getAllPromotersSubsByAddress(promoterAddress);
 
-                    // return subscriptions.map((subscription: any) => ({
-                    //     id: subscription.id,
-                    //     subscriber: subscription.subscriber,
-                    //     start: formatDateTime(subscription.start.toNumber()),
-                    //     end: formatDateTime(subscription.end.toNumber()),
-                    //     subscriptionModel: {
-                    //         id: subscription.subscriptionModel.id,
-                    //         subscriptionType: subscription.subscriptionModel.subscriptionType,
-                    //         subscriptionPeriod: subscription.subscriptionModel.subscriptionPeriod,
-                    //         name: subscription.subscriptionModel.name,
-                    //         price: convertToDecimal(subscription.subscriptionModel.price).toFixed(2),
-                    //         promoPrice: convertToDecimal(subscription.subscriptionModel.promoPrice), // Add the missing property 'promoPrice'
-                    //         period: subscription.subscriptionModel.period,
-                    //         enabled: subscription.subscriptionModel.enabled,
-                    //         fees: subscription.subscriptionModel.fees,
-                    //         promoFees: convertToDecimal(subscription.subscriptionModel.promoFees),
-                    //         isPromoActive: subscription.subscriptionModel.isPromoActive,
-                    //         shopLimit: convertToDecimal(subscription.subscriptionModel.shopLimit),
-                    //     },
-                    //     totAmountPaid: convertToDecimal(subscription.totAmountPaid),
-                    //     paymentTx: subscription?.paymentTx,
-                    //     promoterProfit: convertToDecimal(subscription?.promoterProfit),
-                    //     totShopAmountPaid: convertToDecimal(subscription.totShopAmountPaid),
-
-                    //     promoterWithdrawn: subscription.promoterWithdrawn,
-                    // }));
                     return subscriptions.map((subscription: any) => getFormatedSubscriptionObject(subscription));
 
                     // return subscriptions.map((subscription: any) => ({

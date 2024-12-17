@@ -84,17 +84,7 @@ const useSubscriptionPlan = () => {
                 }));
             } catch (error: any) {
                 checkErrorMessage(error.message);
-                return {
-                    id: 0,
-                    subscriptionType: 0,
-                    subscriptionPeriod: 0,
-                    name: '',
-                    price: 0,
-                    period: 0,
-                    enabled: false,
-                    fees: 0,
-                    shopLimit: 0,
-                };
+                return {} as SubscriptionManagementModel;
             }
         },
         [contract]
@@ -198,33 +188,39 @@ const useSubscriptionPlan = () => {
             return [] as SubscriptionPlans[];
         }
     }, [contract]);
-    const updateSubscriptionFeeOnBC = useCallback(async (subId: number, newFee: number) => {
-        if (contract) {
-            try {
-                const tx = await contract.updateSubscriptionFee(subId, newFee * 100);
-                await tx.wait();
-                Swal.fire({ title: 'Change successful', icon: 'success' });
-            } catch (error: any) {
-                checkErrorMessage(error.message);
-                throw error;
+    const updateSubscriptionFeeOnBC = useCallback(
+        async (subId: number, newFee: number) => {
+            if (contract) {
+                try {
+                    const tx = await contract.updateSubscriptionFee(subId, newFee * 100);
+                    await tx.wait();
+                    Swal.fire({ title: 'Change successful', icon: 'success' });
+                } catch (error: any) {
+                    checkErrorMessage(error.message);
+                    throw error;
+                }
             }
-        }
-    }, [contract]);
-    const updateSubscriptionPriceOnBC = useCallback(async (subId: number, newPrice: number) => {
-        console.log("🚀 ~ updateSubscriptionPriceOnBC ~ newPrice:", newPrice)
-        console.log("🚀 ~ updateSubscriptionPriceOnBC ~ newPrice * 100 * 10 ** 4:", newPrice * 100 * 10 ** 4)
+        },
+        [contract]
+    );
+    const updateSubscriptionPriceOnBC = useCallback(
+        async (subId: number, newPrice: number) => {
+            console.log('🚀 ~ updateSubscriptionPriceOnBC ~ newPrice:', newPrice);
+            console.log('🚀 ~ updateSubscriptionPriceOnBC ~ newPrice * 100 * 10 ** 4:', newPrice * 100 * 10 ** 4);
 
-        if (contract) {
-            try {
-                const tx = await contract.updateSubscriptionPlanPrice(subId, newPrice * 100 * 10 ** 4);
-                await tx.wait();
-                Swal.fire({ title: 'Change successful', icon: 'success' });
-            } catch (error: any) {
-                checkErrorMessage(error.message);
-                throw error;
+            if (contract) {
+                try {
+                    const tx = await contract.updateSubscriptionPlanPrice(subId, newPrice * 100 * 10 ** 4);
+                    await tx.wait();
+                    Swal.fire({ title: 'Change successful', icon: 'success' });
+                } catch (error: any) {
+                    checkErrorMessage(error.message);
+                    throw error;
+                }
             }
-        }
-    }, [contract]);
+        },
+        [contract]
+    );
     return {
         account,
         getSubscriptionByPeriod: getSubscriptionByPeriodOnBC,
@@ -235,8 +231,7 @@ const useSubscriptionPlan = () => {
         changeSubscriptionTypeShopLimit: changeSubscriptionTypeShopLimitOnBC,
         getSubscriptionModels: getSubscriptionPlans,
         updateSubscriptionFeeOnBC,
-        updateSubscriptionPriceOnBC
-
+        updateSubscriptionPriceOnBC,
     };
 };
 

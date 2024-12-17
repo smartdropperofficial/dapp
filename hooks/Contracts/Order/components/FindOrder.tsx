@@ -41,7 +41,7 @@ function FindOrder() {
     const getSubscriptionByIdHandleClick = async () => {
         try {
             if (subscriptionId) {
-                const result = await getSubscriptionById(Number(subscriptionId));
+                const result = await getSubscriptionById(subscriptionId);
                 setSubscription(result);
             } else {
                 alert('Please enter a valid promoter address');

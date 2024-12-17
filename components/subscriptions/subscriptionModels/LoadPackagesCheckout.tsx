@@ -17,7 +17,7 @@ const LoadPackagesCheckout: React.FC<{
     // const { getSubscriptionModels } = useSubscriptionModel();
 
     const [isLoading, setIsLoading] = useState(true);
-    useEffect(() => { }, [ctx.selectedPackageId]);
+    useEffect(() => {}, [ctx.selectedPackageId]);
 
     // useEffect(() => {
     //     const fetchSubscriptions = async () => {
@@ -106,9 +106,10 @@ const LoadPackagesCheckout: React.FC<{
                     <div className="col-xl-4 col-12 mx-1 h-auto d-flex align-items-lg-center" id="free-sub" style={{ height: '300px' }}>
                         <div className="col-12 mb-3 h-xl-100 h-50" style={{ height: '100%' }}>
                             <button
-                                className={`card align-items-center card-secondary px-3 w-100 h-100 ${(ctx.selectedPackageId === -1 || ctx.selectedPackage === null) && ctx.currentSubscription === null ? 'active' : ''
-                                    }  justify-content-center`}
-                                disabled={ctx.currentSubscription?.id! > -1}
+                                className={`card align-items-center card-secondary px-3 w-100 h-100 ${
+                                    (ctx.selectedPackageId === -1 || ctx.selectedPackage === null) && ctx.currentSubscription === null ? 'active' : ''
+                                }  justify-content-center`}
+                                disabled={ctx.currentSubscription?.subscriptionModel.id! > -1}
                                 onClick={() => handlePackageSelect(null)}
                                 style={renderButtonDisabledStyle(ctx.currentSubscription?.subscriptionModel?.id! > -1)}
                             >
@@ -122,7 +123,7 @@ const LoadPackagesCheckout: React.FC<{
                             </button>
                         </div>
                     </div>
-                    { }
+                    {}
                     <div className="ccol-xl-8 d-flex flex-wrap" id="pay-subs">
                         <div className="d-flex flex-wrap col-12 ">
                             <div className="subscription-packages mt-4 mb-5 d-flex flex-column flex-xl-row justify-content-center align-items-center m-auto">
@@ -133,8 +134,9 @@ const LoadPackagesCheckout: React.FC<{
                                                 <div key={sub.id} className="col-12 col-xl-6 mb-1 p-2 h-lg-50 ">
                                                     <button
                                                         className={`card align-items-center card-secondary px-5 h-md-100  d-flex justify-content-center justify-content-lg-start py-4  
-                                                      ${sub.id === ctx.selectedPackage?.id ? 'active' : ''}    ${sub.id === ctx.currentSubscription?.subscriptionModel?.id! ? 'current-sub' : ''
-                                                            }    ${sub.id === ctx.selectedPackageId ? 'active' : ''}   `}
+                                                      ${sub.id === ctx.selectedPackage?.id ? 'active' : ''}    ${
+                                                            sub.id === ctx.currentSubscription?.subscriptionModel?.id! ? 'current-sub' : ''
+                                                        }    ${sub.id === ctx.selectedPackageId ? 'active' : ''}   `}
                                                         onClick={() => handlePackageSelect(sub)}
                                                         style={{
                                                             ...renderButtonDisabledStyle(sub.id <= ctx.currentSubscription?.subscriptionModel?.id!),

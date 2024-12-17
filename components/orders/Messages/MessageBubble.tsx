@@ -7,10 +7,10 @@ interface MessageBubbleProps {
     status: string;
     isSentByLoggedInUser: boolean;
     read: boolean;
-    order_id: string;
+    // order_id: string;
 }
 
-const MessageBubble: React.FC<MessageBubbleProps> = ({ sender: senderAddress, content, timestamp, status, isSentByLoggedInUser, read, order_id }) => {
+const MessageBubble: React.FC<MessageBubbleProps> = ({ sender: senderAddress, content, timestamp, status, isSentByLoggedInUser, read }) => {
     const formatDate = (timestamp: string) => new Date(timestamp).toLocaleString();
 
     return (
