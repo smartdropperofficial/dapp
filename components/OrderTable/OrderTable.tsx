@@ -11,9 +11,9 @@ import Stack from '@mui/material/Stack';
 import Image from 'next/image';
 import { OrderContext } from '@/store/order-context';
 
-
 function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
-    const { TableOrdersCurrentPage, setTableOrdersCurrentPage, OrderTablePagination, setOrderTablePagination, setOrderTableFilter, OrderTableFilter } = useContext(OrderContext);
+    const { TableOrdersCurrentPage, setTableOrdersCurrentPage, OrderTablePagination, setOrderTablePagination, setOrderTableFilter, OrderTableFilter } =
+        useContext(OrderContext);
     const inputRef = useRef<HTMLInputElement>(null);
     const router = useRouter();
 
@@ -23,7 +23,6 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
     const [sort, setSort] = useState<'asc' | 'desc'>('desc');
     const [orderBy, setOrderBy] = useState<string>('created_at');
     const [currentPage, setCurrentPage] = useState(5);
-
 
     useEffect(() => {
         console.log('🚀 ~ OrderTable ~ ordersProps:', ordersProps);
@@ -35,17 +34,17 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
         setCurrentPage(TableOrdersCurrentPage);
         setItemsPerPage(OrderTablePagination);
         setOrderTableFilter(OrderTableFilter);
-    }, [])
+    }, []);
 
     useEffect(() => {
         setTableOrdersCurrentPage(currentPage);
-    }, [currentPage])
+    }, [currentPage]);
     useEffect(() => {
         setOrderTablePagination(itemsPerPage);
-    }, [itemsPerPage])
+    }, [itemsPerPage]);
     useEffect(() => {
         setOrderTableFilter(OrderTableFilter);
-    }, [OrderTableFilter])
+    }, [OrderTableFilter]);
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearch(e.target.value);
@@ -78,7 +77,7 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
     }, [orders, search, OrderTableFilter]);
     const filterByStatus = (status: OrderStatus) => {
         return filteredOrders.filter(order => order.status === status);
-    }
+    };
     const sortedOrders = useMemo(() => {
         return [...filteredOrders].sort((a, b) => {
             const aValue = a[orderBy as keyof OrderSB];
@@ -117,8 +116,7 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
 
     const handlerFilter = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setOrderTableFilter(e.target.value);
-
-    }
+    };
     const RenderSearch = () => (
         <Form.Control
             ref={inputRef}
@@ -197,7 +195,6 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
             case OrderTableStatus.SHIPPING_ADDRESS_REFUSED.value:
                 return (
                     <span className="col-10 col-xl-8 text-danger text-center my-1 p-2 rounded-2" style={{ backgroundColor: '#ffc7c7' }}>
-
                         <b>{OrderTableStatus.SHIPPING_ADDRESS_REFUSED.description}</b>
                     </span>
                 );
@@ -229,14 +226,13 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
                         style={{ backgroundColor: '#ececec', width: 'fit-content' }}
                     >
                         <option value="">All</option>
-                        {Object.values(OrderTableStatus).map((status) => (
+                        {Object.values(OrderTableStatus).map(status => (
                             <option key={status.value} value={status.value}>
                                 {status.description}
                             </option>
                         ))}
                     </Form.Select>
                 </div>
-
             </Form.Group>
         </div>
     );
@@ -262,7 +258,6 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
                     <th data-key="details" style={{ cursor: 'pointer' }}>
                         Request
                     </th>
-
                 </tr>
             </thead>
             <tbody>
@@ -279,12 +274,12 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
                                 Details
                             </Button>
                         </td>
-                        <td className="align-middle cursor-auto " >
-                            {order?.ticket_id &&
+                        <td className="align-middle cursor-auto ">
+                            {order?.ticket_id && (
                                 <Button style={{ backgroundColor: '#616161' }}>
                                     <FaCommentAlt />
                                 </Button>
-                            }
+                            )}
                         </td>
                         {/* <td className='align-middle'> <Button onClick={order?.ticket_id ? () => openTicketMessages(order?.order_id!) : () => openNewRequest(order?.order_id!)} style={{ backgroundColor: order?.ticket_id ? '#616161' : '#primary' }}
                         > {order?.ticket_id ? <>See Request</> : <>Open Request</>} </Button></td> */}
