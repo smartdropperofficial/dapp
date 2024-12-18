@@ -9,7 +9,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const amazon_api = req.query.amazon_api;
             // console.log("🚀 ~  api/getAmountToPay ~ encryptedTaxRequestId:", encryptedTaxRequestId);
             const taxRequestId: string = decryptData(encryptedTaxRequestId as string);
-            // console.log("🚀 ~  api/getAmountToPay ~ taxRequestId:", taxRequestId);
+            console.log('🚀 ~  api/getAmountToPay ~ taxRequestId:', taxRequestId);
 
             // const concatenatedString = process.env.NEXT_PUBLIC_ZINC_API_KEY!;
 
@@ -41,7 +41,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     res.status(200).json({ error: amazonResponse.code });
                 }
             } else {
-                res.status(401).json({});
+                console.error('🚀 ~  api/getAmountToPay ~ taxRequestId: Tax Request Id not found', taxRequestId);
+                res.status(401).json({ error: 'Tax Request Id not found' });
             }
         } catch {
             res.status(400).json({});
