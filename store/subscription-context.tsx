@@ -127,24 +127,18 @@ const SubscriptionContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
             } else if (
                 currentSubscription && // se c'è un abbonamento attivo
                 currentSubscription?.subscriptionModel?.shopLimit! > 0 && // se c'è un limite impostato per lo shop
-                currentSubscription?.monthlyBudget! >= currentSubscription?.subscriptionModel?.shopLimit! // se il limite è stato raggiunto
+                currentSubscription?.monthlyBudget! <= 0 // se il limite è stato raggiunto
             ) {
                 console.log(
                     '🚀 ~ useEffect ~ currentSubscription?.totShopAmountPaid! >= currentSubscription?.subscriptionModel.shopLimit!:',
-                    currentSubscription?.monthlyBudget! >= currentSubscription?.subscriptionModel?.shopLimit!
+                    currentSubscription?.monthlyBudget! <= 0
                 );
 
                 setCanPay(false);
-            } else if (
-                currentSubscription &&
-                currentSubscription?.subscriptionModel?.shopLimit! > 0 &&
-                currentSubscription?.monthlyBudget! < currentSubscription?.subscriptionModel?.shopLimit!
-            ) {
+            } else if (currentSubscription && currentSubscription?.subscriptionModel?.shopLimit! > 0 && currentSubscription?.monthlyBudget! > 0) {
                 console.log(
                     '🚀 ~ useEffect ~ currentSubscription?.totShopAmountPaid! >= currentSubscription?.subscriptionModel.shopLimit!:',
-                    currentSubscription &&
-                        currentSubscription?.subscriptionModel?.shopLimit! > 0 &&
-                        currentSubscription?.monthlyBudget! < currentSubscription?.subscriptionModel?.shopLimit!
+                    currentSubscription && currentSubscription?.subscriptionModel?.shopLimit! > 0 && currentSubscription?.monthlyBudget! > 0
                 );
 
                 setCanPay(true);
