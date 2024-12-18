@@ -260,18 +260,12 @@ const AddProducts = () => {
                             placeholder="Insert Amazon Item Link"
                             onChange={e => setLink(e.target.value)}
                             value={link}
-                            disabled={
-                                subContext.currentSubscription?.subscriptionModel?.shopLimit !== 0 &&
-                                subContext.currentSubscription?.monthlyBudget! >= subContext.currentSubscription?.subscriptionModel?.shopLimit!
-                            }
+                            disabled={subContext.currentSubscription?.subscriptionModel?.shopLimit! > 0 && subContext.currentSubscription?.monthlyBudget! <= 0}
                         />
                         <button
                             className="btn btn-add-in sn btn-primary  rounded-0 "
                             onClick={addProduct}
-                            disabled={
-                                subContext.currentSubscription?.subscriptionModel?.shopLimit !== 0 &&
-                                subContext.currentSubscription?.monthlyBudget! >= subContext.currentSubscription?.subscriptionModel?.shopLimit!
-                            }
+                            disabled={subContext.currentSubscription?.subscriptionModel?.shopLimit! > 0 && subContext.currentSubscription?.monthlyBudget! <= 0}
                         >
                             Add Item
                         </button>
