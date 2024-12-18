@@ -93,7 +93,7 @@ const OrderSummary: React.FC = () => {
     //     console.log(`[${formattedDate}] ${message}`);
     // }
     useEffect(() => {
-        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        window.scrollTo({ top: document.body.scrollHeight / 2, behavior: 'smooth' });
     }, []);
     // Stato per il reCAPTCHA
     const [isCaptchaVerified, setIsCaptchaVerified] = useState(false);
@@ -446,8 +446,15 @@ const OrderSummary: React.FC = () => {
                 <div className="my-4 mx-3 text-end ">
                     <div className="d-flex justify-content-between col-12">
                         <div>
-                            <b>Crypto/Fiat exchange fees: </b>
-                            {/* <Image src="/icons/1inch.png" alt="" height={20} style={{ aspectRatio: 'auto' }} /> */}
+                            <div className="d-flex ">
+                                <b>Crypto/Fiat exchange fees: </b>
+                                {exchangeFees ? (
+                                    <Image src="/icons/1inch.png" alt="" height={20} style={{ aspectRatio: 'auto' }} className="mx-3" />
+                                ) : (
+                                    <Skeleton height={20} count={1} style={{ width: '50px' }} />
+                                )}
+                            </div>
+                            {/* <Image src="/icons/1inch.png" height={50} width={50} style={{ objectFit: 'contain' }} /> */}
                         </div>
                         <p className="col-2 ">${exchangeFees ? exchangeFees?.toFixed(2) : <Skeleton height={20} count={1} style={{ width: '50px' }} />}</p>
                     </div>
