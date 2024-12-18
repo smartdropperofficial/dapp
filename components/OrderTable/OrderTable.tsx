@@ -164,6 +164,12 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
                         <b>{OrderTableStatus.WAITING_TAX.description}</b>
                     </span>
                 );
+            case OrderTableStatus.CREATED.value:
+                return (
+                    <span className="col-10 col-xl-8 text-center my-1 p-2 rounded-2" style={{ backgroundColor: '#ffeeb1', color: '#a96500' }}>
+                        <b>{OrderTableStatus.CREATED.description}</b>
+                    </span>
+                );
 
             case OrderTableStatus.ERROR.value:
                 return (
