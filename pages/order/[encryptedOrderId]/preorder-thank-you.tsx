@@ -48,8 +48,8 @@ const OrderCompleted = () => {
                                     )}
                                 /> */}
                                     <span className="d-block mt-2">
-                                        Grab a coffee while we elaborate your order <br></br>
-                                        <strong className="text-primary"> on blockchain!</strong>
+                                        <br></br>
+                                        <strong className="text-primary"> Grab a coffee while we elaborate your order! </strong>
                                     </span>
                                 </h1>
                                 <div className="img-check-completed position-relative d-flex justify-content-center">
