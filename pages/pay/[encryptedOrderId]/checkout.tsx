@@ -602,15 +602,15 @@ const Checkout = () => {
                                                                             <span>
                                                                                 <b>Limit:</b>
                                                                             </span>
-                                                                            <span className="text-success mx-2">
+                                                                            <span className=" fw-bold mx-2">
                                                                                 ${subsContext?.currentSubscription?.subscriptionModel?.shopLimit!.toFixed(2)}
                                                                             </span>
                                                                         </li>
                                                                         <li className="m-0 text-center text-lg-start">
                                                                             <span>
-                                                                                <b>Spent:</b>
+                                                                                <b>Budget left:</b>
                                                                             </span>
-                                                                            <span className="text-danger mx-2">
+                                                                            <span className="text-success mx-2">
                                                                                 ${subsContext.currentSubscription?.monthlyBudget!.toFixed(2)}
                                                                             </span>
                                                                         </li>
