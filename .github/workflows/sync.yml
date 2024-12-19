@@ -3,7 +3,7 @@ name: Sync Branches
 on:
     push:
         branches:
-            - pre-order
+            - pre-order # Trigger quando ci sono modifiche su 'pre-order'
 
 jobs:
     sync:
@@ -11,7 +11,7 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@v2
+              uses: actions/checkout@v3
 
             - name: Fetch all branches
               run: git fetch --all
