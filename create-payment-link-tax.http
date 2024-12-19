@@ -1,0 +1,7 @@
+### Test POST request to create-payment-link-tax
+POST http://localhost:3000/api/create-payment-link-tax
+Content-Type: application/json
+
+{
+  "order_id": "1356-255469-5017"
+}

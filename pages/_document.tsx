@@ -24,6 +24,7 @@ export default function Document() {
                 <div id="modal"></div>
                 <Script src="https://kit.fontawesome.com/400bd53359.js" strategy="lazyOnload" />
                 <Script src="https://integrate.depay.com/widgets/v12.js" strategy="afterInteractive" async defer />
+                <script src="https://commerce.coinbase.com/v1/checkout.js"></script>
             </body>
         </Html>
     );

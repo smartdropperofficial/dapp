@@ -34,6 +34,7 @@ import { OrderContext } from '@/store/order-context';
 import CoinbaseButton from '@/components/UI/CoinbaseButton';
 import Skeleton from 'react-loading-skeleton';
 import useConfiguration from '@/hooks/Database/subscription/useConfiguration';
+import CoinbasePaymentButtonTax from '@/components/UI/CoinbasePaymentButtonTax';
 const Checkout = () => {
     const { getExchangeTax } = useOrderManagement();
     const { getTaxOwnerWallet } = useConfiguration();
@@ -994,7 +995,7 @@ const Checkout = () => {
                                                             <b>Pay to confirm order</b>
                                                         </h4>
                                                     </div>
-                                                    <button
+                                                    {/* <button
                                                         disabled={subsContext.canPay === false}
                                                         className={`btn form-control  mt-2 col-12 col-xl-10 ${
                                                             subsContext.canPay === false ? 'btn-disabled' : 'btn-success'
@@ -1012,7 +1013,8 @@ const Checkout = () => {
                                                                 exchangeFees!
                                                             ).toFixed(2)
                                                         )}
-                                                    </button>
+                                                    </button> */}
+                                                    <CoinbasePaymentButtonTax orderId={order?.order_id!} />
 
                                                     {subsContext.currentSubscription! && subsContext.canPay === false ? (
                                                         <span className="text-danger mt-2">You have exceeded your monthly limit</span>
