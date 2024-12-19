@@ -1,26 +1,26 @@
 name: Sync Branches
 
 on:
-    push:
-        branches:
-            - pre-order # Trigger quando ci sono modifiche su 'pre-order'
+  push:
+    branches:
+      - pre-order  # Trigger quando ci sono modifiche su 'pre-order'
 
 jobs:
-    sync:
-        runs-on: ubuntu-latest
+  sync:
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v3
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-            - name: Fetch all branches
-              run: git fetch --all
+      - name: Fetch all branches
+        run: git fetch --all
 
-            - name: Sync child branches
-              run: |
-                  for branch in $(git branch -r | grep 'origin/' | grep -v 'origin/HEAD' | grep -v 'origin/main' | grep -v 'origin/pre-order'); do
-                    branch_name=$(echo $branch | sed 's|origin/||')
-                    echo "Syncing $branch_name with pre-order"
-                    git checkout $branch_name
-                    git rebase pre-order || (echo "Conflict detected during rebase on $branch_name!" && exit 1)
-                  done
+      - name: Sync child branches
+        run: |
+          for branch in $(git branch -r | grep 'origin/' | grep -v 'origin/HEAD' | grep -v 'origin/main' | grep -v 'origin/pre-order'); do
+            branch_name=$(echo $branch | sed 's|origin/||')
+            echo "Syncing $branch_name with pre-order"
+            git checkout $branch_name
+            git rebase pre-order || (echo "Conflict detected during rebase on $branch_name!" && exit 1)
+          done
