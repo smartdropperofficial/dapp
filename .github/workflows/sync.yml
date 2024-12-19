@@ -3,7 +3,7 @@ name: Sync Branches
 on:
   push:
     branches:
-      - pre-order
+      - main-pre-order
 jobs:
   sync:
     runs-on: ubuntu-latest
@@ -15,9 +15,9 @@ jobs:
       - name: Sync child branches
         run: >
           for branch in $(git branch -r | grep 'origin/' | grep -v 'origin/HEAD' |
-          grep -v 'origin/main' | grep -v 'origin/pre-order'); do
+          grep -v 'origin/main' | grep -v 'origin/main-pre-order'); do
             branch_name=$(echo $branch | sed 's|origin/||')
-            echo "Syncing $branch_name with pre-order"
+            echo "Syncing $branch_name with main-pre-order"
             git checkout $branch_name
-            git rebase pre-order || (echo "Conflict detected during rebase on $branch_name!" && exit 1)
+            git rebase main-pre-order || (echo "Conflict detected during rebase on $branch_name!" && exit 1)
           done
