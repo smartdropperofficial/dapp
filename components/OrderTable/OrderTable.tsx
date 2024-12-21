@@ -219,10 +219,10 @@ function OrderTable({ ordersProps }: { ordersProps: OrderSB[] }) {
         router.push(`/pay/${tmpEnc}/checkout`);
     };
     const RenderStatusFilter = () => (
-        <div className="d-flex col-lg-6 col-6 justify-content-lg-end justify-content-center align-items-center">
+        <div className="d-flex col-lg-6 col-12 justify-content-lg-end justify-content-center align-items-center">
             <Form.Group as={Col} controlId="status" className="my-2">
-                <div className="d-flex col-lg-6 col-8 justify-content-lg-start justify-content-center align-items-center">
-                    <Form.Label className="d-flex col-lg-6 col-12 align-items-lg-start mb-0 text-start">Filter by Status</Form.Label>
+                <div className="d-flex col-lg-6 col-12 justify-content-lg-start justify-content-center align-items-center flex-column flex-lg-row">
+                    <Form.Label className="d-flex col-lg-6 col-12 align-items-lg-start justify-content-center  mb-0 text-start">Filter by Status</Form.Label>
                     <Form.Select
                         value={OrderTableFilter}
                         onChange={handlerFilter}
