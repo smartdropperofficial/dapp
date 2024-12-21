@@ -448,11 +448,11 @@ const OrderSummary: React.FC = () => {
                         <div>
                             <div className="d-flex ">
                                 <b>Crypto/Fiat exchange fees: </b>
-                                {exchangeFees ? (
+                                {/* {exchangeFees ? (
                                     <Image src="/icons/1inch.png" alt="" height={20} style={{ aspectRatio: 'auto' }} className="mx-3" />
                                 ) : (
                                     <Skeleton height={20} count={1} style={{ width: '50px' }} />
-                                )}
+                                )}    */}
                             </div>
                             {/* <Image src="/icons/1inch.png" height={50} width={50} style={{ objectFit: 'contain' }} /> */}
                         </div>
@@ -511,10 +511,10 @@ const OrderSummary: React.FC = () => {
                                                     });
                                                 } else {
                                                     setIsCaptchaVerified(false);
-                                                    Swal.fire({
-                                                        title: 'Captcha verification error!',
-                                                        icon: 'error',
-                                                    });
+                                                    // Swal.fire({
+                                                    //     title: 'Captcha verification error!',
+                                                    //     icon: 'error',
+                                                    // });
                                                 }
                                             }}
                                         />

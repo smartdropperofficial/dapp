@@ -172,7 +172,7 @@ const OrderProduct: React.FC<IMyOrderProductProps> = ({ product, order }) => {
                 {order?.pre_order_payment_tx && !order?.creation_tx && (
                     <div className="d-flex col-12">
                         <span className="disclaimer alert alert-warning my-1 text-center col-12">
-                            * If you don&apos;t see any <b> Order code</b> 1 hour after Order Payment and Order Confirmation, contact support on Telegram
+                            * If you don&apos;t see any UPDATE within <b> 24 hours</b> after Order Payment and Order Confirmation, contact support on Telegram
                         </span>
                     </div>
                 )}

@@ -12,7 +12,7 @@ import { useAccount, useDisconnect } from 'wagmi'; // Assicurati di avere useAcc
 
 import ModalOverlay from './ModalOverlay';
 import Loading from './Loading';
-import { ReCAPTCHA } from 'react-google-recaptcha';
+import ReCAPTCHA from 'react-google-recaptcha';
 import Swal from 'sweetalert2';
 
 const Layout: React.FC<{ children: React.ReactNode }> = props => {
